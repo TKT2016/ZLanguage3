@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D6ED0D5E-D787-4AA6-B814-13ECD88CA14A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZCompileDesc</RootNamespace>
+    <AssemblyName>ZyyDesc</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\IZDescTypeDictionary.cs" />
+    <Compile Include="Collections\IZTypeDictionary.cs" />
+    <Compile Include="Collections\IWordDictionaryList.cs" />
+    <Compile Include="Collections\NamingList.cs" />
+    <Compile Include="Descriptions\ArgDescriptions\ZArg.cs" />
+    <Compile Include="Descriptions\ArgDescriptions\ZParam.cs" />
+    <Compile Include="Descriptions\BracketDescriptions\ZBracketCallDesc.cs" />
+    <Compile Include="Descriptions\BracketDescriptions\ZBracketDefDesc.cs" />
+    <Compile Include="Descriptions\ICallDesc.cs" />
+    <Compile Include="Descriptions\IDefDesc.cs" />
+    <Compile Include="Descriptions\ProcDescriptions\ZCallDesc.cs" />
+    <Compile Include="Descriptions\ProcDescriptions\ZConstructorDesc.cs" />
+    <Compile Include="Descriptions\ProcDescriptions\ZMethodDesc.cs" />
+    <Compile Include="Descriptions\ProcDescriptions\ZNewDesc.cs" />
+    <Compile Include="Descriptions\ProcDescriptions\ZProcDescBase.cs" />
+    <Compile Include="Utils\EnumerableHelper.cs" />
+    <Compile Include="ZLangBasicTypes.cs" />
+    <Compile Include="Utils\ZDescriptionHelper.cs" />
+    <Compile Include="ZTypes\ZAssemblyDesc.cs" />
+    <Compile Include="ZLibRTException.cs" />
+    <Compile Include="ZTypes\ZPackageDesc.cs" />
+    <Compile Include="Collections\ZPackageDescList.cs" />
+    <Compile Include="Collections\IWordDictionary.cs" />
+    <Compile Include="Utils\IWordDictionaryHelper.cs" />
+    <Compile Include="Utils\ZDescTypeListHelper.cs" />
+    <Compile Include="Utils\ZTypeListHelper.cs" />
+    <Compile Include="Words\WordData.cs" />
+    <Compile Include="Collections\WordDictionary.cs" />
+    <Compile Include="Words\WordInfo.cs" />
+    <Compile Include="Words\WordKind.cs" />
+    <Compile Include="ZMembers\ZEnumItemInfo.cs" />
+    <Compile Include="ZMembers\ZFieldInfo.cs" />
+    <Compile Include="ZMembers\ZMemberInfo.cs" />
+    <Compile Include="ZMembers\ZConstructorInfo.cs" />
+    <Compile Include="ZMembers\ZMethodInfo.cs" />
+    <Compile Include="ZMembers\ZPropertyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ZTypes\IZDescType.cs" />
+    <Compile Include="ZTypes\ZClassType.cs" />
+    <Compile Include="ZTypes\ZEnumType.cs" />
+    <Compile Include="ZTypes\ZDimType.cs" />
+    <Compile Include="ZTypes\ZType.cs" />
+    <Compile Include="ZTypeManager.cs" />
+    <Compile Include="ZTypes\ZTypeUtil.cs" />
+    <Compile Include="Utils\ZCodeParser.cs" />
+    <Compile Include="Utils\ProcDescHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZLangRT\ZLangRT.csproj">
+      <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
+      <Name>ZLangRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
+      <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>
+      <Name>Z语言系统</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

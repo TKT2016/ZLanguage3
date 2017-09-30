@@ -1,0 +1,5 @@
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileKit\bin\Debug\ZCompileKit.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileKit\bin\Debug\ZCompileKit.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileKit\obj\Debug\ZCompileKit.csprojResolveAssemblyReference.cache
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileKit\obj\Debug\ZCompileKit.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileKit\obj\Debug\ZCompileKit.pdb

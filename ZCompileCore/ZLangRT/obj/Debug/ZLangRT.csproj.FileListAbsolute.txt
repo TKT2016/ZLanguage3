@@ -1,0 +1,5 @@
+E:\ProgProj\Z\Z3\ZCompileCore2\ZLangRT\bin\Debug\ZLangRT.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZLangRT\bin\Debug\ZLangRT.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\ZLangRT\obj\Debug\ZLangRT.csprojResolveAssemblyReference.cache
+E:\ProgProj\Z\Z3\ZCompileCore2\ZLangRT\obj\Debug\ZLangRT.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZLangRT\obj\Debug\ZLangRT.pdb

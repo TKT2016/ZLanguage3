@@ -1,0 +1,9 @@
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\obj\Debug\ZGameEngine.csprojResolveAssemblyReference.cache
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\bin\Debug\ZGameEngine.dll
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\bin\Debug\ZGameEngine.pdb
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\bin\Debug\OpenTK.dll
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\bin\Debug\OpenTK.GLControl.dll
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\bin\Debug\ZOpen2D.dll
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\bin\Debug\ZOpen2D.pdb
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\obj\Debug\ZGameEngine.dll
+E:\ProgProj\Z\Z3\ZGameEngine\ZGameEngine\obj\Debug\ZGameEngine.pdb

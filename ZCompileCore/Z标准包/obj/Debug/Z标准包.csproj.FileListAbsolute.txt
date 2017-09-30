@@ -1,0 +1,9 @@
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\bin\Debug\Z标准包.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\bin\Debug\Z标准包.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\bin\Debug\ZLangRT.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\bin\Debug\Z语言系统.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\bin\Debug\ZLangRT.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\bin\Debug\Z语言系统.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\obj\Debug\Z标准包.csprojResolveAssemblyReference.cache
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\obj\Debug\Z标准包.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\Z标准包\obj\Debug\Z标准包.pdb

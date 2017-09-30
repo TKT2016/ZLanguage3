@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E67A9E30-33BF-4396-8EAD-2D100B3DB84A}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZCompiler</RootNamespace>
+    <AssemblyName>ZCompiler</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CompileCmdModel.cs" />
+    <Compile Include="MainEntry.cs" />
+    <Compile Include="Const.cs" />
+    <Compile Include="ProjectCompiler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FileCompiler.cs" />
+    <Compile Include="ZProjFileParser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sample\测试返回值.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\你好.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试异常.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试窗体.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试选择结构.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试循环.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试列表每一个.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试定时器.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试Lambda1.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试强制转换.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试打印乘法.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试属性默认值.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试文件创建.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\测试矩形构造函数.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\test.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="项目说明.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZCompileCore\ZCompileCore.csproj">
+      <Project>{47777972-9e15-4ab2-89dc-a6c988864847}</Project>
+      <Name>ZCompileCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZCompileDesc\ZCompileDesc.csproj">
+      <Project>{d6ed0d5e-d787-4aa6-b814-13ecd88ca14a}</Project>
+      <Name>ZCompileDesc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZCompileKit\ZCompileKit.csproj">
+      <Project>{0744fe01-7ebf-42ca-ac05-869ec1d24f6c}</Project>
+      <Name>ZCompileKit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZLangRT\ZLangRT.csproj">
+      <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
+      <Name>ZLangRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Z标准包\Z标准包.csproj">
+      <Project>{d52c5bd7-dd7d-459a-9953-8b3972fdf2b1}</Project>
+      <Name>Z标准包</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
+      <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>
+      <Name>Z语言系统</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

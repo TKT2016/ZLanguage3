@@ -1,0 +1,9 @@
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\ZyyDesc.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\ZyyDesc.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\ZLangRT.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\Z语言系统.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\ZLangRT.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\Z语言系统.pdb
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\obj\Debug\ZCompileDesc.csprojResolveAssemblyReference.cache
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\obj\Debug\ZyyDesc.dll
+E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\obj\Debug\ZyyDesc.pdb
