@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4B25DB15-5A2E-4315-B83C-3FC1FB0E635F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZLogoCompiler</RootNamespace>
+    <AssemblyName>ZLogoCompiler</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LogoCompiler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ZCompileCore\ZCompileCore\ZCompileCore.csproj">
+      <Project>{47777972-9e15-4ab2-89dc-a6c988864847}</Project>
+      <Name>ZCompileCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZCompileCore\ZCompileKit\ZCompileKit.csproj">
+      <Project>{0744fe01-7ebf-42ca-ac05-869ec1d24f6c}</Project>
+      <Name>ZCompileKit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZCompileCore\ZLangRT\ZLangRT.csproj">
+      <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
+      <Name>ZLangRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZCompileCore\ZCompileDesc\ZCompileDesc.csproj">
+      <Project>{d6ed0d5e-d787-4aa6-b814-13ecd88ca14a}</Project>
+      <Name>ZCompileDesc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZCompileCore\Z语言系统\Z语言系统.csproj">
+      <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>
+      <Name>Z语言系统</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZGameEngine\ZOpen2D\ZOpen2D.csproj">
+      <Project>{842c496b-f32a-4ce6-9d92-285f4f7cbc9f}</Project>
+      <Name>ZOpen2D</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZLogoEngine\ZLogoEngine.csproj">
+      <Project>{e0461ca9-202a-4c24-9b93-25a466c768a0}</Project>
+      <Name>ZLogoEngine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,13 @@
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZCompileCore.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZCompileCore.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZCompileKit.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZLangRT.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\Z语言系统.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZCompileKit.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZLangRT.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\Z语言系统.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\obj\Release\ZCompileCore.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\obj\Release\ZCompileCore.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\obj\Release\ZCompileCore.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZCompileDesc.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Release\ZCompileDesc.pdb
