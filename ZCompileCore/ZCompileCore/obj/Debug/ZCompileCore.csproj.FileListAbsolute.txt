@@ -11,3 +11,16 @@ E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileCore\bin\Debug\ZLangRT.pdb
 E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileCore\bin\Debug\Z语言系统.pdb
 E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileCore\obj\Debug\ZCompileCore.dll
 E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileCore\obj\Debug\ZCompileCore.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZCompileCore.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZCompileCore.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZCompileDesc.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZCompileKit.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZLangRT.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\Z语言系统.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZCompileDesc.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZCompileKit.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\ZLangRT.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\bin\Debug\Z语言系统.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\obj\Debug\ZCompileCore.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\obj\Debug\ZCompileCore.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileCore\obj\Debug\ZCompileCore.pdb

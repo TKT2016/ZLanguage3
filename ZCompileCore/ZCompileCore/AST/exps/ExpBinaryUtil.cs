@@ -43,7 +43,7 @@ namespace ZCompileCore.AST
             }
             if (opKind == TokenKind.EQ || opKind == TokenKind.NE)
             {
-                if (Calculater.IsNumber(ltype) && Calculater.IsNumber(rtype))
+                if (Calculater.IsNumberType(ltype) && Calculater.IsNumberType(rtype))
                 {
                     return CalculaterMethodTypeEnum.MathCompare;
                 }
@@ -121,7 +121,7 @@ namespace ZCompileCore.AST
         {
             if (ltype == typeof(bool) && rtype == typeof(bool)) return "Bool";
             if (ltype == typeof(int) && rtype == typeof(int)) return "Int";
-            if (Calculater.IsNumber(ltype) && Calculater.IsNumber(rtype)) return "Float";
+            if (Calculater.IsNumberType(ltype) && Calculater.IsNumberType(rtype)) return "Float";
             return "Ref";
         }
     }

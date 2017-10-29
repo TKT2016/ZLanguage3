@@ -88,20 +88,6 @@ namespace ZCompileCore.Contexts
             CurrentTable.ParentTable = SuperTable;
         }
 
-        //public SymbolDefMember FindMember(string name)
-        //{
-        //    if(MemberDictionary.ContainsKey(name))
-        //    {
-        //        SymbolDefMember member = MemberDictionary.Get(name);
-        //        return member;
-        //    }
-        //    if (IsStaticClass) return null;
-        //    ZMemberInfo zmember = BaseZType.SearchZMember(name);
-        //    if (zmember == null) return null;
-        //    SymbolDefMember symbol = SymbolDefMember.Create(name,zmember);
-        //    return symbol;
-        //}
-
         public ZMethodDesc[] SearchThisProc(ZCallDesc procDesc)
         {
             return ProcManagerContext.SearchProc(procDesc);
@@ -115,20 +101,5 @@ namespace ZCompileCore.Contexts
             public ISymbolDocumentWriter IDoc { get;  set; }
         }
 
-        //IWordDictionaryList _WordCollection;
-        //public IWordDictionary ClassWordDictionary
-        //{
-        //    get
-        //    {
-        //        if (_WordCollection == null)
-        //        {
-        //            _WordCollection = new IWordDictionaryList();
-        //            _WordCollection.Add(this.FileContext.ImportContext.ImportPackageDescList);
-        //            _WordCollection.Add(this.PropertyContext.Dict);
-        //            //_WordCollection.AddRange(this.ProcManagerContext.GetWordCollection());
-        //        }
-        //        return _WordCollection;
-        //    }
-        //}
     }
 }

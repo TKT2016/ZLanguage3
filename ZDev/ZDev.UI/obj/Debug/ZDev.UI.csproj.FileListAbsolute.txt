@@ -51,3 +51,6 @@ E:\ProgProj\Z\Z3\ZDev\ZDev.UI\obj\Debug\ZDev.UI.Properties.Resources.resources
 E:\ProgProj\Z\Z3\ZDev\ZDev.UI\obj\Debug\ZDev.UI.csproj.GenerateResource.Cache
 E:\ProgProj\Z\Z3\ZDev\ZDev.UI\obj\Debug\ZDev.exe
 E:\ProgProj\Z\Z3\ZDev\ZDev.UI\obj\Debug\ZDev.pdb
+E:\MySource\Zyy\Z3\ZDev\ZDev.UI\bin\Debug\ZDev.exe.config
+E:\MySource\Zyy\Z3\ZDev\ZDev.UI\obj\Debug\ZDev.exe
+E:\MySource\Zyy\Z3\ZDev\ZDev.UI\obj\Debug\ZDev.pdb

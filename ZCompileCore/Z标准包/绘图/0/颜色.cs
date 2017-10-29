@@ -9,7 +9,7 @@ using ZLangRT.Attributes;
 
 namespace Z标准包.绘图
 {
-    [ZEnum(typeof(Color))]
+    [ZStatic(typeof(Color))]
     public class 颜色
     {
         [ZCode("红色")]

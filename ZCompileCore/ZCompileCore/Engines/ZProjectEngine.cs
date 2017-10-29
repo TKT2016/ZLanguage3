@@ -20,7 +20,7 @@ namespace ZCompileCore.Engines
     public class ZProjectEngine
     {
         ContextProject projectContext;
-        //ProjectCompileResult result;
+
         ZProjectModel projectModel;
 
         List<FileEnum> enumeFiles;

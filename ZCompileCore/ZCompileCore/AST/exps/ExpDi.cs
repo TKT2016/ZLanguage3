@@ -42,7 +42,7 @@ namespace ZCompileCore.AST
 
             if (Property == null)
             {
-                ErrorE(SubjectExp.Postion, "不存在索引");
+                ErrorE(SubjectExp.Position, "不存在索引");
             }
             else
             {

@@ -39,7 +39,7 @@ namespace ZCompileCore.AST
 
             if (LeftExp.RetType is ZEnumType)
             {
-                ErrorE(RightExp.Postion, "约定没有属性");
+                ErrorE(RightExp.Position, "约定没有属性");
             }
             else if (LeftExp.RetType is ZClassType)
             {
@@ -47,7 +47,7 @@ namespace ZCompileCore.AST
                 ZMember = zclass.SearchZMember(propertyName);
                 if (ZMember == null)
                 {
-                    ErrorE(LeftExp.Postion, "不存在'{0}'属性", propertyName);
+                    ErrorE(LeftExp.Position, "不存在'{0}'属性", propertyName);
                 }
                 else
                 {
@@ -78,7 +78,7 @@ namespace ZCompileCore.AST
             }
             else
             {
-                ErrorE(RightExp.Postion, "'的'后面的‘{0}’不是属性名称", RightExp.ToString());
+                ErrorE(RightExp.Position, "'的'后面的‘{0}’不是属性名称", RightExp.ToString());
             }
             return false;
         }
@@ -194,11 +194,11 @@ namespace ZCompileCore.AST
             return buf.ToString();
         }
         
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {
-                return LeftExp.Postion; 
+                return LeftExp.Position; 
             }
         }
         #endregion

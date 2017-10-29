@@ -16,7 +16,7 @@ namespace ZCompiler
             if (args.Length == 0)
             {
                 args = new string[] { "Sample/test.zyy" };
-                //args = new string[] { "Sample/测试打印乘法.zyy" };
+                args = new string[] { "Sample/测试重复.zyy" };
                 //args = new string[] { "Sample/测试矩形构造函数.zyy" };
                 //args = new string[] { "Sample/测试强制转换.zyy" };
                 //args = new string[] { "Sample/测试属性默认值.zyy" };

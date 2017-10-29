@@ -76,11 +76,11 @@ namespace ZCompileCore.AST
             return SrcExp.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {
-                return SrcExp.Postion; ;
+                return SrcExp.Position; ;
             }
         }
         #endregion

@@ -33,7 +33,7 @@ namespace ZCompileCore.AST
             return PartNameToken.GetText();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {

@@ -111,7 +111,7 @@ namespace ZCompileCore.AST
             ZConstructorInfo ZConstructor = SearchZConstructor();
             if (ZConstructor == null)
             {
-                ErrorE(BracketExp.Postion, "没有正确的创建过程");
+                ErrorE(BracketExp.Position, "没有正确的创建过程");
             }
             else
             {

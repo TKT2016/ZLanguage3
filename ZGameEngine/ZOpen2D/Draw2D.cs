@@ -36,25 +36,19 @@ namespace ZGameEngine.Graphics
             return y / HalfHeight;
         }
 
-        //private int i = 0;
-        public void DrawTexture(Texture2D texture, Vector2 position,float angle)
+        public void DrawTextureGL(Texture2D texture, float px, float py, float angle)
         {
-            float px = getGLX(position.X);
-            float py = getGLY(position.Y);
-
             GL.PushMatrix();
             GL.Translate(px, py, 0f);
             //GL.Scale(Scale.X, Scale.Y, 1f);
             GL.Rotate(angle, Vector3.UnitZ);//GL.Rotate(Rotation, 0f, 0f, 1f);
             Color color = Color.White;
             GL.Color4(color.R, color.G, color.B, (byte)255);
-
             GL.BindTexture(TextureTarget.Texture2D, texture.Id);
-
             GL.Begin(PrimitiveType.Quads);
 
-           // float w = Origin.X / (Texture.Texture.Width / 1);
-           // float h = Origin.Y / (Texture.Texture.Height / 1);
+            // float w = Origin.X / (Texture.Texture.Width / 1);
+            // float h = Origin.Y / (Texture.Texture.Height / 1);
             float wx = getGLX(texture.HalfWidth);
             float wy = getGLY(texture.HalfHeight);
 
@@ -69,7 +63,13 @@ namespace ZGameEngine.Graphics
             GL.End();
 
             GL.PopMatrix();
-       
+        }
+        
+        public void DrawTexture(Texture2D texture, Vector2 position,float angle)
+        {
+            float px = getGLX(position.X);
+            float py = getGLY(position.Y);
+            DrawTextureGL(texture,px,py,angle);
         }
 
         public void DrawLine(Vector2 start, Vector2 end, float lineWidth, Color lineColor)
@@ -106,6 +106,104 @@ namespace ZGameEngine.Graphics
             var blue = color.B;
             GL.ClearColor(red, green, blue, 0.0f);
             //GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        }
+
+        public Bitmap GetSceneImage()
+        {
+            int width = (int)this.Width;
+            int height = (int)this.Height;
+            int x = 0;
+            int y = 0;
+            var format = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+            var lockMode = System.Drawing.Imaging.ImageLockMode.WriteOnly;
+            Bitmap bitmap = new Bitmap(width, height, format);
+            var bitmapRect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+            System.Drawing.Imaging.BitmapData bmpData = bitmap.LockBits(bitmapRect, lockMode, format);
+            GL.ReadPixels(x, y, width, height, GlPixelFormat.Rgba, PixelType.UnsignedByte, bmpData.Scan0);
+            //GL.ReadPixels(x, y, width, height, GL.GL_BGRA, GL.GL_UNSIGNED_BYTE, bmpData.Scan0);
+            bitmap.UnlockBits(bmpData);
+            bitmap.RotateFlip(RotateFlipType.Rotate180FlipX);
+
+            //bitmap.Save(fileName);
+            return bitmap;
+        }
+
+        public void SaveSceneImage(string fileName)
+        {
+            Bitmap bitmap = GetSceneImage();
+            bitmap.Save(fileName);
+
+           /*
+            var pdata = new UnmanagedArray<Pixel>(width * height);
+
+             GL.ReadPixels(0,0, width,height, GlPixelFormat.Rgb,PixelType.Bitmap,)//  GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, pdata.Header);
+             var bitmap = new Bitmap(width, height);
+             int index = 0;
+             for (int j = height - 1; j >= 0; j--)
+             {
+                 for (int i = 0; i < width; i++)
+                 {
+                     Pixel v = pdata[index++];
+                     Color c = v.ToColor();
+                     bitmap.SetPixel(i, j, c);
+                 }
+             }
+ 
+             bitmap.Save(fileName);*/
+            /*
+         GLint ViewPort[4];
+         GL.GetInteger(); glGetIntegerv(GL_VIEWPORT,ViewPort);
+         GLsizei ColorChannel = 3;
+         GLsizei bufferSize = ViewPort[2]*ViewPort[3]*sizeof(GLubyte)*ColorChannel;
+         GLubyte * ImgData = (GLubyte*)malloc(bufferSize);
+ 
+          GL.PixelStore();// glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+         GL.ReadPixels();// glReadPixels(ViewPort[0],ViewPort[1],ViewPort[2],ViewPort[3],GL_RGB,GL_UNSIGNED_BYTE,ImgData);
+ 
+         FILE * saveTxt=NULL;
+         saveTxt=fopen("H:\\Data\\saveImage.txt","w");
+         if (!saveTxt)
+         {
+          cout<<"Cannot save the RGB value！"<<endl;
+          getchar();
+         }
+         for (int i=0;i
+         {
+          fprintf(saveTxt,"%d  %d  %d\n",ImgData[3*i],ImgData[3*i],ImgData[3*i]);
+         }
+ 
+         BITMAPFILEHEADER hdr;
+         BITMAPINFOHEADER infoHdr;
+ 
+         infoHdr.biSize = sizeof(BITMAPINFOHEADER);
+         infoHdr.biWidth = ViewPort[2];
+         infoHdr.biHeight = ViewPort[3];
+         infoHdr.biPlanes = 1;
+         infoHdr.biBitCount = 24;
+         infoHdr.biCompression = 0;
+         infoHdr.biSizeImage =ViewPort[2]*ViewPort[3]*3;
+         infoHdr.biXPelsPerMeter = 0;
+         infoHdr.biYPelsPerMeter = 0;
+         infoHdr.biClrUsed = 0;
+         infoHdr.biClrImportant = 0;
+ 
+         hdr.bfType = 0x4D42;
+         hdr.bfReserved1 = 0;
+         hdr.bfReserved2 = 0;
+         hdr.bfOffBits = 54;
+         hdr.bfSize =(DWORD)(sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+ViewPort[2]* ViewPort[3] * 3);
+         FILE *fid=NULL;
+         if( !(fid = fopen(fileName,"wb+")) )
+         {
+          cout<<"Cannot load bmp image format!"<<endl;
+          getchar();
+         }
+         fwrite(&hdr,1,sizeof(BITMAPFILEHEADER),fid);
+         fwrite(&infoHdr,1,sizeof(BITMAPINFOHEADER),fid);
+         fwrite(ImgData,1,ViewPort[2]* ViewPort[2] * 3,fid);
+         fclose(fid);
+         free(ImgData);
+             * */
         }
         /*
         public static void DrawRectangle(Vector2 position, Vector2 size)

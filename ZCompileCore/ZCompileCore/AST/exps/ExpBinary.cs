@@ -93,11 +93,11 @@ namespace ZCompileCore.AST
             return buf.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {
-                return LeftExp.Postion; ;
+                return LeftExp.Position; ;
             }
         }
     }

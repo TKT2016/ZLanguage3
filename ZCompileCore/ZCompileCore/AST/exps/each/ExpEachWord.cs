@@ -14,7 +14,7 @@ namespace ZCompileCore.AST
         {
             return new Exp[] { };
         }
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get {return EachToken.Position; }
         }

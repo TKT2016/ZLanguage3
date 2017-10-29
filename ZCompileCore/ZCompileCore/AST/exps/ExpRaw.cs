@@ -21,6 +21,30 @@ namespace ZCompileCore.AST
 
         public override Exp Parse()
         {
+            //var wordTree = new ExpParseDictionary(this.ExpContext);
+            //WordSegmenter segmenter = new WordSegmenter(wordTree);
+            //List<Token> tokens = new List<Token>();
+            //foreach (var tok in RawTokens)
+            //{
+            //    if (tok.Kind == TokenKind.Ident)
+            //    {
+            //        Token[] newTokens = segmenter.Split(tok);
+            //        tokens.AddRange(newTokens);
+            //    }
+            //    else if (tok.Kind != TokenKind.NewLine)
+            //    {
+            //        tokens.Add(tok);
+            //    }
+            //}
+            List<Token> tokens = WordSegment();
+            ExpParser parser = new ExpParser();
+            Exp exp = parser.Parse(tokens,this.FileContext);
+            exp.SetContext(this.ExpContext);
+            return exp;
+        }
+
+        public List<Token> WordSegment()
+        {
             var wordTree = new ExpParseDictionary(this.ExpContext);
             WordSegmenter segmenter = new WordSegmenter(wordTree);
             List<Token> tokens = new List<Token>();
@@ -36,10 +60,7 @@ namespace ZCompileCore.AST
                     tokens.Add(tok);
                 }
             }
-            ExpParser parser = new ExpParser();
-            Exp exp = parser.Parse(tokens,this.FileContext);
-            exp.SetContext(this.ExpContext);
-            return exp;
+            return tokens;
         }
 
         #region 覆盖方法

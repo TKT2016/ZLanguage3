@@ -68,7 +68,7 @@ namespace ZCompileCore.AST
             {
                 if (condition.RetType != ZLangBasicTypes.ZBOOL)
                 {
-                    ErrorE(condition.Postion, "条件表达式不是判断表达式");
+                    ErrorE(condition.Position, "条件表达式不是判断表达式");
                 }
             }
             return condition;

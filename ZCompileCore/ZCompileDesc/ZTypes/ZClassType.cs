@@ -292,28 +292,30 @@ namespace ZCompileDesc.ZTypes
             return null;
         }
 
-        public ZMethodInfo FindDeclaredZMethod(ZCallDesc zpdesc)
+        public ZMethodInfo[] FindDeclaredZMethod(ZCallDesc zpdesc)
         {
+            List<ZMethodInfo> methods = new List<ZMethodInfo>();
             foreach (var item in this.ZMethods)
             {
                 if (item.HasZProcDesc(zpdesc))
                 {
-                    return item;
+                    methods.Add(item);
                 }
             }
-            return null;
+            return methods.ToArray();
         }
 
-        public ZMethodInfo FindDeclaredZMethod(ZMethodDesc zmdesc)
+        public ZMethodInfo[] FindDeclaredZMethod(ZMethodDesc zmdesc)
         {
+            List<ZMethodInfo> methods = new List<ZMethodInfo>();
             foreach (var item in this.ZMethods)
             {
                 if (item.HasZProcDesc(zmdesc))
                 {
-                    return item;
+                    methods.Add(item);
                 }
             }
-            return null;
+            return methods.ToArray();
         }
 
         public ZMethodInfo FindDeclaredZMethod(string sharpMethodName)
@@ -350,40 +352,40 @@ namespace ZCompileDesc.ZTypes
             return null;
         }
 
-        public ZMethodInfo SearchZMethod(ZCallDesc zpdesc)
+        public ZMethodInfo[] SearchZMethod(ZCallDesc zpdesc)
         {
             ZClassType temp = this;
             while (temp != null)
             {
-                ZMethodInfo zmethod = temp.FindDeclaredZMethod(zpdesc);
-                if (zmethod != null)
+                ZMethodInfo[] zmethods = temp.FindDeclaredZMethod(zpdesc);
+                if (zmethods.Length>0)
                 {
-                    return zmethod;
+                    return zmethods;
                 }
                 else
                 {
                     temp = temp.BaseZType;
                 }
             }
-            return null;
+            return new ZMethodInfo[]{};
         }
 
-        public ZMethodInfo SearchZMethod(ZMethodDesc zdesc)
+        public ZMethodInfo[] SearchZMethod(ZMethodDesc zdesc)
         {
             ZClassType temp = this;
             while (temp != null)
             {
-                ZMethodInfo zmethod = temp.FindDeclaredZMethod(zdesc);
-                if (zmethod != null)
+                ZMethodInfo[] zmethods = temp.FindDeclaredZMethod(zdesc);
+                if (zmethods.Length > 0)
                 {
-                    return zmethod;
+                    return zmethods;
                 }
                 else
                 {
                     temp = temp.BaseZType;
                 }
             }
-            return null;
+            return new ZMethodInfo[] { };
         }
 
         #endregion

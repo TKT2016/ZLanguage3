@@ -79,7 +79,7 @@ namespace ZCompileCore.AST
         }
 
         protected CodePosition ZeroCodePostion = new CodePosition(0, 0);
-        public virtual CodePosition Postion { get { return ZeroCodePostion; } }
+        public virtual CodePosition Position { get { return ZeroCodePostion; } }
 
         protected Exp AnalySubExp(Exp exp)
         {

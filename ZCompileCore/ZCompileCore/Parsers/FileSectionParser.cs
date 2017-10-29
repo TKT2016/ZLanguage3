@@ -651,9 +651,14 @@ namespace ZCompileCore.Parsers
                 Stmt stmt = ParseIf();
                 return stmt;
             }
-            else if (kind == TokenKind.While)
+            else if (kind == TokenKind.Dang)
             {
                 Stmt stmt = ParseWhile();
+                return stmt;
+            }
+            else if (kind == TokenKind.Repeat)
+            {
+                Stmt stmt = ParseRepeat();
                 return stmt;
             }
             else if (kind == TokenKind.Catch)
@@ -721,11 +726,23 @@ namespace ZCompileCore.Parsers
         private Stmt ParseWhile()
         {
             StmtWhile whileStmt = new StmtWhile();
-            whileStmt.WhileToken = tape.Current;
+            whileStmt.DangToken = tape.Current;
             tape.MoveNext();
-            whileStmt.Condition = ParseRawExpLine();
-            whileStmt.WhileBody = ParseStmtBlock(whileStmt.WhileToken.Position);
+            whileStmt.ConditionExp = ParseRawExpLine();
+            whileStmt.WhileBody = ParseStmtBlock(whileStmt.DangToken.Position);
+            //tape.Match(TokenKind.Repeat);
             return whileStmt;
+        }
+
+        private Stmt ParseRepeat()
+        {
+            StmtRepeat repeatStmt = new StmtRepeat();
+            repeatStmt.RepeatToken = tape.Current;
+            tape.MoveNext();
+            repeatStmt.TimesExp = ParseRawExpLine();
+            repeatStmt.RepeatBody = ParseStmtBlock(repeatStmt.RepeatToken.Position);
+            //tape.Match(TokenKind.Times);
+            return repeatStmt;
         }
 
         private Stmt ParseIf()

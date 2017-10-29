@@ -169,11 +169,11 @@ namespace ZCompileCore.AST
             return BodyExp.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {
-                return BodyExp.Postion; ;
+                return BodyExp.Position; ;
             }
         }
         #endregion

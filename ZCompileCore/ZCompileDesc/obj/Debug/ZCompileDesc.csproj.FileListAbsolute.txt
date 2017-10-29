@@ -7,3 +7,12 @@ E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\bin\Debug\Z语言系统.pdb
 E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\obj\Debug\ZCompileDesc.csprojResolveAssemblyReference.cache
 E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\obj\Debug\ZyyDesc.dll
 E:\ProgProj\Z\Z3\ZCompileCore2\ZCompileDesc\obj\Debug\ZyyDesc.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\bin\Debug\ZCompileDesc.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\bin\Debug\ZCompileDesc.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\bin\Debug\ZLangRT.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\bin\Debug\Z语言系统.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\bin\Debug\ZLangRT.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\bin\Debug\Z语言系统.pdb
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\obj\Debug\ZCompileDesc.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\obj\Debug\ZCompileDesc.dll
+E:\MySource\Zyy\Z3\ZCompileCore\ZCompileDesc\obj\Debug\ZCompileDesc.pdb

@@ -72,6 +72,12 @@ namespace ZCompileDesc.ZTypes
             return info1;
         }
 
+        public List<ZPackageDesc> GetPackageDescs()
+        {
+            var list = PackageDescTable.Values.OrderBy(p => p.Name).ToList();
+            return list;
+        }
+
         public ZPackageDesc SearhcZPackageDesc(string packageName)
         {
             if (PackageDescTable.ContainsKey(packageName))

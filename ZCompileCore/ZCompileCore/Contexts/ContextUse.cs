@@ -97,10 +97,10 @@ namespace ZCompileCore.Contexts
             List<ZMethodInfo> data = new List<ZMethodInfo>();
             foreach (var zclass in UseZClassList)
             {
-                var zmethod = zclass.SearchZMethod(procDesc);
-                if (zmethod != null)
+                var zmethods = zclass.SearchZMethod(procDesc);
+                if (zmethods !=null &&zmethods.Length > 0)
                 {
-                    data.Add(zmethod);
+                    data.AddRange(zmethods);
                 }
             }
             return data.ToArray();

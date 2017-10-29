@@ -54,6 +54,7 @@
     <Compile Include="ILDemo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="S3\TestDefaultValue.cs" />
+    <Compile Include="S3\TestRepeat.cs" />
     <Compile Include="S3\TestSC.cs" />
     <Compile Include="S3\TestStrongTrans.cs" />
     <Compile Include="S3\TestProperty.cs" />

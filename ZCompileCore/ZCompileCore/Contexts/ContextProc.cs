@@ -117,6 +117,13 @@ namespace ZCompileCore.Contexts
             return EachIndex;
         }
 
+        int RepeatIndex = -1;
+        public int CreateRepeatIndex()
+        {
+            RepeatIndex++;
+            return RepeatIndex;
+        }
+
         #endregion
 
         public ProcEmitContext EmitContext { get; set; }

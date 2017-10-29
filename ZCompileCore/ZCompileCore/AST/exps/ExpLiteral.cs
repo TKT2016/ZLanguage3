@@ -56,7 +56,7 @@ namespace ZCompileCore.AST
             }
             else
             {
-                ErrorE(this.Postion, LiteralToken.ToCode() + "不是正确的值");
+                ErrorE(this.Position, LiteralToken.ToCode() + "不是正确的值");
                 //return null;
             }
             return this;
@@ -116,7 +116,7 @@ namespace ZCompileCore.AST
             return LiteralToken.ToCode();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {

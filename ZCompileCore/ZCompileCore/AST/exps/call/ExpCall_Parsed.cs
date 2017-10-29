@@ -57,6 +57,10 @@ namespace ZCompileCore.AST
             if (temp != null) 
                 return temp;
 
+            temp = SearchBase();
+            if (temp != null)
+                return temp;
+
             temp = SearchUse();
             if (temp != null) 
                 return temp;
@@ -65,9 +69,31 @@ namespace ZCompileCore.AST
             if (temp != null) 
                 return temp;
             
-            ErrorE(this.Postion,"无法找到调用相应的过程");
+            ErrorE(this.Position,"无法找到调用相应的过程");
             ExpCallNone expCallNone = new ExpCallNone(this.ExpContext, CallDesc , this);
             return expCallNone;     
+        }
+         
+        private Exp SearchBase()
+        {
+            if (this.ExpContext.ClassContext.BaseZType == null)
+                return null;
+            ZMethodInfo[] descArray = this.ExpContext.ClassContext.BaseZType.FindDeclaredZMethod(CallDesc);
+            if (descArray.Length == 0)
+            {
+                return null;
+            }
+            else if (descArray.Length > 1)
+            {
+                ErrorE(this.Position, "找到多个过程，不能确定是属于哪一个简略使用的类型的过程");
+                return null;
+            }
+            else
+            {
+                ZMethodInfo methodDesc = descArray[0];
+                ExpCallThis expCallThis = new ExpCallThis(this.ExpContext, CallDesc, methodDesc.ZDesces[0], this, ArgExps);
+                return expCallThis;
+            }
         }
 
         private Exp SearchSubject( )
@@ -92,8 +118,8 @@ namespace ZCompileCore.AST
 
         private Exp SearchUse( )
         {
-            try
-            {
+            //try
+            //{
                 ZMethodInfo[] zmethods = this.ExpContext.ClassContext.FileContext.SearchUseProc(CallDesc);
                 if (zmethods.Length == 0)
                 {
@@ -101,7 +127,7 @@ namespace ZCompileCore.AST
                 }
                 else if (zmethods.Length > 1)
                 {
-                    ErrorE(this.Postion, "找到多个过程，不能确定是属于哪一个简略使用的类型的过程");
+                    ErrorE(this.Position, "找到多个过程，不能确定是属于哪一个简略使用的类型的过程");
                     return null;
                 }
                 else
@@ -109,11 +135,11 @@ namespace ZCompileCore.AST
                     ExpCallUse expCallForeign = new ExpCallUse(this.ExpContext, CallDesc, zmethods[0], this.SrcExp, ArgExps);
                     return expCallForeign;
                 }
-            }
-            catch(Exception ex)
-            {
-                throw new CompileCoreException(ex.Message);
-            }
+            //}
+            //catch(Exception ex)
+            //{
+            //    throw new CompileCoreException(ex.Message);
+            //}
         }
 
         private Exp SearchThis( )
@@ -125,7 +151,7 @@ namespace ZCompileCore.AST
             }
             else if (descArray.Length >1)
             {
-                ErrorE(this.Postion, "找到多个过程，不能确定是属于哪一个简略使用的类型的过程");
+                ErrorE(this.Position, "找到多个过程，不能确定是属于哪一个简略使用的类型的过程");
                 return null;
             }
             else
@@ -187,11 +213,11 @@ namespace ZCompileCore.AST
             return buf.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {
-                return Elements[0].Postion; ;
+                return Elements[0].Position; ;
             }
         }
         #endregion

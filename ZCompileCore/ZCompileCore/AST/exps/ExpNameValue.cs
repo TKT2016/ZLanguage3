@@ -50,7 +50,7 @@ namespace ZCompileCore.AST
             return NameToken.GetText()+":"+ValueExp.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {

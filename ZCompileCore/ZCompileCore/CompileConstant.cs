@@ -20,5 +20,6 @@ namespace ZCompileCore
         public const String ZListAddMethodName = "Add";
 
         public const String Calculater_LEInt = "LEInt";
+        public const String Calculater_LTInt = "LTInt";
     }
 }

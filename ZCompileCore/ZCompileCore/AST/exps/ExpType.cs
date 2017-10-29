@@ -149,7 +149,7 @@ namespace ZCompileCore.AST
             return string.Join("", TypeTokens.Select(p=>p.GetText()));
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {

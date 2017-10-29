@@ -42,7 +42,7 @@ namespace ZCompileCore.AST
             VarSymbol = symbols.Get(VarName);
             if (VarSymbol == null)
             {
-                ErrorE(this.Postion, "变量'{0}'不存在", VarName);
+                ErrorE(this.Position, "变量'{0}'不存在", VarName);
                 //RetType = ZLangBasicTypes.ZOBJECT;
             }
             else
@@ -191,7 +191,7 @@ namespace ZCompileCore.AST
             return VarToken.GetText();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {

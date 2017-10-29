@@ -34,18 +34,20 @@ namespace ZCompileCore.AST
         {
             if (SubjectExp.RetType is ZEnumType)
             {
-                ErrorE(this.Postion, "约定类型没有过程");
+                ErrorE(this.Position, "约定类型没有过程");
             }
             else
             {
                 SubjectZType =  (SubjectExp.RetType as ZClassType);
-                SearchedMethod = SubjectZType.SearchZMethod(ExpProcDesc);
-                if (SearchedMethod == null)
+                var zmethods = SubjectZType.SearchZMethod(ExpProcDesc);
+                //SearchedMethod = SubjectZType.SearchZMethod(ExpProcDesc);
+                if (zmethods.Length == 0)
                 {
-                    ErrorE(this.Postion, "没有找到对应的过程");
+                    ErrorE(this.Position, "没有找到对应的过程");
                 }
                 else
                 {
+                    SearchedMethod = zmethods[0];
                     var defArgs = SearchedMethod.ZDesces[0].DefArgs;
                     newExpArgs = AnalyArgLambda(defArgs, ArgExps);
 

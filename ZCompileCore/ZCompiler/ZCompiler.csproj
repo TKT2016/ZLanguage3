@@ -50,6 +50,9 @@
     <Compile Include="ZProjFileParser.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Sample\测试重复.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Sample\测试返回值.zyy">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -63,9 +66,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Sample\测试选择结构.zyy">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Sample\测试循环.zyy">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Sample\测试列表每一个.zyy">

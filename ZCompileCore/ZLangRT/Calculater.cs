@@ -111,15 +111,6 @@ namespace ZLangRT
 
         public static bool GE(object a, object b)
         {
-            //Console.Write(a);
-            //Console.Write( "  ");
-            //Console.WriteLine( b);
-            /*if(a is int && b is int)
-                return (int)a >= (int)b;
-            if (a is float && b is float)
-                return (float)a >= (float)b;
-            if (a is float || b is float)
-                return Convert.ToDouble(a) >= Convert.ToDouble(b);*/
             if(IsNumber(a) && IsNumber(b))
                 return Convert.ToDouble(a) >= Convert.ToDouble(b);
             throw new ZyyRTException("Calculater.GE失败");
@@ -217,7 +208,17 @@ namespace ZLangRT
 
         public static bool IsNumber(object x)
         {
+            if(x is Type)
+            {
+                throw new ZyyRTException("参数不能为Type类型");
+            }
             return x is byte || x is char || x is float || x is int || x is decimal || x is double;
+        }
+
+        public static bool IsNumberType(Type type)
+        {
+            return type==typeof(byte) || type==typeof(char)  ||type==typeof(float)
+            || type == typeof(int) || type == typeof(decimal) || type == typeof(double);
         }
 
         public static bool IsEnumValue(object x)

@@ -58,6 +58,7 @@
     <Compile Include="AST\exps\lambda\ExpNewLambda.cs" />
     <Compile Include="AST\exps\each\ExpEachItem.cs" />
     <Compile Include="AST\sections\SectionConstructorDefault.cs" />
+    <Compile Include="AST\stmts\StmtRepeat.cs" />
     <Compile Include="AST\units\ProcBracket.cs" />
     <Compile Include="CompileCoreException.cs" />
     <Compile Include="Contexts\ExpParseDictionary.cs" />

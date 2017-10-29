@@ -70,11 +70,11 @@ namespace ZCompileCore.AST
             return buf.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {
-                return Elements[0].Postion; ;
+                return Elements[0].Position; ;
             }
         }
         #endregion

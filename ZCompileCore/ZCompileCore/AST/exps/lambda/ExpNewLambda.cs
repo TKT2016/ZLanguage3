@@ -40,7 +40,7 @@ namespace ZCompileCore.AST
             {
                 if (actionExp.RetType.SharpType != typeof(bool))
                 {
-                    ErrorE(actionExp.Postion, "结果应该是" + fnRetType.ZName);
+                    ErrorE(actionExp.Position, "结果应该是" + fnRetType.ZName);
                 }
             }
             else if (fnRetType.SharpType == typeof(Action))

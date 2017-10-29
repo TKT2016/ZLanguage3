@@ -39,7 +39,7 @@ namespace ZCompileCore.AST
                 Type stype = RetType.SharpType;
                 if (stype != typeof(int) && stype != typeof(float) && stype != typeof(double) && stype != typeof(decimal))
                 {
-                    ErrorE(RightExp.Postion, "不能进行'{0}'运算", OpToken.GetText());
+                    ErrorE(RightExp.Position, "不能进行'{0}'运算", OpToken.GetText());
                     //return null;
                 }
             }
@@ -91,7 +91,7 @@ namespace ZCompileCore.AST
             return buf.ToString();
         }
 
-        public override CodePosition Postion
+        public override CodePosition Position
         {
             get
             {

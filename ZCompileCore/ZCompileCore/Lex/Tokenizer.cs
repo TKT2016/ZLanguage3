@@ -299,7 +299,10 @@ namespace ZCompileCore.Lex
             if (processKeyIdent(token, "如果",TokenKind.IF)) return;
             if (processKeyIdent(token, "否则如果", TokenKind.ELSEIF)) return;
             if (processKeyIdent(token, "否则", TokenKind.ELSE)) return;
-            if (processKeyIdent(token, "循环当", TokenKind.While)) return;
+            //if (processKeyIdent(token, "循环当", TokenKind.While)) return;
+            if (processKeyIdent(token, "重复", TokenKind.Repeat)) return;
+            if (processKeyIdent(token, "当", TokenKind.Dang)) return;
+            if (processKeyIdent(token, "次", TokenKind.Times)) return;
             if (processKeyIdent(token, "处理", TokenKind.Catch)) return;
             tokenList.Add(token);
         }

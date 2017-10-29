@@ -39,7 +39,7 @@ namespace ZCompileCore.AST
             }
             else
             {
-                ErrorE(this.ToExp.Postion, "该表达式不能被赋值");
+                ErrorE(this.ToExp.Position, "该表达式不能被赋值");
             }
             this.RetType = ZLangBasicTypes.ZVOID;
             AnalyArgLambda();

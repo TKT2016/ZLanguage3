@@ -53,7 +53,10 @@ namespace ZCompileCore.Lex
         //Case,
         //For,
         //Foreach,
-        While,//循环当
+        //While,//循环当
+        Repeat,//重复
+        Dang,//当
+        Times,//次
         //Foreach,//循环每一个
         Catch,//捕捉
         Each,//每一个

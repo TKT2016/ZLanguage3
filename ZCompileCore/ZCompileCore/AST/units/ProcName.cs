@@ -107,10 +107,10 @@ namespace ZCompileCore.AST
             ZClassType baseZType = context.BaseZType;
             if(baseZType!=null)
             {
-                var zmethod = baseZType.SearchZMethod(ProcDesc);
-                if(zmethod!=null)
+                var zmethods = baseZType.SearchZMethod(ProcDesc);
+                if (zmethods.Length > 0)
                 {
-                    return zmethod.SharpMethod.Name;
+                    return zmethods[0].SharpMethod.Name;
                 }
             }
             string mname= this.CreateMethodName(ProcDesc);
