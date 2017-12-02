@@ -24,9 +24,16 @@ namespace Z标准包.绘图.形状
         [ZCode("宽度")]
         public int 宽度 { get; set; }
 
+        [ZCode("左上角位置")]
         public Point 左上角位置 { get; set; }
+
+         [ZCode("左下角位置")]
         public Point 左下角位置 { get { return new Point(左上角位置.X, 左上角位置.Y+宽度); } }
+
+        [ZCode("右上角位置")]
         public Point 右上角位置 { get { return new Point(左上角位置.X+长度, 左上角位置.Y ); } }
+
+        [ZCode("右下角位置")]
         public Point 右下角位置 { get { return new Point(左上角位置.X + 长度, 左上角位置.Y + 宽度); } }
 
         public Point 中心点
@@ -36,7 +43,7 @@ namespace Z标准包.绘图.形状
                 return new Point(左上角位置.X + 长度 / 2, 左上角位置.Y + 宽度 / 2);
             }
         }
-
+        [ZCode("相交于(矩形:r)")]
         public bool 相交于(矩形 r)
         {
             if (ContainerPoint(r.左上角位置)) return true;

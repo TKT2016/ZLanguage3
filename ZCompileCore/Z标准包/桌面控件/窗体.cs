@@ -9,8 +9,8 @@ using ZLangRT.Attributes;
 
 namespace Z标准包.桌面控件
 {
-    [ZInstance(typeof(Form))]
-    public class 窗体
+    [ZInstance(typeof(ZForm))]
+    public abstract class 窗体
     {
         [ZCode("标题")]
         public string Text { get; set; }
@@ -32,5 +32,8 @@ namespace Z标准包.桌面控件
 
         [ZCode("高度")]
         public int Height { get; set; }
+
+        [ZCode("添加(Control:control)")]
+        public abstract void Add(Control control);
     }
 }

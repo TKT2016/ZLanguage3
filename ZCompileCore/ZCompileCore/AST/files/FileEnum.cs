@@ -9,7 +9,7 @@ using ZCompileDesc.ZTypes;
 
 namespace ZCompileCore.AST
 {
-    public class FileEnum:FileType
+    public class FileEnum:FileSource
     {
         public List<SectionEnum> EnumSections;
 
@@ -19,23 +19,34 @@ namespace ZCompileCore.AST
             EnumSections = enumSections;
         }
 
-        public void Compile()
+        public ZEnumType Compile()
         {
-            ProjectCompileResult compileResult = this.ProjectContext.CompileResult;
-            if (compileResult.Errors.ContainsKey(this.FileContext.FileModel.ZFileInfo))
+            SetContext(this.FileContext);
+            var MessageCollection = this.ProjectContext.MessageCollection;
+            if (MessageCollection.ContainsErrorSrcKey(this.FileContext.FileModel.ZFileInfo.ZFileName))
             {
-                return;
+                return null;
             }
             else
             {
                 foreach (SectionEnum enumSection in EnumSections)
                 {
-                    ZType ztype = enumSection.Compile(this.ProjectContext.EmitContext.ModuleBuilder, this.ProjectContext.ProjectModel.ProjectPackageName);
-                    if (ztype != null)
-                    {
-                        this.ProjectContext.CompileResult.CompiledTypes.Add(ztype);
-                    }
+                    var builder = this.ProjectContext.EmitContext.ModuleBuilder;
+                    var packageName = this.ProjectContext.ProjectModel.ProjectPackageName;
+                    var fileName = this.FileContext.FileModel.GetFileNameNoEx();
+                    ZEnumType ztype = enumSection.Compile(builder, packageName, fileName);
+                    return ztype;
                 }
+            }
+            return null;
+        }
+
+        public void SetContext(ContextFile fileContext)
+        {
+            this.FileContext = fileContext;
+            foreach (SectionEnum itemPackage in this.EnumSections)
+            {
+                itemPackage.SetContext(fileContext);
             }
         }
     }

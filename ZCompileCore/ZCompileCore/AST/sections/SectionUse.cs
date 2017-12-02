@@ -12,61 +12,108 @@ namespace ZCompileCore.AST
 {
     public class SectionUse: SectionBase
     {
-        public Token KeyToken;
-        public List<Token> TypeNameTokens = new List<Token>();
+        public LexToken KeyToken;
+        public List<LexToken> TypeNameTokens = new List<LexToken>();
 
-        public void AddTypeToken(Token token)
+        public void AddTypeToken(LexToken token)
         {
             TypeNameTokens.Add(token);
         }
 
-        public void Analy()
+        List<LexToken> _TextStructTokens;
+        public override void AnalyText()
         {
-            foreach (var nameToken in TypeNameTokens)
+            _TextStructTokens = new List<LexToken>();
+            foreach (LexToken nameToken in this.TypeNameTokens)
             {
-                AnalyNameItem(nameToken);
+                AnalyNameItemText(nameToken);
             }
         }
 
-        public void AnalyNameItem(Token nameToken)
+        public override void AnalyType()
         {
-            ContextUse useContext = this.FileContext.UseContext;
-            string typeName = nameToken.GetText();
-            if (useContext.ContainsType(typeName))
+            foreach (LexToken nameToken in this._TextStructTokens)
             {
-                this.FileContext.Errorf(nameToken.Position, "'{0}'已经被使用", typeName);
+                AnalyNameItemType(nameToken);
             }
-            else
+        }
+
+        public override void AnalyBody()
+        {
+            return;
+        }
+
+        public override void EmitName()
+        {
+            return;
+        }
+
+        public override void EmitBody()
+        {
+            return;
+        }
+
+        public void AnalyNameItemType(LexToken nameToken)
+        {
+            ContextImportUse importUseContext = this.FileContext.ImportUseContext;
+            string typeName = nameToken.GetText();
+            //if (typeName == "随机数器")
+            //{
+            //    Console.WriteLine("随机数器");
+            //}
+            IZDescType[] ztypes = importUseContext.SearchImportIZType_WithUse(typeName);
+            if (ztypes.Length == 0)
             {
-                IZDescType[] ztypes = this.FileContext.ImportContext.ImportPackageDescList.SearchZDescType(typeName);
-                IZDescType descType = ztypes[0];
-                if (descType is ZClassType)
+                this.FileContext.Errorf(nameToken.Position, "没有搜索到'{0}'", typeName);
+                return;
+            }
+            IZDescType descType = ztypes[0];
+            if (descType is ZClassType)
+            {
+                ZClassType zclass = descType as ZClassType;
+                if (zclass.IsStatic)
                 {
-                    ZClassType zclass = descType as ZClassType;
-                    if (zclass.IsStatic)
-                    {
-                        useContext.UseZClassList.Add(zclass);
-                    }
-                    else
-                    {
-                        this.FileContext.Errorf(nameToken.Position, "'{0}'不是唯一类型，不能被简略使用", typeName);
-                    }
-                }
-                else if (descType is ZEnumType)
-                {
-                    ZEnumType zenum = descType as ZEnumType;
-                    useContext.UseZEnumList.Add(zenum);
-                }
-                else if (descType is ZDimType)
-                {
-                    ZDimType zdim = descType as ZDimType;
-                    useContext.UseZDimList.Add(zdim);
+                    importUseContext.AddUseType(zclass);
                 }
                 else
                 {
-                    throw new CompileCoreException();
+                    this.FileContext.Errorf(nameToken.Position, "'{0}'不是唯一类型，不能被简略使用", typeName);
                 }
             }
+            else if (descType is ZEnumType)
+            {
+                ZEnumType zenum = descType as ZEnumType;
+                importUseContext.AddUseType(zenum);
+            }
+            else if (descType is ZDimType)
+            {
+                ZDimType zdim = descType as ZDimType;
+                importUseContext.AddUseType(zdim);
+            }
+            else
+            {
+                throw new CCException();
+            }
+        }
+
+        private void AnalyNameItemText(LexToken nameToken)
+        {
+            ContextImportUse contextiu = this.FileContext.ImportUseContext;
+            string typeName = nameToken.GetText();
+            if (contextiu.ContainsUserZTypeName(typeName))
+            {
+                this.FileContext.Errorf(nameToken.Position, "'{0}'重复使用", typeName);
+            }
+            else
+            {
+                contextiu.AddUseZTypeName(typeName);
+                _TextStructTokens.Add(nameToken);
+            }
+        }
+
+        public void SetContext(ContextFile fileContext)
+        {
+            this.FileContext = fileContext;
         }
 
         public override string ToString()

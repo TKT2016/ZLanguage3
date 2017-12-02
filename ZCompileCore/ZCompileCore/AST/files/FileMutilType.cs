@@ -17,12 +17,12 @@ namespace ZCompileCore.AST
 
         public List<SectionEnum> Enumes= new List<SectionEnum> ();
         public List<SectionDim> Dimes = new List<SectionDim> ();
-        public List<SectionClassName> Classes = new List<SectionClassName> ();
+        public List<SectionClassNameDef> Classes = new List<SectionClassNameDef> ();
 
         public List<SectionProperties> Propertieses = new List<SectionProperties> ();
 
         public List<SectionProc> Proces = new List<SectionProc> ();
-        public List<SectionConstructor> Constructors = new List<SectionConstructor>();
+        public List<SectionConstructorDef> Constructors = new List<SectionConstructorDef>();
 
         public void AddSection(SectionBase section)
         {
@@ -42,9 +42,9 @@ namespace ZCompileCore.AST
             {
                 Dimes.Add(section as SectionDim);
             }
-            else if (section is SectionClassName)
+            else if (section is SectionClassNameDef)
             {
-                Classes.Add(section as SectionClassName);
+                Classes.Add(section as SectionClassNameDef);
             }
             else if (section is SectionProperties)
             {
@@ -54,13 +54,13 @@ namespace ZCompileCore.AST
             {
                 Proces.Add(section as SectionProc);
             }
-            else if (section is SectionConstructor)
+            else if (section is SectionConstructorDef)
             {
-                Constructors.Add(section as SectionConstructor);
+                Constructors.Add(section as SectionConstructorDef);
             }
             else
             {
-                throw new CompileCoreException();
+                throw new CCException();
             }
         }
        

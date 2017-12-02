@@ -5,12 +5,11 @@ using System.Reflection;
 using System.Text;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 
 namespace ZCompileDesc.ZTypes
 {
-    public class ZAssemblyDesc : IWordDictionary, IZTypeDictionary
+    public class ZAssemblyDesc : IZTypeDictionary//,IWordDictionary, 
     {
         public Assembly ZAssembly { get; protected set; }
         public string Name { get; protected set; }
@@ -61,16 +60,16 @@ namespace ZCompileDesc.ZTypes
             return ZTypeListHelper.Search(zname, PackageDescTable.Values.ToArray());
         }
 
-        public bool ContainsWord(string text)
-        {
-            return IWordDictionaryHelper.EnumerableContainsWord(text, PackageDescTable.Values);
-        }
+        //public bool ContainsWord(string text)
+        //{
+        //    return IWordDictionaryHelper.EnumerableContainsWord(text, PackageDescTable.Values);
+        //}
 
-        public WordInfo SearchWord(string text)
-        {
-            WordInfo info1 = IWordDictionaryHelper.EnumerableSearchWord(text, PackageDescTable.Values);
-            return info1;
-        }
+        //public WordInfo SearchWord(string text)
+        //{
+        //    WordInfo info1 = IWordDictionaryHelper.EnumerableSearchWord(text, PackageDescTable.Values);
+        //    return info1;
+        //}
 
         public List<ZPackageDesc> GetPackageDescs()
         {

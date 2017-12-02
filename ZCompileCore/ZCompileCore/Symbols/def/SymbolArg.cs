@@ -15,15 +15,20 @@ namespace ZCompileCore.Symbols
         public int ArgIndex { get; set; }
         public bool IsGeneric { get; set; }
 
-        public SymbolArg(string name, ZType argType, int argIndex )
+        public SymbolArg(string name, ZType argType)
         {
             this.SymbolName = name;
             ArgZType = argType;
-            ArgIndex = argIndex;
             SymbolZType = ArgZType;
 
             CanRead = true;
             CanWrite = true;
+        }
+
+        public SymbolArg(string name, ZType argType, int argIndex )
+            :this(name,argType)
+        {
+            ArgIndex = argIndex;
         }
 
         public override string ToString()

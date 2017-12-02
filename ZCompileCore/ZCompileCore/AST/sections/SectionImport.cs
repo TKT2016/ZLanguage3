@@ -13,16 +13,46 @@ namespace ZCompileCore.AST
 {
     public class SectionImport : SectionBase
     {
-        public Token KeyToken;
+        public LexToken KeyToken;
         public List<PackageNameAST> Packages = new List<PackageNameAST>();
-        List<ZType> addedZtypes = new List<ZType>();
-        public void Analy()
+
+        public override void AnalyText()
         {
-            addedZtypes = new List<ZType>();
             foreach (PackageNameAST itemPackage in this.Packages)
             {
-                itemPackage.FileContext = this.FileContext;
-                itemPackage.Analy(this.FileContext);
+                itemPackage.AnalyText();
+            }
+        }
+
+        public override void AnalyType()
+        {
+            foreach (PackageNameAST itemPackage in this.Packages)
+            {
+                itemPackage.AnalyType();
+            }
+        }
+
+        public override void AnalyBody()
+        {
+            return;
+        }
+
+        public override void EmitName()
+        {
+            return;
+        }
+
+        public override void EmitBody()
+        {
+            return;
+        }
+
+        public void SetContext(ContextFile fileContext)
+        {
+            this.FileContext = fileContext;
+            foreach (PackageNameAST itemPackage in this.Packages)
+            {
+                itemPackage.SetContext(fileContext);
             }
         }
 

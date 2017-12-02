@@ -2,49 +2,26 @@
 using System.Collections.Generic;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
 using ZCompileCore.Tools;
-using ZCompileDesc.Words;
 
 namespace ZCompileCore.Parsers
 {
-    public class ExpParser//:ParserBase
+    public class ExpParser
     {
         TokenTape tape;
 
-        public Exp Parse(List<Token> tokens, ContextFile fileContext)
+        public Exp Parse(List<LexToken> tokens, ContextFile fileContext)
         {
+            //if (tokens.Count>5 && tokens[1].GetText() == "X坐标" && tokens[2].GetText() == ">")
+            //{
+            //    Console.WriteLine("X坐标>战场参数的长度");
+            //}
             tape = new TokenTape(tokens, fileContext);
             Exp exp = ParseAssign();
             return exp;
-        }
-
-        private Exp ParseNameValueExp()
-        {
-            Exp leftExp = ParseBinaryLogicExp();
-
-            if (tape.Current.Kind == TokenKind.Colon)
-            {
-                tape.MoveNext();
-                Exp rightExp = ParseBinaryLogicExp ();
-                if(leftExp is ExpVar)
-                {
-                    ExpVar leftVarExp = (leftExp as ExpVar);
-                    Token varToken = leftVarExp.VarToken;
-                    ExpNameValue expNameValue = new ExpNameValue(varToken, rightExp);
-                    return expNameValue;
-                }
-                else
-                {
-                    tape.error("调用过程时指定的参数名称只能是标识符");
-                    return rightExp;
-                }
-            }
-            else
-            {
-                return leftExp;
-            }
         }
 
         private Exp ParseAssign()
@@ -76,9 +53,36 @@ namespace ZCompileCore.Parsers
             }
         }
 
+        private Exp ParseNameValueExp()
+        {
+            Exp leftExp = ParseBinaryLogicExp();
+
+            if (tape.Current.Kind == TokenKind.Colon)
+            {
+                tape.MoveNext();
+                Exp rightExp = ParseBinaryLogicExp();
+                if (leftExp is ExpVarBase)
+                {
+                    ExpVarBase leftVarExp = (leftExp as ExpVarBase);
+                    LexToken varToken = leftVarExp.VarToken;
+                    ExpNameValue expNameValue = new ExpNameValue(varToken, rightExp);
+                    return expNameValue;
+                }
+                else
+                {
+                    tape.error("调用过程时指定的参数名称只能是标识符");
+                    return rightExp;
+                }
+            }
+            else
+            {
+                return leftExp;
+            }
+        }
+
         private Exp ParseBinaryLogicExp()
         {
-            Token opToken;
+            LexToken opToken;
             Exp resultExpr = parseCompareExpr();
             while (tape.CurrentKind == TokenKind.AND || tape.CurrentKind == TokenKind.OR)
             {
@@ -92,10 +96,8 @@ namespace ZCompileCore.Parsers
 
         protected Exp parseCompareExpr()
         {
-            Token opToken;
+            LexToken opToken;
             Exp resultExpr = parseAddSub();
-            //while (CurrentToken.Kind == TokenKind.GT || CurrentToken.Kind == TokenKind.LT || CurrentToken.Kind == TokenKind.GE
-            //    || CurrentToken.Kind == TokenKind.LE || CurrentToken.Kind == TokenKind.NE || CurrentToken.Kind == TokenKind.EQ)
             while (TokenKindHelper.IsCompareOp(tape.CurrentKind))
             {
                 opToken = tape.Current;
@@ -108,7 +110,7 @@ namespace ZCompileCore.Parsers
 
         public Exp parseAddSub()
         {
-            Token opToken;
+            LexToken opToken;
             Exp resultExpr = parseMulDiv();
             while (tape.CurrentKind == TokenKind.ADD || tape.CurrentKind == TokenKind.SUB)
             {
@@ -123,8 +125,8 @@ namespace ZCompileCore.Parsers
         Exp parseMulDiv()
         {
             //report("parseMulDiv");
-            Token opToken;
-            Exp resultExpr = parseCall();
+            LexToken opToken;
+            Exp resultExpr = ParseChain();
             while (tape.Current.Kind == TokenKind.MUL || tape.Current.Kind == TokenKind.DIV)
             {
                 opToken = tape.Current;
@@ -135,166 +137,96 @@ namespace ZCompileCore.Parsers
             return resultExpr;
         }
 
-        Exp parseCall()
+        private Exp ParseChain()
         {
-            //report("parseCall");
-            List<Exp> exps = new List<Exp>();
-            while (tape.Current.Kind == TokenKind.Ident || tape.Current.Kind == TokenKind.LBS || TokenKindHelper.IsLiteral(tape.Current.Kind))//|| CurrentKind == TokenKind.RBS
-            {
-                Exp term = parseChain();
-                exps.Add(term);
-            }
-            if (exps.Count == 2 && (exps[0] is ExpType) && (exps[1] is ExpBracket))
-            {
-                ExpNew expNew = new ExpNew();
-                expNew.TypeExp = (exps[0] as ExpType);
-                expNew.BracketExp = (exps[1] as ExpBracket);
-                return expNew;
-            }
-            else if (exps.Count == 0)
-            {
-                return null;
-            }
-            else if (exps.Count == 1 && !(exps[0] is ExpProcNamePart))
-            {
-                return exps[0];
-            }
-            else
-            {
-                ExpCall callExp = new ExpCall();
-                callExp.Elements = exps;
-                return callExp;
-            }
-        }
-
-        Exp parseChain()
-        {
-            //report("parseChain");
-            Exp leftExp = parseTerm();
-            if (leftExp == null) return null;
-
+            ExpChain expChain = new ExpChain();
+            //Console.WriteLine(tape.Current.GetText());
+            //if (tape.Current.GetText().IndexOf("速度")!=-1)
+            //{      
+            //    Console.WriteLine("速度");
+            //}
             while (tape.Current.Kind != TokenKind.EOF)
             {
-                if (tape.Current.Kind == TokenKind.DE)
+                if (tape.Current.Kind == TokenKind.LBS)
                 {
-                    ExpDe deExp = new ExpDe();
-                    deExp.KeyToken = tape.Current;
-                    deExp.LeftExp = leftExp;
-                    tape.MoveNext();
-                    Exp rightExp = parseTerm();
-                    deExp.RightExp = rightExp;
-                    leftExp = deExp;
+                    ExpBracket subExp = parseBracket();
+                    expChain.Add(subExp);
                 }
-                else if (tape.Current.Kind == TokenKind.DI)
+                else if (tape.Current.Kind == TokenKind.RBS)
                 {
-                    ExpDi diExp = new ExpDi();
-                    diExp.KeyToken = tape.Current;
-                    diExp.SubjectExp = leftExp;
+                    break;
+                    //tape.error("多余的右括号");
+                    //tape.MoveNext();
+                }
+                else if (tape.Current.IsLiteral)
+                {
+                    ExpLiteral subExp = parseLiteral();
+                    expChain.Add(subExp);
+                }
+                else if (tape.Current.Kind== TokenKind.Ident
+                    || tape.Current.Kind == TokenKind.DE
+                    || tape.Current.Kind == TokenKind.DI
+                    )
+                {
+                    LexToken tok = tape.Current;
+                    expChain.Add(tok);
                     tape.MoveNext();
-                    Exp rightExp = parseTerm();
-                    diExp.ArgExp = rightExp;
-                    leftExp = diExp;
                 }
                 else
                 {
-                    return leftExp;
+                    break;
                 }
             }
-            return leftExp;
-        }
-
-        Exp parseTerm()
-        {
-            //report("parseTerm");
-            Exp leftExp = null;
-            if (TokenKindHelper.IsLiteral(tape.CurrentKind))// CurrentToken.IsLiteral())
+            if(expChain.SubCount==0)
             {
-                leftExp = parseLiteral();
-            }
-            else if (tape.CurrentKind == TokenKind.Each)
-            {
-                ExpEachWord varExp = new ExpEachWord();
-                varExp.EachToken = tape.Current;
-                tape.MoveNext();
-                return varExp;
-            }
-            else if (tape.Current.IsTypeName())
-            {
-                leftExp = parseTypeExp();
-                return leftExp;
-            }
-            else if (tape.Current.IsProcPart())
-            {
-                leftExp = parseProcNamePart();
-                return leftExp;
-            }
-            else if (tape.Current.IsVarName())
-            {
-                leftExp = parseVarExp();
-                return leftExp;
-            }
-            else if (tape.Current.Kind == TokenKind.Ident)
-            {
-                leftExp = parseVarExp();
-                return leftExp;
-            }
-            else if (tape.Current.Kind == TokenKind.LBS)
-            {
-                leftExp = parseBracket();
-                return leftExp;
-            }
-            else if (tape.Current.Kind == TokenKind.RBS)
-            {
-                tape.error("多余的右括号");
-                tape.MoveNext();
                 return null;
             }
-            else if (tape.Current.WKind == WordKind.Unkown)
-            {
-                var currentText = tape.Current.GetText();
-                tape.error("无法识别'" + currentText + "'");
-                tape.MoveNext();
-                return null;
-            }
-            return leftExp;
+            return expChain;
         }
 
-        ExpBracket parseBracket()
+        private ExpLiteral parseLiteral()
         {
-             //report("parseBracket");
-             ExpBracket bracket = new ExpBracket();
-             bracket.LeftBracketToken = tape.Current;
-             tape.MoveNext();
-             if (!tape.isBracketEnd(tape.Current.Kind))
-             {
-                 while (true)
-                 {
-                     Exp expr = ParseAssign();// ParseBinaryLogicExp();
-                     if (expr != null)
-                     {
-                         bracket.InneExps.Add(expr);
-                     }
+            ExpLiteral literalex = new ExpLiteral();
+            literalex.LiteralToken = tape.Current;
+            tape.MoveNext();
+            return literalex;
+        }
 
-                     if (tape.isBracketEnd(tape.CurrentKind))
-                     {
-                         break;
-                     }
-                     if (tape.CurrentKind != TokenKind.Comma)
-                     {
-                         tape.error("多余的表达式元素");
-                         tape.MoveNext();
-                         while (!(tape.isBracketEnd(tape.CurrentKind)) && tape.CurrentKind != TokenKind.Comma)
-                         {
-                             tape.MoveNext();
-                         }
-                     }
-                     if (tape.CurrentKind == TokenKind.Comma)
-                     {
-                         tape.MoveNext();
-                     }
-                 }
-             }
-            if(tape.CurrentKind== TokenKind.RBS)
+        private ExpBracket parseBracket()
+        {
+            //report("parseBracket");
+            ExpBracket bracket = new ExpBracket();
+            bracket.LeftBracketToken = tape.Current;
+            tape.MoveNext();
+            if (!tape.isBracketEnd(tape.Current.Kind))
+            {
+                while (true)
+                {
+                    Exp expr = ParseAssign();
+                    if (expr != null)
+                    {
+                        bracket.InneExps.Add(expr);
+                    }
+                    if (tape.isBracketEnd(tape.CurrentKind))
+                    {
+                        break;
+                    }
+                    if (tape.CurrentKind != TokenKind.Comma)
+                    {
+                        tape.error("多余的表达式元素");
+                        tape.MoveNext();
+                        while (!(tape.isBracketEnd(tape.CurrentKind)) && tape.CurrentKind != TokenKind.Comma)
+                        {
+                            tape.MoveNext();
+                        }
+                    }
+                    else if (tape.CurrentKind == TokenKind.Comma)
+                    {
+                        tape.MoveNext();
+                    }
+                }
+            }
+            if (tape.CurrentKind == TokenKind.RBS)
             {
                 bracket.RightBracketToken = tape.Current;
                 tape.MoveNext();
@@ -306,53 +238,5 @@ namespace ZCompileCore.Parsers
             return bracket;
         }
 
-        ExpProcNamePart parseProcNamePart()
-        {
-            //report("parseVarExp");
-            ExpProcNamePart varExp = new ExpProcNamePart();
-            varExp.PartNameToken = tape.Current;
-            tape.MoveNext();
-            return varExp;
-        }
-
-        ExpVar parseVarExp()
-        {
-            //report("parseVarExp");
-            ExpVar varExp = new ExpVar();
-            varExp.VarToken = tape.Current;
-            tape.MoveNext();
-            return varExp;
-        }
-
-        ExpType parseTypeExp()
-        {
-            //report("parseTypeExp");
-            ExpType typeExp = new ExpType();
-            while (tape.Current.Kind != TokenKind.EOF)
-            {
-                if (tape.Current.IsTypeName())
-                {
-                    typeExp.TypeTokens.Add(tape.Current);
-                    tape.MoveNext();
-                    if(tape.Pre.WKind== WordKind.GenericClassName)
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }  
-            }
-            return typeExp;
-        }
-
-        Exp parseLiteral()
-        {
-            ExpLiteral literalex = new ExpLiteral();
-            literalex.LiteralToken = tape.Current;
-            tape.MoveNext();
-            return literalex;
-        }
     }
 }

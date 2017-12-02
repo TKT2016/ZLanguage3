@@ -51,7 +51,7 @@ namespace ZCompileCore.AST
         {
             get
             {
-                return this.ProcContext.EmitContext.ILout;
+                return this.ProcContext.GetILGenerator();//.ILout;
             }
         }
 
@@ -59,19 +59,24 @@ namespace ZCompileCore.AST
         {
             if (condition==null)
             {
-                ErrorE(nullPosition, "条件表达式不是判断表达式");
+                ErrorF(nullPosition, "条件表达式不是判断表达式");
                 return null;
             }
-            condition = ParseExp(condition);
-            condition = condition.Analy();
-            if (condition.AnalyCorrect)
+            var condition2 = ParseExp(condition);
+            var condition3 = condition2.Analy();
+            if (condition3.AnalyCorrect)
             {
-                if (condition.RetType != ZLangBasicTypes.ZBOOL)
+                if (condition3.RetType != ZLangBasicTypes.ZBOOL)
                 {
-                    ErrorE(condition.Position, "条件表达式不是判断表达式");
+                    ErrorF(condition.Position, "条件表达式不是判断表达式");
+                }
+                else
+                {
+                   return condition3;
                 }
             }
-            return condition;
+            return null;
+            //return condition;
         }
 
         //protected void MarkSequencePoint( )

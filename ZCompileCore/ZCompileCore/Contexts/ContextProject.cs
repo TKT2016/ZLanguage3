@@ -18,29 +18,20 @@ namespace ZCompileCore.Contexts
 {
     public  class ContextProject
     {
+        public string PackageName { get; set; }
         public ZProjectModel ProjectModel { get;private set; }
-        public Dictionary<Assembly, ZAssemblyDesc> AssemblyDescDictionary { get; protected set; }
+        public Dictionary<Assembly, ZAssemblyDesc> AssemblyDescDictionary { get; private set; }
+        public CompiledTypeCollection CompiledTypes { get; private set; }
+        public CompileMessageCollection MessageCollection { get; private set; }
 
-        public ProjectCompileResult CompileResult { get; protected set; }
-        public ContextProject(ZProjectModel projectModel)
+        public ContextProject(ZProjectModel projectModel, CompileMessageCollection messageCollection)
         {
             ProjectModel = projectModel;
-            AssemblyDescDictionary = new Dictionary<Assembly, ZAssemblyDesc>();
-            CompileResult = new ProjectCompileResult();
-        }
+            PackageName = ProjectModel.ProjectPackageName;
+            MessageCollection = messageCollection;
 
-        public string GetBinaryNameEx()
-        {
-            string binFileName = this.ProjectModel.BinaryFileNameNoEx;
-            if (this.ProjectModel.BinaryFileKind == PEFileKinds.Dll)
-            {
-                binFileName += ".dll";
-            }
-            else
-            {
-                binFileName += ".exe";
-            }
-            return binFileName;
+            AssemblyDescDictionary = new Dictionary<Assembly, ZAssemblyDesc>();
+            CompiledTypes = new CompiledTypeCollection();
         }
 
         public bool AddAssembly(Assembly assembly)
@@ -51,20 +42,32 @@ namespace ZCompileCore.Contexts
             return true;
         }
 
+        public ZPackageDesc SearchZPackageDesc(string packageName)
+        {
+            var dict = this.AssemblyDescDictionary;
+            foreach (ZAssemblyDesc assemblyDesc in dict.Values)
+            {
+                ZPackageDesc packageDesc = assemblyDesc.SearhcZPackageDesc(packageName);
+                if (packageDesc != null)
+                    return packageDesc;
+            }
+            return null;
+        }
+
         public void AddPackage(string packageName)
         {
             try
             {
-                    Assembly asm = Assembly.Load(packageName);
-                    AddAssembly(asm);
+                Assembly asm = Assembly.Load(packageName);
+                AddAssembly(asm);
             }
-            catch(FileNotFoundException)
+            catch (FileNotFoundException)
             {
-                Errorf(0,0,"开发包 ‘"+packageName+"’不存在");
+                Errorf(0, 0, "开发包 ‘" + packageName + "’不存在");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Errorf(0, 0, "加载开发包 ‘" + packageName + "’错误:"+ex.Message);
+                Errorf(0, 0, "加载开发包 ‘" + packageName + "’错误:" + ex.Message);
             }
         }
 
@@ -72,10 +75,9 @@ namespace ZCompileCore.Contexts
 
         public void Error(int line, int col, string message)
         {
-            var fileName = this.ProjectModel.ProjectFileInfo;
-            //CompileConsole.Error("项目" + fileName??(null) + " 第" + line + "行,第" + col + "列错误:" + message);
-            CompileMessage cmsg = new CompileMessage(fileName, line, col, message);
-            this.CompileResult.Errors.Add(fileName,cmsg);        
+            var fileName = this.ProjectModel.ProjectFileInfo.ZFileName;
+            CompileMessage cmsg = new CompileMessage( new CompileMessageSrcKey( fileName), line, col, message);
+            this.MessageCollection.AddError(cmsg);        
         }
 
         public void Errorf(int line, int col, string messagef, params string[] args)
@@ -89,6 +91,7 @@ namespace ZCompileCore.Contexts
             string msg = string.Format(messagef, args);
             Error(position.Line, position.Col, msg);
         }
+
 
         #endregion
 

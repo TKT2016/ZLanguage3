@@ -7,6 +7,9 @@ namespace TKT.CLRTest.S3
     [ZStatic]
     class TestProperty
     {
+        public string P1 { get; set; }
+        public static int P2 { get; set; }
+
         private static int _计数器;
 
         private static string _名称;

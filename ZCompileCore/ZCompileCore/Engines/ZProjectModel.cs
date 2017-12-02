@@ -87,5 +87,19 @@ namespace ZCompileCore.Engines
         {
             RefPackageList.AddRange(packageNames);
         }
+
+        public string GetBinaryNameEx()
+        {
+            string binFileName = this.BinaryFileNameNoEx;
+            if (this.BinaryFileKind == PEFileKinds.Dll)
+            {
+                binFileName += ".dll";
+            }
+            else
+            {
+                binFileName += ".exe";
+            }
+            return binFileName;
+        }
     }
 }

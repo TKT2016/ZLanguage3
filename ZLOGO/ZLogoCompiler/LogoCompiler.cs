@@ -52,12 +52,13 @@ namespace ZLogoCompiler
             projectModel.AddClass(classModel);
             return projectModel;
         }
-
+        CompileMessageCollection MessageCollection = new CompileMessageCollection();
         public ProjectCompileResult Compile(string filePath)
         {
+            MessageCollection.Clear();
             ZProjectModel projectModel = Init(filePath);
-            ZProjectEngine builder = new ZProjectEngine();
-            ProjectCompileResult result = builder.Compile(projectModel);
+            ZProjectEngine builder = new ZProjectEngine(MessageCollection, projectModel);
+            ProjectCompileResult result = builder.Compile();
             return result;
         }
 

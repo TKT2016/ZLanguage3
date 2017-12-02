@@ -1,0 +1,15 @@
+﻿<Properties StartupConfiguration="{8790C2A5-6055-40BC-AC24-913CD47135F3}|Default">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workbench ActiveDocument="ZCompileCore\AST\exps\call\ExpCallThis.cs">
+    <Files>
+      <File FileName="ZCompileCore\AST\exps\call\ExpCallUse.cs" Line="48" Column="25" />
+      <File FileName="ZCompileCore\AST\exps\call\ExpCallThis.cs" Line="45" Column="41" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.TKT.CLRTest PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

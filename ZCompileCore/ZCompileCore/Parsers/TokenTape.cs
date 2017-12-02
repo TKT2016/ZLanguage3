@@ -9,12 +9,12 @@ using ZCompileCore.Reports;
 
 namespace ZCompileCore.Parsers
 {
-    public class TokenTape : ArrayTape<Token>
+    public class TokenTape : ArrayTape<LexToken>
     {
         ContextFile fileContext;
 
-        public TokenTape(List<Token> tokens, ContextFile fileContext)
-            : base(tokens.ToArray(), Token.EOF)
+        public TokenTape(List<LexToken> tokens, ContextFile fileContext)
+            : base(tokens.ToArray(), LexToken.EOF)
         {
             this.fileContext = fileContext;
         }
@@ -48,7 +48,7 @@ namespace ZCompileCore.Parsers
         {
             if (CurrentKind != tokKind)
             {
-                error(this.Current, this.Current.ToCode() + "不正确,应该是" + Token.GetTextByKind(tokKind));
+                error(this.Current, this.Current.ToCode() + "不正确,应该是" + LexToken.GetTextByKind(tokKind));
                 return false;
             }
             else
@@ -58,7 +58,7 @@ namespace ZCompileCore.Parsers
             }
         }
 
-        public void error(Token tok, string str)
+        public void error(LexToken tok, string str)
         {
            this.fileContext.Errorf(tok.Position, str);
         }

@@ -6,7 +6,7 @@ using ZCompileDesc.Collections;
 
 namespace ZCompileDesc.Descriptions
 {
-    public class ZBracketDefDesc //: ZBracketDescBase,IDefDesc
+    public class ZBracketDefDesc : IDefDesc//, ZBracketDescBase
     {
         public List<ZParam> Params { get; protected set; }
     //    public NamingList<ZArgDefDescBase> DefArgs { get; protected set; } 
@@ -131,7 +131,7 @@ namespace ZCompileDesc.Descriptions
         public ZParam[] GetParamNormals()
         {
             return Params
-               .Where(p => (p.IsGeneric == false))
+               .Where(p => (p.IsGenericArg == false))
                .ToArray();
         }
 

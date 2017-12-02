@@ -97,6 +97,7 @@ namespace ZDev.Forms
             //this.CodeEditor.Name = "codeEditor";
             this.Editor.Size = new System.Drawing.Size(284, 262);
             this.Editor.TabIndex = 0;
+             
             //this.codeEditor.StyleNeeded += new System.EventHandler<ScintillaNET.StyleNeededEventArgs>(this.codeEditor_StyleNeeded);
             // 
             // DocEditor

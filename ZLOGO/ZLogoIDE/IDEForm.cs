@@ -41,18 +41,18 @@ namespace ZLogoIDE
             {
                 compileMsgForm.Hide();
                 LogoCompiler compiler = new LogoCompiler();// (new FileInfo(FileFullPath));
-                var result= compiler.Compile(FileFullPath);
-                if (result.HasError())
+                ProjectCompileResult result = compiler.Compile(FileFullPath);
+                if (result.MessageCollection.HasError())
                 {
                     StringBuilder buffBuilder = new StringBuilder();
                     buffBuilder.AppendFormat("文件'{0}{1}'有以下错误:\n", FileName, LogoCompiler.ZLogoExt);
-                    foreach (CompileMessage compileMessage in result.Errors.ValuesToList())
+                    foreach (CompileMessage compileMessage in result.MessageCollection.Errors)
                     {
                         if (compileMessage.Line > 0 || compileMessage.Col > 0)
                         {
                             buffBuilder.AppendFormat("第{0}行,第{1}列", compileMessage.Line, compileMessage.Col);
                         }
-                        buffBuilder.AppendFormat("错误:{0}\n", compileMessage.Text);
+                        buffBuilder.AppendFormat("错误:{0}\n", compileMessage.Content);
                     }
                     compileMsgForm.ShowMessage(buffBuilder.ToString());
                     compileMsgForm.Show();
@@ -66,7 +66,6 @@ namespace ZLogoIDE
                     compileMsgForm.Hide();
                     compiler.Run(result);
                 }
-                
             }
         }
 

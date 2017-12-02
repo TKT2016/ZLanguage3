@@ -46,6 +46,7 @@
     <Compile Include="补语控制.cs" />
     <Compile Include="常用辅助.cs" />
     <Compile Include="对应表.cs" />
+    <Compile Include="常用转义符.cs" />
     <Compile Include="随机数器.cs" />
     <Compile Include="时间日期辅助.cs" />
     <Compile Include="时间日期.cs" />

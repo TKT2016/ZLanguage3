@@ -8,15 +8,19 @@ using ZLangRT.Utils;
 using ZCompileDesc.Utils;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Collections;
-using ZCompileDesc.Words;
 
 namespace ZCompileDesc.ZMembers 
 {
-    public class ZConstructorInfo: IWordDictionary
+    public class ZConstructorInfo //: IWordDictionary
     {
-        public ConstructorInfo Constructor { get; private set; }
+        public ConstructorInfo Constructor { get; protected set; }
         public ZConstructorDesc ZDesc { get; protected set; }
         public AccessAttributeEnum AccessAttribute { get; protected set; }
+
+        internal ZConstructorInfo( )
+        {
+
+        }
 
         public ZConstructorInfo(ConstructorInfo constructorInfo)
         {
@@ -26,33 +30,8 @@ namespace ZCompileDesc.ZMembers
 
         protected void Init()
         {
-            //if (Constructor.DeclaringType.Name=="矩形")
-            //{
-            //    Console.WriteLine("ZCompileDesc.ZMembers.ZConstructorInfo.Init");
-            //}
             ZDesc = ProcDescHelper.CreateZConstructorDesc(Constructor);
             AccessAttribute = GetAccessAttributeEnum(Constructor);
-        }
-
-
-        public bool ContainsWord(string text)
-        {
-            var paramsArr = this.Constructor.GetParameters();
-            foreach (var item in paramsArr)
-            {
-                if(item.Name==text)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public WordInfo SearchWord(string text)
-        {
-            if (!ContainsWord(text)) return null;
-            WordInfo newWord = new WordInfo(text, WordKind.ParamName, this);
-            return newWord;
         }
 
         public virtual bool HasZConstructorDesc(ZNewDesc procDesc)

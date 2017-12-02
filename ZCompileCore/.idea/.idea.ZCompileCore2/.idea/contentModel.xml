@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Administrator\.Rider2017.2\system\resharper-host\local\Transient\ReSharperHost\v10\SolutionCaches\_ZCompileCore2.-51575827.00" t="ExcludeRecursive" />
+    <e p="E:\ProgProj\Z\Z3\ZCompileCore" t="IncludeFlat">
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="TKT.CLRTest" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="EntryMain.cs" t="Include" />
+        <e p="Form1.cs" t="Include" />
+        <e p="Form1.Designer.cs" t="Include" />
+        <e p="Form1.resx" t="Include" />
+        <e p="ILDemo.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="S3" t="Include">
+          <e p="TestDefaultValue.cs" t="Include" />
+          <e p="TestProperty.cs" t="Include" />
+          <e p="TestRepeat.cs" t="Include" />
+          <e p="TestSC.cs" t="Include" />
+          <e p="TestStrongTrans.cs" t="Include" />
+        </e>
+        <e p="S4" t="Include">
+          <e p="注册表操作Test.cs" t="Include" />
+        </e>
+        <e p="TKT.CLRTest.csproj" t="IncludeRecursive" />
+      </e>
+      <e p="ZCompileCore" t="IncludeRecursive">
+        <e p="AST" t="Include">
+          <e p="exps" t="Include">
+            <e p="call" t="Include">
+              <e p="ExpCall.cs" t="Include" />
+              <e p="ExpCall_Parsed.cs" t="Include" />
+              <e p="ExpCallAnalyedBase.cs" t="Include" />
+              <e p="ExpCallNone.cs" t="Include" />
+              <e p="ExpCallSubject.cs" t="Include" />
+              <e p="ExpCallThis.cs" t="Include" />
+              <e p="ExpCallUse.cs" t="Include" />
+              <e p="ExpProcNamePart.cs" t="Include" />
+            </e>
+            <e p="each" t="Include">
+              <e p="ExpEach.cs" t="Include" />
+              <e p="ExpEachItem.cs" t="Include" />
+              <e p="ExpEachWord.cs" t="Include" />
+            </e>
+            <e p="Exp.cs" t="Include" />
+            <e p="ExpAssign.cs" t="Include" />
+            <e p="ExpBinary.cs" t="Include" />
+            <e p="ExpBinaryUtil.cs" t="Include" />
+            <e p="ExpBracket.cs" t="Include" />
+            <e p="ExpCast.cs" t="Include" />
+            <e p="ExpDe.cs" t="Include" />
+            <e p="ExpDi.cs" t="Include" />
+            <e p="ExpLiteral.cs" t="Include" />
+            <e p="ExpNameValue.cs" t="Include" />
+            <e p="ExpNew.cs" t="Include" />
+            <e p="ExpNewList.cs" t="Include" />
+            <e p="ExpRaw.cs" t="Include" />
+            <e p="ExpUnary.cs" t="Include" />
+            <e p="ExpVar.cs" t="Include" />
+            <e p="lambda" t="Include">
+              <e p="ExpLambdaBody.cs" t="Include" />
+              <e p="ExpNewLambda.cs" t="Include" />
+            </e>
+            <e p="NewExpAnalyInfo.cs" t="Include" />
+            <e p="types" t="Include">
+              <e p="ExpCallNone.cs" t="Include" />
+              <e p="ExpType.cs" t="Include" />
+              <e p="ExpTypeOne.cs" t="Include" />
+              <e p="ExpTypeThree.cs" t="Include" />
+              <e p="ExpTypeTwo.cs" t="Include" />
+            </e>
+          </e>
+          <e p="files" t="Include">
+            <e p="FileClass.cs" t="Include" />
+            <e p="FileDim.cs" t="Include" />
+            <e p="FileEnum.cs" t="Include" />
+            <e p="FileMutilType.cs" t="Include" />
+            <e p="FileType.cs" t="Include" />
+          </e>
+          <e p="ISetter.cs" t="Include" />
+          <e p="sections" t="Include">
+            <e p="SectionBase.cs" t="Include" />
+            <e p="SectionClassName.cs" t="Include" />
+            <e p="SectionConstructor.cs" t="Include" />
+            <e p="SectionConstructorDefault.cs" t="Include" />
+            <e p="SectionDim.cs" t="Include" />
+            <e p="SectionEnum.cs" t="Include" />
+            <e p="SectionImport.cs" t="Include" />
+            <e p="SectionProc.cs" t="Include" />
+            <e p="SectionProperties.cs" t="Include" />
+            <e p="SectionUse.cs" t="Include" />
+          </e>
+          <e p="stmts" t="Include">
+            <e p="Stmt.cs" t="Include" />
+            <e p="StmtBlock.cs" t="Include" />
+            <e p="StmtCall.cs" t="Include" />
+            <e p="StmtCatch.cs" t="Include" />
+            <e p="StmtIf.cs" t="Include" />
+            <e p="StmtRepeat.cs" t="Include" />
+            <e p="StmtTry.cs" t="Include" />
+            <e p="StmtWhile.cs" t="Include" />
+          </e>
+          <e p="Tree.cs" t="Include" />
+          <e p="units" t="Include">
+            <e p="PackageNameAST.cs" t="Include" />
+            <e p="ProcArg.cs" t="Include" />
+            <e p="ProcBracket.cs" t="Include" />
+            <e p="ProcName.cs" t="Include" />
+            <e p="PropertyAST.cs" t="Include" />
+            <e p="UnitBase.cs" t="Include" />
+          </e>
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="CompileConstant.cs" t="Include" />
+        <e p="CompileCoreException.cs" t="Include" />
+        <e p="Contexts" t="Include">
+          <e p="CompiledTypeCollection.cs" t="Include" />
+          <e p="ContextClass.cs" t="Include" />
+          <e p="ContextExp.cs" t="Include" />
+          <e p="ContextFile.cs" t="Include" />
+          <e p="ContextImport.cs" t="Include" />
+          <e p="ContextProc.cs" t="Include" />
+          <e p="ContextProject.cs" t="Include" />
+          <e p="ContextUse.cs" t="Include" />
+          <e p="ExpRawParseDictionary.cs" t="Include" />
+          <e p="ProcContextCollection.cs" t="Include" />
+          <e p="PropertyContextCollection.cs" t="Include" />
+        </e>
+        <e p="Engines" t="Include">
+          <e p="CompileUtil.cs" t="Include" />
+          <e p="ZFileEngine.cs" t="Include" />
+          <e p="ZFileModel.cs" t="Include" />
+          <e p="ZProjectEngine.cs" t="Include" />
+          <e p="ZProjectModel.cs" t="Include" />
+        </e>
+        <e p="Lex" t="Include">
+          <e p="CodePosition.cs" t="Include" />
+          <e p="FileSourceReader.cs" t="Include" />
+          <e p="SourceReader.cs" t="Include" />
+          <e p="StringSourceReader.cs" t="Include" />
+          <e p="Token.cs" t="Include" />
+          <e p="Tokenizer.cs" t="Include" />
+          <e p="TokenKind.cs" t="Include" />
+          <e p="TokenKindHelper.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Parsers" t="Include">
+          <e p="ExpCallParser.cs" t="Include" />
+          <e p="ExpParser.cs" t="Include" />
+          <e p="ExpTape.cs" t="Include" />
+          <e p="FileSectionParser.cs" t="Include" />
+          <e p="NameTypeParser.cs" t="Include" />
+          <e p="TokenTape.cs" t="Include" />
+          <e p="WordSegmenter.cs" t="Include" />
+        </e>
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Reports" t="Include">
+          <e p="CompileConsole.cs" t="Include" />
+          <e p="CompileMessage.cs" t="Include" />
+          <e p="CompileMessageCollection.cs" t="Include" />
+          <e p="CompileMessageEnum.cs.TXT" t="Include" />
+          <e p="CompileMessageKey.cs" t="Include" />
+          <e p="ProjectCompileResult.cs" t="Include" />
+        </e>
+        <e p="Symbols" t="Include">
+          <e p="base" t="Include">
+            <e p="SymbolBase.cs" t="Include" />
+            <e p="SymbolDefBase.cs" t="Include" />
+            <e p="SymbolRefBase.cs" t="Include" />
+          </e>
+          <e p="def" t="Include">
+            <e p="SymbolArg.cs" t="Include" />
+            <e p="SymbolDefField.cs" t="Include" />
+            <e p="SymbolDefMember.cs" t="Include" />
+            <e p="SymbolDefProperty.cs" t="Include" />
+            <e p="SymbolLocalVar.cs" t="Include" />
+          </e>
+          <e p="ref" t="Include">
+            <e p="SymbolRefMutil.cs" t="Include" />
+            <e p="SymbolRefStaticMember.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Tables" t="Include">
+          <e p="ClassSymbolTable.cs" t="Include" />
+          <e p="ISymbolTable.cs" t="Include" />
+          <e p="ProcSymbolTable.cs" t="Include" />
+          <e p="SuperSymbolTable.cs" t="Include" />
+          <e p="SymbolTableBase.cs" t="Include" />
+          <e p="UseSymbolTable.cs" t="Include" />
+        </e>
+        <e p="Tools" t="Include">
+          <e p="CallAjuster.cs" t="Include" />
+          <e p="EmitSymbolHelper.cs" t="Include" />
+        </e>
+        <e p="ZCompileCore.csproj" t="IncludeRecursive" />
+      </e>
+      <e p="ZCompileCore2.sln" t="IncludeFlat" />
+      <e p="ZCompileDesc" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Collections" t="Include">
+          <e p="IWordDictionary.cs" t="Include" />
+          <e p="IWordDictionaryList.cs" t="Include" />
+          <e p="IZDescTypeDictionary.cs" t="Include" />
+          <e p="IZTypeDictionary.cs" t="Include" />
+          <e p="NamingList.cs" t="Include" />
+          <e p="WordDictionary.cs" t="Include" />
+          <e p="ZPackageDescList.cs" t="Include" />
+        </e>
+        <e p="Descriptions" t="Include">
+          <e p="ArgDescriptions" t="Include">
+            <e p="ZArg.cs" t="Include" />
+            <e p="ZParam.cs" t="Include" />
+          </e>
+          <e p="BracketDescriptions" t="Include">
+            <e p="ZBracketCallDesc.cs" t="Include" />
+            <e p="ZBracketDefDesc.cs" t="Include" />
+          </e>
+          <e p="ICallDesc.cs" t="Include" />
+          <e p="IDefDesc.cs" t="Include" />
+          <e p="ProcDescriptions" t="Include">
+            <e p="ZCallDesc.cs" t="Include" />
+            <e p="ZConstructorDesc.cs" t="Include" />
+            <e p="ZMethodDesc.cs" t="Include" />
+            <e p="ZNewDesc.cs" t="Include" />
+            <e p="ZProcDescBase.cs" t="Include" />
+          </e>
+        </e>
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Tools" t="Include">
+          <e p="ZClassTypeHelper.cs" t="Include" />
+        </e>
+        <e p="Utils" t="Include">
+          <e p="EnumerableHelper.cs" t="Include" />
+          <e p="IWordDictionaryHelper.cs" t="Include" />
+          <e p="ProcDescHelper.cs" t="Include" />
+          <e p="ZCodeParser.cs" t="Include" />
+          <e p="ZDescriptionHelper.cs" t="Include" />
+          <e p="ZDescTypeListHelper.cs" t="Include" />
+          <e p="ZTypeListHelper.cs" t="Include" />
+        </e>
+        <e p="Words" t="Include">
+          <e p="WordData.cs" t="Include" />
+          <e p="WordHelper.cs" t="Include" />
+          <e p="WordInfo.cs" t="Include" />
+          <e p="WordKind.cs" t="Include" />
+        </e>
+        <e p="ZCompileDesc.csproj" t="IncludeRecursive" />
+        <e p="ZLangBasicTypes.cs" t="Include" />
+        <e p="ZLibRTException.cs" t="Include" />
+        <e p="ZMembers" t="Include">
+          <e p="ZConstructorCompilingInfo.cs" t="Include" />
+          <e p="ZConstructorInfo.cs" t="Include" />
+          <e p="ZEnumItemInfo.cs" t="Include" />
+          <e p="ZFieldInfo.cs" t="Include" />
+          <e p="ZMemberInfo.cs" t="Include" />
+          <e p="ZMethodInfo.cs" t="Include" />
+          <e p="ZPropertyCompilingInfo.cs" t="Include" />
+          <e p="ZPropertyInfo.cs" t="Include" />
+        </e>
+        <e p="ZTypeManager.cs" t="Include" />
+        <e p="ZTypes" t="Include">
+          <e p="IZDescType.cs" t="Include" />
+          <e p="ZAssemblyDesc.cs" t="Include" />
+          <e p="ZClassCompilingType.cs" t="Include" />
+          <e p="ZClassLibType.cs" t="Include" />
+          <e p="ZClassType.cs" t="Include" />
+          <e p="ZDimType.cs" t="Include" />
+          <e p="ZEnumType.cs" t="Include" />
+          <e p="ZPackageDesc.cs" t="Include" />
+          <e p="ZType.cs" t="Include" />
+          <e p="ZTypeUtil.cs" t="Include" />
+        </e>
+      </e>
+      <e p="ZCompileKit" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Collections" t="Include">
+          <e p="ArrayTape.cs" t="Include" />
+          <e p="IName.cs" t="Include" />
+          <e p="KeyValuesDictionary.cs" t="Include" />
+          <e p="NameDictionary.cs" t="Include" />
+          <e p="StringValuesDictionary.cs" t="Include" />
+        </e>
+        <e p="Infoes" t="Include">
+          <e p="ZCompileFileInfo.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Tools" t="Include">
+          <e p="ChineseHelper.cs" t="Include" />
+          <e p="ContinuousMerger.cs" t="Include" />
+          <e p="EmitHelper.cs" t="Include" />
+          <e p="ListHelper.cs" t="Include" />
+          <e p="StringHelper.cs" t="Include" />
+          <e p="TxtFileEncoding.cs" t="Include" />
+        </e>
+        <e p="ZCompileKit.csproj" t="IncludeRecursive" />
+      </e>
+      <e p="ZCompiler" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="CompileCmdModel.cs" t="Include" />
+        <e p="Const.cs" t="Include" />
+        <e p="FileCompiler.cs" t="Include" />
+        <e p="MainEntry.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="ProjectCompiler.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Sample" t="Include">
+          <e p="test.zyy" t="Include" />
+          <e p="Z标准包测试" t="Include">
+            <e p="操作系统" t="Include">
+              <e p="测试剪贴板.zyy" t="Include" />
+              <e p="测试定时器.zyy" t="Include" />
+              <e p="测试注册表操作.zyy" t="Include" />
+              <e p="测试设置桌面背景图.zyy" t="Include" />
+              <e p="测试进程.zyy" t="Include" />
+              <e p="测试进程窗口.zyy" t="Include" />
+            </e>
+            <e p="文件系统" t="Include">
+              <e p="测试文件创建.zyy" t="Include" />
+            </e>
+            <e p="桌面控件" t="Include">
+              <e p="测试窗体.zyy" t="Include" />
+            </e>
+          </e>
+          <e p="你好.zyy" t="Include" />
+          <e p="小飞机游戏" t="Include">
+            <e p="0" t="Include">
+              <e p="Project.tktxm" t="Include" />
+              <e p="主程序.zyy" t="Include" />
+              <e p="子弹.zyy" t="Include" />
+              <e p="方向.zyy" t="Include" />
+              <e p="游戏窗体.zyy" t="Include" />
+              <e p="物体.zyy" t="Include" />
+              <e p="陨石.zyy" t="Include" />
+              <e p="飞机.zyy" t="Include" />
+            </e>
+            <e p="_说明.txt" t="Include" />
+            <e p="resource" t="Include">
+              <e p="bg_01.jpg" t="Include" />
+              <e p="bg_02.jpg" t="Include" />
+              <e p="BOMB3.WAV" t="Include" />
+              <e p="BOMB5.WAV" t="Include" />
+              <e p="DiJi.png" t="Include" />
+              <e p="explosion.mp3" t="Include" />
+              <e p="explosion.wav" t="Include" />
+              <e p="font.fnt" t="Include" />
+              <e p="font_0.png" t="Include" />
+              <e p="grey_bullet.png" t="Include" />
+              <e p="icon36x36.png" t="Include" />
+              <e p="icon48x48.png" t="Include" />
+              <e p="icon72x72.png" t="Include" />
+              <e p="loading.gif" t="Include" />
+              <e p="plane.png" t="Include" />
+              <e p="plane.xml" t="Include" />
+              <e p="red_bullet.png" t="Include" />
+              <e p="shoot.mp3" t="Include" />
+              <e p="shoot.wav" t="Include" />
+            </e>
+            <e p="主程序.zyy" t="Include" />
+            <e p="子弹.zyy" t="Include" />
+            <e p="子弹管理器.zyy" t="Include" />
+            <e p="子弹类型.zyy" t="Include" />
+            <e p="小飞机游戏.zxm" t="Include" />
+            <e p="战场.zyy" t="Include" />
+            <e p="战场参数.zyy" t="Include" />
+            <e p="敌人.zyy" t="Include" />
+            <e p="敌机管理器.zyy" t="Include" />
+            <e p="游戏状态.zyy" t="Include" />
+            <e p="物体.zyy" t="Include" />
+            <e p="飞机.zyy" t="Include" />
+          </e>
+          <e p="测试Lambda1.zyy" t="Include" />
+          <e p="测试列表每一个.zyy" t="Include" />
+          <e p="测试属性默认值.zyy" t="Include" />
+          <e p="测试异常.zyy" t="Include" />
+          <e p="测试强制转换.zyy" t="Include" />
+          <e p="测试打印乘法.zyy" t="Include" />
+          <e p="测试矩形构造函数.zyy" t="Include" />
+          <e p="测试返回值.zyy" t="Include" />
+          <e p="测试选择结构.zyy" t="Include" />
+          <e p="测试重复.zyy" t="Include" />
+        </e>
+        <e p="ZCompiler.csproj" t="IncludeRecursive" />
+        <e p="ZProjFileParser.cs" t="Include" />
+        <e p="项目说明.txt" t="Include" />
+      </e>
+      <e p="ZLangRT" t="IncludeRecursive">
+        <e p="Attributes" t="Include">
+          <e p="IZTag.cs" t="Include" />
+          <e p="ZCodeAttribute.cs" t="Include" />
+          <e p="ZDimAttribute.cs" t="Include" />
+          <e p="ZEnumAttribute.cs" t="Include" />
+          <e p="ZInstanceAttribute.cs" t="Include" />
+          <e p="ZStaticAttribute.cs" t="Include" />
+          <e p="ZyyAttribute.cs" t="Include" />
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Calculater.cs" t="Include" />
+        <e p="Collections" t="Include">
+          <e p="PairDict.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Utils" t="Include">
+          <e p="AccessAttributeEnum.cs" t="Include" />
+          <e p="AttributeUtil.cs" t="Include" />
+          <e p="DebugUtil.cs" t="Include" />
+          <e p="GenericUtil.cs" t="Include" />
+          <e p="Invoker.cs" t="Include" />
+          <e p="ReflectionUtil.cs" t="Include" />
+        </e>
+        <e p="ZLambda.cs" t="Include" />
+        <e p="ZLangRT.csproj" t="IncludeRecursive" />
+        <e p="ZyyRTException.cs" t="Include" />
+      </e>
+      <e p="Z标准包" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="Z标准包.csproj" t="IncludeRecursive" />
+        <e p="操作系统" t="Include">
+          <e p="0" t="Include">
+            <e p="KeyboardHook.cs" t="Include" />
+            <e p="MouseHook.cs" t="Include" />
+            <e p="Win32Api.cs" t="Include" />
+          </e>
+          <e p="0txt" t="Include">
+            <e p="进程2.cs.TXT" t="Include" />
+            <e p="进程启动体.cs.TXT" t="Include" />
+            <e p="进程操作.cs.TXT" t="Include" />
+          </e>
+          <e p="GetWindowCmd.cs" t="Include" />
+          <e p="IntPtrHelper.cs" t="Include" />
+          <e p="User32.cs" t="Include" />
+          <e p="剪贴板.cs" t="Include" />
+          <e p="剪贴板数据格式.cs" t="Include" />
+          <e p="定时器.cs" t="Include" />
+          <e p="操作系统配置器.cs" t="Include" />
+          <e p="桌面背景显示方式.cs" t="Include" />
+          <e p="注册表操作器.cs" t="Include" />
+          <e p="注册表键.cs" t="Include" />
+          <e p="注册表项.cs" t="Include" />
+          <e p="程序牌照.cs" t="Include" />
+          <e p="进程.cs" t="Include" />
+          <e p="进程操作器.cs" t="Include" />
+          <e p="进程窗口.cs" t="Include" />
+          <e p="进程窗口操作器.cs" t="Include" />
+        </e>
+        <e p="文件系统" t="Include">
+          <e p="图片.cs" t="Include" />
+          <e p="文件.cs" t="Include" />
+          <e p="文件夹.cs" t="Include" />
+          <e p="文件系统操作器.cs" t="Include" />
+          <e p="文件系统节点.cs" t="Include" />
+        </e>
+        <e p="桌面控件" t="Include">
+          <e p="0" t="Include">
+            <e p="光标.cs" t="Include" />
+            <e p="尺寸.cs" t="Include" />
+            <e p="桌面定时器.cs" t="Include" />
+            <e p="键盘参数.cs" t="Include" />
+            <e p="键盘按键.cs" t="Include" />
+            <e p="鼠标参数.cs" t="Include" />
+            <e p="鼠标按键.cs" t="Include" />
+          </e>
+          <e p="ZButton.cs" t="Include" />
+          <e p="ZForm.cs" t="Include" />
+          <e p="ZPanel.cs" t="Include" />
+          <e p="按钮.cs" t="Include" />
+          <e p="控件.cs" t="Include" />
+          <e p="控件管理器.cs" t="Include" />
+          <e p="点.cs" t="Include" />
+          <e p="窗体.cs" t="Include" />
+          <e p="面板.cs" t="Include" />
+        </e>
+        <e p="绘图" t="Include">
+          <e p="0" t="Include">
+            <e p="位图.cs" t="Include" />
+            <e p="图片.cs.TXT" t="Include" />
+            <e p="图片辅助.cs" t="Include" />
+            <e p="字体.cs" t="Include" />
+            <e p="文本块.cs" t="Include" />
+            <e p="画笔.cs" t="Include" />
+            <e p="笔刷.cs" t="Include" />
+            <e p="笔刷库.cs" t="Include" />
+            <e p="线性渐变笔刷.cs" t="Include" />
+            <e p="绘图辅助.cs" t="Include" />
+            <e p="颜色.cs" t="Include" />
+          </e>
+          <e p="动画窗体.cs" t="Include" />
+          <e p="形状" t="Include">
+            <e p="圆.cs" t="Include" />
+            <e p="椭圆.cs" t="Include" />
+            <e p="点.cs" t="Include" />
+            <e p="点辅助.cs" t="Include" />
+            <e p="矩形.cs" t="Include" />
+            <e p="线段.cs" t="Include" />
+          </e>
+          <e p="绘图器.cs" t="Include" />
+          <e p="绘图窗体.cs" t="Include" />
+        </e>
+        <e p="网络" t="Include">
+          <e p="HttpHelper.cs" t="Include" />
+          <e p="IP地址.cs" t="Include" />
+          <e p="PictureDownUtil.cs" t="Include" />
+          <e p="SocketHttpRequest.cs" t="Include" />
+          <e p="网址.cs" t="Include" />
+          <e p="网络操作.cs" t="Include" />
+        </e>
+      </e>
+      <e p="Z语言系统" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="VOID.cs" t="Include" />
+        <e p="Z语言系统.csproj" t="IncludeRecursive" />
+        <e p="事物.cs" t="Include" />
+        <e p="列表.cs" t="Include" />
+        <e p="判断符.cs" t="Include" />
+        <e p="可运行条件.cs" t="Include" />
+        <e p="可运行语句.cs" t="Include" />
+        <e p="字符.cs" t="Include" />
+        <e p="对应表.cs" t="Include" />
+        <e p="常用数学函数.cs" t="Include" />
+        <e p="常用转义符.cs" t="Include" />
+        <e p="常用辅助.cs" t="Include" />
+        <e p="异常.cs" t="Include" />
+        <e p="控制台.cs" t="Include" />
+        <e p="整数.cs" t="Include" />
+        <e p="文本.cs" t="Include" />
+        <e p="时间日期.cs" t="Include" />
+        <e p="时间日期辅助.cs" t="Include" />
+        <e p="浮点数.cs" t="Include" />
+        <e p="补语控制.cs" t="Include" />
+        <e p="随机数器.cs" t="Include" />
+      </e>
+    </e>
+  </component>
+</project>

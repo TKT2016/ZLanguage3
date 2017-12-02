@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ZLangRT.Attributes
 {
-    public class ZyyAttribute : Attribute
+    public abstract class ZyyAttribute : Attribute
     {
         public const string Version = "1.0";
     }

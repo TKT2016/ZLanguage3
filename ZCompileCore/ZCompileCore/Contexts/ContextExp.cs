@@ -7,12 +7,11 @@ using ZCompileCore.AST;
 using ZCompileCore.Symbols;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using Z语言系统;
 
 namespace ZCompileCore.Contexts
 {
-    public class ContextExp:IWordDictionary
+    public class ContextExp //:IWordDictionary
     {
         public Stmt Stmt { get;private set; }
         public ContextProc ProcContext { get; private set; }
@@ -45,18 +44,18 @@ namespace ZCompileCore.Contexts
             }
         }
 
-        #region IWordDictionary实现
-        public bool ContainsWord(string text)
-        {
-            return ProcContext.ContainsWord(text)
-            ;
-        }
+        //#region IWordDictionary实现
+        //public bool ContainsWord(string text)
+        //{
+        //    return ProcContext.ContainsWord(text)
+        //    ;
+        //}
 
-        public WordInfo SearchWord(string text)
-        {
-            return ProcContext.SearchWord(text);
-        }
-        #endregion
+        //public WordInfo SearchWord(string text)
+        //{
+        //    return ProcContext.SearchWord(text);
+        //}
+        //#endregion
 
         //public IWordDictionary ExpWordDictionary
         //{

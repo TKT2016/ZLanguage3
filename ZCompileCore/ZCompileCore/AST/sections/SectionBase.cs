@@ -12,10 +12,15 @@ namespace ZCompileCore.AST
     {
         public ContextFile FileContext { get; set; }
 
-        protected virtual void errorf(CodePosition postion, string msgFormat, params object[] msgParams)
+        protected virtual void ErrorF(CodePosition postion, string msgFormat, params object[] msgParams)
         {
             this.FileContext.Errorf(postion, msgFormat, msgParams);
         }
-        
+
+        public abstract void AnalyText();
+        public abstract void AnalyType();
+        public abstract void AnalyBody();
+        public abstract void EmitName();
+        public abstract void EmitBody();
     }
 }

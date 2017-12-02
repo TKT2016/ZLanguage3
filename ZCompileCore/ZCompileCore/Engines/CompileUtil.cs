@@ -25,7 +25,7 @@ namespace ZCompileCore.Engines
 
         public static void MoveBinary(ContextProject projectContext)
         {
-            string exBinFileName = projectContext.GetBinaryNameEx();
+            string exBinFileName = projectContext.ProjectModel.GetBinaryNameEx();
             string fromFileFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, exBinFileName);
             string toFileFullPath = Path.Combine(projectContext.ProjectModel.BinarySaveDirectoryInfo.FullName, exBinFileName);
             if (File.Exists(toFileFullPath))
@@ -40,19 +40,13 @@ namespace ZCompileCore.Engines
             CompileUtil.DeletePDB(projectContext);
         }
 
-        public static void GenerateBinary(ContextProject context)
+        public static void GenerateBinary(ContextProject projectContext)
         {
-            string binFileName = context.GetBinaryNameEx();
-            string projectPackageName = context.ProjectModel.ProjectPackageName;
-            //var assemblyName = new AssemblyName(projectPackageName);
-            //AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
-            //var moduleBuilder = assemblyBuilder.DefineDynamicModule(projectPackageName, binFileName, true);
-            //context.EmitContext.AssemblyName = assemblyName;
-            //context.EmitContext.AssemblyBuilder = assemblyBuilder;
-            //context.EmitContext.ModuleBuilder = moduleBuilder;
+            string binFileName = projectContext.ProjectModel.GetBinaryNameEx();
+            string projectPackageName = projectContext.ProjectModel.ProjectPackageName;
 
-            context.CreateProjectEmitContext(AppDomain.CurrentDomain, projectPackageName, projectPackageName, binFileName); 
-            setAttr(context.EmitContext.AssemblyBuilder , context);
+            projectContext.CreateProjectEmitContext(AppDomain.CurrentDomain, projectPackageName, projectPackageName, binFileName);
+            setAttr(projectContext.EmitContext.AssemblyBuilder, projectContext);
         }
 
         private static void setAttr(AssemblyBuilder builder, ContextProject context)

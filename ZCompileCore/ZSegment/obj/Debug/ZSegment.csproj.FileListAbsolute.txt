@@ -1,0 +1,15 @@
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\dict.txt
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\char_state_tab.json
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\pos_prob_emit.json
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\pos_prob_start.json
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\pos_prob_trans.json
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\prob_emit.json
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\jieba\Resources\prob_trans.json
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\ZSegment.dll.config
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\ZSegment.dll
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\ZSegment.pdb
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\JiebaNet.Segmenter.dll
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\bin\Debug\Newtonsoft.Json.dll
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\obj\Debug\ZSegment.csprojResolveAssemblyReference.cache
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\obj\Debug\ZSegment.dll
+E:\ProgProj\Z\Z4\ZCompileCore\ZSegment\obj\Debug\ZSegment.pdb

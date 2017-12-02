@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZCompiler", "..\ZCompileCor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKT.CLRTest", "..\ZCompileCore\TKT.CLRTest\TKT.CLRTest.csproj", "{8790C2A5-6055-40BC-AC24-913CD47135F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZNLP", "..\ZCompileCore\ZSegment\ZNLP.csproj", "{3497D4F3-DE89-4676-980B-50DAB21B824E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z标准包", "..\ZCompileCore\Z标准包\Z标准包.csproj", "{D52C5BD7-DD7D-459A-9953-8B3972FDF2B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{8790C2A5-6055-40BC-AC24-913CD47135F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8790C2A5-6055-40BC-AC24-913CD47135F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8790C2A5-6055-40BC-AC24-913CD47135F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3497D4F3-DE89-4676-980B-50DAB21B824E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3497D4F3-DE89-4676-980B-50DAB21B824E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3497D4F3-DE89-4676-980B-50DAB21B824E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3497D4F3-DE89-4676-980B-50DAB21B824E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D52C5BD7-DD7D-459A-9953-8B3972FDF2B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D52C5BD7-DD7D-459A-9953-8B3972FDF2B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D52C5BD7-DD7D-459A-9953-8B3972FDF2B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D52C5BD7-DD7D-459A-9953-8B3972FDF2B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

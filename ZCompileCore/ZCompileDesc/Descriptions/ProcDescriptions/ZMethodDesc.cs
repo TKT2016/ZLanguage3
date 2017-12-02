@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZMembers;
 using ZCompileDesc.ZTypes;
 using ZLangRT;
@@ -44,23 +43,20 @@ namespace ZCompileDesc.Descriptions
             return index != -1;
         }
 
-        public WordInfo SearchWord(string text)
+        public string[] GetStringParts()
         {
-            if (!ContainsWord(text)) return null;
-            WordInfo info = new WordInfo(text, WordKind.ProcNamePart, this);
-            return info;
+            return StringParts.ToArray();
         }
+
+        //public WordInfo SearchWord(string text)
+        //{
+        //    if (!ContainsWord(text)) return null;
+        //    WordInfo info = new WordInfo(text, WordKind.ProcNamePart, this);
+        //    return info;
+        //}
 
         public bool ZEquals(ZMethodDesc zdef)
         {
-            //#region DEBUG
-            //string zdefcode = zdef.ToZCode();
-            //string zcallcode = zdef.ToZCode();
-            //if (zdefcode.StartsWith("打印") && zdefcode.StartsWith("打印"))
-            //{
-            //    Console.WriteLine("ZCallDesc.Compare " + zdefcode);
-            //}
-            //#endregion
             if (this.PartsCount != zdef.PartsCount) return false;
             int size = this.PartsCount;
             for (int i = 0; i < size; i++)

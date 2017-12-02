@@ -12,6 +12,7 @@ namespace Z语言系统
     {
         static Random rnd = new Random();
 
+        [ZCode("生成随机数")]
         public static int 生成随机数()
         {
             return rnd.Next();
@@ -22,6 +23,7 @@ namespace Z语言系统
             return rnd.Next(最小值, 最大值);
         }*/
 
+        [ZCode("生成随机数(整数:最小值, 整数:最大值)")]
         public static int 生成随机数(int 最小值, int 最大值)
         {
             int x= rnd.Next((int)最小值, (int)最大值);
@@ -29,6 +31,7 @@ namespace Z语言系统
             return x;
         }
 
+        [ZCode("生成随机数(浮点数:最小值, 浮点数:最大值)")]
         public static int 生成随机数(float 最小值, float 最大值)
         {
             int x = rnd.Next((int)最小值, (int)最大值);

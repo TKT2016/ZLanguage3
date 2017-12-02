@@ -16,16 +16,20 @@ namespace ZCompiler
 
         public ProjectCompileResult CompileResult { get; private set;}
 
-        public FileCompiler( )
-        {
+        CompileMessageCollection MessageCollection;
 
+        public FileCompiler()
+        {
+            
         }
 
-        public ProjectCompileResult Compile(string srcPath)
+        public ProjectCompileResult Compile(string srcPath, CompileMessageCollection messageCollection)
         {
+            MessageCollection = messageCollection;
             InitFile(srcPath);
-            ZProjectEngine builder2 = new ZProjectEngine();
-            ProjectCompileResult result = builder2.Compile(projectModel);
+            ZProjectEngine builder2 = new ZProjectEngine(MessageCollection, projectModel);
+            //builder2.SetProjectModel(projectModel);
+            ProjectCompileResult result = builder2.Compile();
             CompileResult= result;
             return result;
         }

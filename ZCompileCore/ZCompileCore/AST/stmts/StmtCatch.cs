@@ -9,7 +9,6 @@ using ZCompileCore.Symbols;
 using ZCompileCore.Tools;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 using ZCompileKit.Tools;
 
@@ -17,8 +16,8 @@ namespace ZCompileCore.AST
 {
     public class StmtCatch:Stmt
     {
-       public Token CatchToken { get; set; }
-       public Token ExceptionTypeVarToken { get; set; }
+       public LexToken CatchToken { get; set; }
+       public LexToken ExceptionTypeVarToken { get; set; }
        public StmtBlock CatchBody { get; set; }
 
        string exTypeName;
@@ -28,43 +27,52 @@ namespace ZCompileCore.AST
 
        public override void Analy( )
        {
-           var tyedimNames = GetTypeWords();
-           NameTypeParser parser = new NameTypeParser(tyedimNames);
-           NameTypeParser.ParseResult result = parser.ParseVar(ExceptionTypeVarToken);
-           exTypeName = result.TypeName;
-           exType = result.ZType;
-           exName = result.VarName;
-           var symbols = this.ProcContext.Symbols;
+           //var retText = ExceptionTypeVarToken.GetText();
+           TypeArgParser parser = new TypeArgParser(this.ClassContext);
+           TypeArgParser.ParseResult result = parser.Parse(ExceptionTypeVarToken);
+           if (result.ResultCount == 1)
+           {
+               //var tyedimNames = GetTypeWords();
+               //var segMan = this.FileContext.SegManager;
+               //NameTypeParser parser = new NameTypeParser(segMan.TypeNameDict, segMan.ArgSegementer);
+               //NameTypeParser.ParseResult result = parser.ParseVar(ExceptionTypeVarToken);
+
+               exTypeName = result.ArgZTypes[0].ZName;
+               exType = result.ArgZTypes[0];
+               exName = result.ArgName;
+           }
+           //var symbols = this.ProcContext.Symbols;
            //exTypeName = ExceptionTypeToken.GetText();
            //exType = ZTypeCache.GetByZName(exTypeName)[0];
-           
            //if (exType == null)
            //{
            //    errorf(ExceptionTypeToken.Postion, "类型'{0}'不存在", exTypeName);
            //}
            //exName = ExceptionVarToken.GetText();
-           var exSymbol2 = symbols.Get(exName);
-           if (exSymbol2 == null)
+           //var exSymbol2 = symbols.Get(exName);
+           if (this.ProcContext.ContainsVarName(exName)==false)// exSymbol2 == null)
            {
                exSymbol = new SymbolLocalVar(exName, exType);
                exSymbol.LoacalVarIndex =this.ProcContext.CreateLocalVarIndex(exName);
+               this.ProcContext.AddDefSymbol(exSymbol);
            }
            else
            {
-               if (exSymbol2 is SymbolLocalVar)
+               if (this.ProcContext.IsDefLocal(exName))//if (exSymbol2 is SymbolLocalVar)
                {
-                   exSymbol = exSymbol2 as SymbolLocalVar;
+                   exSymbol = this.ProcContext.GetDefLocal(exName);// exSymbol2 as SymbolLocalVar;
                    if (exSymbol.SymbolZType != exType)
                    {
-                       ErrorE(ExceptionTypeVarToken.Position, "变量'{0}'的类型与异常的类型不一致", exName);
+                       ErrorF(ExceptionTypeVarToken.Position, "变量'{0}'的类型与异常的类型不一致", exName);
                    }
                }
                else
                {
-                   ErrorE(ExceptionTypeVarToken.Position, "变量名称'{0}'已经使用过", exName);
+                   ErrorF(ExceptionTypeVarToken.Position, "变量名称'{0}'已经使用过", exName);
                }
            }
-           symbols.Add(exSymbol);
+           //symbols.Add(exSymbol);
+           
            CatchBody.ProcContext = this.ProcContext;
            CatchBody.Analy();
        }
@@ -78,13 +86,13 @@ namespace ZCompileCore.AST
            IL.EndExceptionBlock();
        }
 
-       private IWordDictionary GetTypeWords()
-       {
-           WordDictionary dict = this.ProcContext.ClassContext.FileContext.ImportContext.TypeNameDict;
-           //WordDictionaryList collect = new WordDictionaryList();
-           //collect.Add(dict);
-           return dict;
-       }
+       //private IWordDictionary GetTypeWords()
+       //{
+       //    WordDictionary dict = this.ProcContext.ClassContext.FileContext.ImportContext.TypeNameDict;
+       //    //WordDictionaryList collect = new WordDictionaryList();
+       //    //collect.Add(dict);
+       //    return dict;
+       //}
 
        #region 覆盖 
        public override string ToString()

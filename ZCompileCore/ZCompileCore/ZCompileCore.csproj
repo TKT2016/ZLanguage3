@@ -8,9 +8,10 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZCompileCore</RootNamespace>
-    <AssemblyName>ZCompileCore</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <AssemblyName>ZCompileCore4</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,11 +30,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JiebaNet.Segmenter">
+      <HintPath>..\ZSegment\jieba\JiebaNet.Segmenter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,64 +48,106 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AST\exps\call\ExpCall_Parsed.cs" />
-    <Compile Include="AST\exps\call\ExpCallAnalyedBase.cs" />
-    <Compile Include="AST\exps\call\ExpCallNone.cs" />
-    <Compile Include="AST\exps\each\ExpEach.cs" />
-    <Compile Include="AST\exps\ExpCast.cs" />
-    <Compile Include="AST\exps\ExpNameValue.cs" />
-    <Compile Include="AST\exps\lambda\ExpLambdaBody.cs" />
-    <Compile Include="AST\exps\ExpBinaryUtil.cs" />
-    <Compile Include="AST\exps\call\ExpCallUse.cs" />
-    <Compile Include="AST\exps\call\ExpCallThis.cs" />
-    <Compile Include="AST\exps\call\ExpCallSubject.cs" />
-    <Compile Include="AST\exps\ExpNewList.cs" />
-    <Compile Include="AST\exps\call\ExpProcNamePart.cs" />
-    <Compile Include="AST\exps\lambda\ExpNewLambda.cs" />
-    <Compile Include="AST\exps\each\ExpEachItem.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallSingleSuper.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeSingleBase.cs" />
+    <Compile Include="ASTExps\Vars\ExpSuperProperty.cs" />
+    <Compile Include="ASTExps\Vars\ExpLocal.cs" />
+    <Compile Include="ASTExps\Vars\ExpStaticClassName.cs" />
+    <Compile Include="ASTExps\Calls\ExpCall_Parsed.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallAnalyedBase.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallNone.cs" />
+    <Compile Include="ASTExps\each\ExpEach.cs" />
+    <Compile Include="ASTExps\ExpCast.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallDoubleUse.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallDoubleThis.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallSubjectMethod.cs" />
+    <Compile Include="ASTExps\ExpCallBase.cs" />
+    <Compile Include="ASTExps\ExpChain.cs" />
+    <Compile Include="ASTExps\ExpNameValue.cs" />
+    <Compile Include="ASTExps\lambda\ExpLambdaBody.cs" />
+    <Compile Include="ASTExps\ExpBinaryUtil.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallUse.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallThis.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallSubject.cs" />
+    <Compile Include="ASTExps\ExpNewList.cs" />
+    <Compile Include="ASTExps\Calls\ExpProcNamePart.cs" />
+    <Compile Include="ASTExps\lambda\ExpNewLambda.cs" />
+    <Compile Include="ASTExps\each\ExpEachItem.cs" />
+    <Compile Include="ASTExps\Types\ExpCallNone.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeThree.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeTwo.cs" />
+    <Compile Include="AST\sections\DimVarAST.cs" />
+    <Compile Include="AST\sections\SectionClassBase.cs" />
+    <Compile Include="AST\sections\SectionClassNameBase.cs" />
+    <Compile Include="AST\sections\SectionClassNameDefault.cs" />
+    <Compile Include="AST\sections\SectionConstructorBase.cs" />
     <Compile Include="AST\sections\SectionConstructorDefault.cs" />
+    <Compile Include="AST\stmts\StmtForeach.cs" />
     <Compile Include="AST\stmts\StmtRepeat.cs" />
     <Compile Include="AST\units\ProcBracket.cs" />
-    <Compile Include="CompileCoreException.cs" />
-    <Compile Include="Contexts\ExpParseDictionary.cs" />
+    <Compile Include="CCException.cs" />
+    <Compile Include="Contexts\CompiledTypeCollection.cs" />
+    <Compile Include="Contexts\ContextImportTypes.cs" />
+    <Compile Include="ASTExps\ExpErrors.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeBase.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeSingle.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeCompiling.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallSingleThis.cs" />
+    <Compile Include="ASTExps\Calls\ExpCallSingleUse.cs" />
+    <Compile Include="ASTExps\Vars\ExpUseProperty.cs" />
+    <Compile Include="ASTExps\Vars\ExpUseEnumItem.cs" />
+    <Compile Include="ASTExps\Vars\ExpDefProperty.cs" />
+    <Compile Include="ASTExps\Vars\ExpArg.cs" />
+    <Compile Include="ASTExps\Vars\ExpLocalVar.cs" />
+    <Compile Include="ASTExps\ExpVarBase.cs" />
+    <Compile Include="Contexts\ContextImportUse.cs" />
+    <Compile Include="Lex\ZKeywords.cs" />
+    <Compile Include="Lex\TokenZTypeHelper.cs" />
+    <Compile Include="Parsers\ChainItemParser.cs" />
+    <Compile Include="Parsers\ChainParser.cs" />
     <Compile Include="Parsers\ExpCallParser.cs" />
     <Compile Include="Parsers\ExpTape.cs" />
+    <Compile Include="Parsers\TypeArgParser.cs" />
+    <Compile Include="Parsers\TypePropertyParser.cs" />
+    <Compile Include="Parsers\ZTypeParser.cs" />
+    <Compile Include="Reports\CompileMessageKey.cs" />
+    <Compile Include="Reports\CompileMessageCollection.cs" />
+    <Compile Include="Tools\BuilderUtil.cs" />
     <Compile Include="Tools\CallAjuster.cs" />
-    <Compile Include="AST\exps\NewExpAnalyInfo.cs" />
+    <Compile Include="ASTExps\NewExpAnalyInfo.cs" />
     <Compile Include="Engines\CompileUtil.cs" />
     <Compile Include="Tools\EmitSymbolHelper.cs" />
-    <Compile Include="AST\ISetter.cs" />
+    <Compile Include="ASTExps\ISetter.cs" />
     <Compile Include="AST\files\FileClass.cs" />
     <Compile Include="AST\files\FileDim.cs" />
     <Compile Include="AST\files\FileMutilType.cs" />
-    <Compile Include="AST\files\FileType.cs" />
+    <Compile Include="AST\files\FileSource.cs" />
     <Compile Include="AST\files\FileEnum.cs" />
     <Compile Include="AST\units\ProcName.cs" />
     <Compile Include="AST\units\ProcArg.cs" />
     <Compile Include="AST\units\PropertyAST.cs" />
     <Compile Include="AST\sections\SectionProc.cs" />
-    <Compile Include="AST\sections\SectionConstructor.cs" />
+    <Compile Include="AST\sections\SectionConstructorDef.cs" />
     <Compile Include="AST\sections\SectionProperties.cs" />
     <Compile Include="AST\sections\SectionDim.cs" />
     <Compile Include="AST\sections\SectionImport.cs" />
     <Compile Include="AST\sections\SectionUse.cs" />
-    <Compile Include="AST\sections\SectionClassName.cs" />
+    <Compile Include="AST\sections\SectionClassNameDef.cs" />
     <Compile Include="AST\sections\SectionEnum.cs" />
     <Compile Include="AST\sections\SectionBase.cs" />
-    <Compile Include="AST\exps\Exp.cs" />
-    <Compile Include="AST\exps\ExpAssign.cs" />
-    <Compile Include="AST\exps\call\ExpCall.cs" />
-    <Compile Include="AST\exps\ExpBinary.cs" />
-    <Compile Include="AST\exps\ExpBracket.cs" />
-    <Compile Include="AST\exps\ExpDe.cs" />
-    <Compile Include="AST\exps\ExpDi.cs" />
-    <Compile Include="AST\exps\each\ExpEachWord.cs" />
-    <Compile Include="AST\exps\ExpNew.cs" />
-    <Compile Include="AST\exps\ExpType.cs" />
-    <Compile Include="AST\exps\ExpUnary.cs" />
-    <Compile Include="AST\exps\ExpVar.cs" />
-    <Compile Include="AST\exps\ExpLiteral.cs" />
-    <Compile Include="AST\exps\ExpRaw.cs" />
+    <Compile Include="ASTExps\Exp.cs" />
+    <Compile Include="ASTExps\ExpAssign.cs" />
+    <Compile Include="ASTExps\Calls\ExpCall.cs" />
+    <Compile Include="ASTExps\ExpBinary.cs" />
+    <Compile Include="ASTExps\ExpBracket.cs" />
+    <Compile Include="ASTExps\ExpDe.cs" />
+    <Compile Include="ASTExps\ExpDi.cs" />
+    <Compile Include="ASTExps\each\ExpEachWord.cs" />
+    <Compile Include="ASTExps\ExpNew.cs" />
+    <Compile Include="ASTExps\Types\ExpTypeUnsure.cs" />
+    <Compile Include="ASTExps\ExpUnary.cs" />
+    <Compile Include="ASTExps\ExpLiteral.cs" />
+    <Compile Include="ASTExps\ExpRaw.cs" />
     <Compile Include="AST\stmts\Stmt.cs" />
     <Compile Include="AST\stmts\StmtBlock.cs" />
     <Compile Include="AST\stmts\StmtCall.cs" />
@@ -109,8 +157,8 @@
     <Compile Include="AST\stmts\StmtTry.cs" />
     <Compile Include="AST\Tree.cs" />
     <Compile Include="AST\units\PackageNameAST.cs" />
-    <Compile Include="AST\units\UnitBase.cs" />
-    <Compile Include="CompileConstant.cs" />
+    <Compile Include="AST\units\sectionParts.cs" />
+    <Compile Include="CompileConst.cs" />
     <Compile Include="Engines\ZFileEngine.cs" />
     <Compile Include="Engines\ZProjectEngine.cs" />
     <Compile Include="Engines\ZFileModel.cs" />
@@ -118,46 +166,42 @@
     <Compile Include="Contexts\ContextClass.cs" />
     <Compile Include="Contexts\ContextExp.cs" />
     <Compile Include="Contexts\ContextFile.cs" />
-    <Compile Include="Contexts\ContextImport.cs" />
     <Compile Include="Contexts\ContextProc.cs" />
     <Compile Include="Contexts\ContextProject.cs" />
-    <Compile Include="Contexts\ProcContextCollection.cs" />
-    <Compile Include="Contexts\PropertyContextCollection.cs" />
     <Compile Include="Contexts\ContextUse.cs" />
     <Compile Include="Lex\StringSourceReader.cs" />
     <Compile Include="Lex\FileSourceReader.cs" />
     <Compile Include="Reports\CompileConsole.cs" />
     <Compile Include="Reports\CompileMessage.cs" />
-    <Compile Include="Reports\CompileMessageEnum.cs" />
+    <Content Include="Reports\CompileMessageEnum.cs.TXT" />
     <Compile Include="Symbols\base\SymbolBase.cs" />
     <Compile Include="Symbols\base\SymbolRefBase.cs" />
-    <Compile Include="Symbols\ref\SymbolRefStaticMember.cs" />
-    <Compile Include="Symbols\def\SymbolDefMember.cs" />
-    <Compile Include="Symbols\ref\SymbolRefMutil.cs" />
-    <Compile Include="Tables\SuperSymbolTable.cs" />
-    <Compile Include="Tables\UseSymbolTable.cs" />
-    <Compile Include="Tables\ISymbolTable.cs" />
-    <Compile Include="Tables\ClassSymbolTable.cs" />
-    <Compile Include="Tables\ProcSymbolTable.cs" />
-    <Compile Include="Tables\SymbolTableBase.cs" />
+    <Content Include="Symbols\ref\SymbolRefStaticMember.cs.TXT" />
+    <Content Include="Symbols\def\SymbolDefMember.cs.TXT" />
+    <Content Include="Symbols\ref\SymbolRefMutil.cs.TXT" />
+    <Content Include="Tables\SuperSymbolTable.cs.TXT" />
+    <Content Include="Tables\UseSymbolTable.cs.TXT" />
+    <Content Include="Tables\ISymbolTable.cs.TXT" />
+    <Content Include="Tables\ClassSymbolTable.cs.TXT" />
+    <Content Include="Tables\ProcSymbolTable.cs.TXT" />
+    <Content Include="Tables\SymbolTableBase.cs.TXT" />
     <Compile Include="Lex\CodePosition.cs" />
     <Compile Include="Lex\SourceReader.cs" />
-    <Compile Include="Lex\Token.cs" />
+    <Compile Include="Lex\LexToken.cs" />
     <Compile Include="Lex\Tokenizer.cs" />
     <Compile Include="Lex\TokenKind.cs" />
     <Compile Include="Lex\TokenKindHelper.cs" />
     <Compile Include="Parsers\ExpParser.cs" />
     <Compile Include="Parsers\FileSectionParser.cs" />
     <Compile Include="Parsers\TokenTape.cs" />
-    <Compile Include="Parsers\NameTypeParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reports\ProjectCompileResult.cs" />
     <Compile Include="Symbols\def\SymbolArg.cs" />
     <Compile Include="Symbols\base\SymbolDefBase.cs" />
-    <Compile Include="Symbols\def\SymbolDefField.cs" />
-    <Compile Include="Symbols\def\SymbolDefProperty.cs" />
+    <Content Include="Symbols\def\SymbolDefField.cs.TXT" />
+    <Content Include="Symbols\def\SymbolDefProperty.cs.TXT" />
     <Compile Include="Symbols\def\SymbolLocalVar.cs" />
-    <Compile Include="Parsers\WordSegmenter.cs" />
+    <Compile Include="Parsers\TokenSegmenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZCompileDesc\ZCompileDesc.csproj">
@@ -171,6 +215,10 @@
     <ProjectReference Include="..\ZLangRT\ZLangRT.csproj">
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
       <Name>ZLangRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZSegment\ZNLP.csproj">
+      <Project>{3497d4f3-de89-4676-980b-50dab21b824e}</Project>
+      <Name>ZNLP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
       <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>

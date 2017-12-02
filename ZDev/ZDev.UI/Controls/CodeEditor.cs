@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using ZDev.Forms;
 using ZDev.Util;
 
@@ -30,7 +31,7 @@ namespace ZDev.Controls
             //this.HotspotClick += new System.EventHandler<ScintillaNET.HotspotClickEventArgs>(this.editorClick);
             this.Click += new System.EventHandler(this.editorClick);
             this.TextChanged += new System.EventHandler(this.editorTextChanged);
-
+            this.KeyDown += new KeyEventHandler(this.EditorKeyDown);
             InitCurrentLineStyle();
             TextChangedStatus = -1;
         }
@@ -49,6 +50,16 @@ namespace ZDev.Controls
             this.GotoPosition(position);
             HighLightCurrentLine(position);
         }
+
+        private void EditorKeyDown(object sender, KeyEventArgs e)
+        {
+            if(KeyDownAction!=null)
+            {
+                KeyDownAction(sender, e);
+            }
+        }
+
+        public Action<object, KeyEventArgs> KeyDownAction{get;set;}
 
         private void editorTextChanged(object sender, EventArgs e)
         {

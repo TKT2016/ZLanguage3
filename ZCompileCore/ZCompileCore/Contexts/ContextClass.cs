@@ -9,88 +9,142 @@ using ZCompileKit.Collections;
 using ZCompileCore.Symbols;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 using ZCompileDesc.ZMembers;
+using ZCompileDesc.Compilings;
 
 namespace ZCompileCore.Contexts
 {
-    public class ContextClass : IWordDictionary
+    public class ContextClass
     {
         public ContextFile FileContext { get; set; }
-
-        public PropertyContextCollection PropertyContext { get; set; }
-        public ProcContextCollection ProcManagerContext { get; set; }
+        //public ProcContextCollection ProcManagerContext { get; set; }
 
         public string ClassName { get; set; }
-        public string ExtendsName { get; set; }
-       
-        
-        public ZClassType BaseZType { get; set; }
-        public bool IsStaticClass { get; set; }
+        //public string ExtendsName { get; set; }
+        //public ZClassType BaseZType { get; set; }
+
         public ClassEmitContext EmitContext { get; set; }
         
         public MethodBuilder InitPropertyMethod { get; set; }
 
-        public ClassSymbolTable Symbols { get{return CurrentTable;} }
+        //public ClassSymbolTable Symbols { get{return CurrentTable;} }
 
+        //public SuperSymbolTable SuperTable { get; private set; }
+        //public ClassSymbolTable CurrentTable { get; private set; }
 
-        public SuperSymbolTable SuperTable { get; private set; }
-        public ClassSymbolTable CurrentTable { get; private set; }
+        public ZMemberCompiling NestedOutFieldSymbol { get; set; }
+        //public string ContextKey { get { return FileContext.ContextKey + "." + (ClassName ?? ""); } }
+        //string _KeyContext;
 
-        public SymbolDefField NestedOutFieldSymbol { get; set; }
-        public string ContextKey { get { return FileContext.ContextKey + "." + (ClassName ?? ""); } }
+        //public ContextStructText ClassStruct { get; private set; }
+        //public ZClassCompilingType ThisCompilingType { get; private set; }
+         ZClassCompilingType ThisCompilingType;
         public ContextClass(ContextFile fileContext)
         {
             FileContext = fileContext;
-
-            PropertyContext = new PropertyContextCollection();
-            PropertyContext.ClassContext = this;
-
-            ProcManagerContext = new ProcContextCollection();
-            ProcManagerContext.ClassContext = this;
             EmitContext = new ClassEmitContext();
+            ThisCompilingType = new ZClassCompilingType();
+            //ProcManagerContext = new ProcContextCollection();
+            //ProcManagerContext.ClassContext = this;
+            
+            //CurrentTable = new ClassSymbolTable("Class");
 
-            //MemberDictionary = new NameDictionary<SymbolDefMember>();
-            CurrentTable = new ClassSymbolTable("Class");
+            //ClassStruct = new ContextStructText();
+            //_KeyContext = FileContext.FileModel.GetFileNameNoEx() + "." + (ClassName ?? "()");
         }
 
-        #region IWordDictionary实现
-        public bool ContainsWord(string text)
+        public void AddMember(ZMemberCompiling zcp)
         {
-            return ClassName==text
-                || PropertyContext.ContainsWord(text)
-                || ProcManagerContext.ContainsWord(text)
-            ;
+            //Symbols.Add(symbol);
+            //ZMemberCompiling zcp = new ZMemberCompiling(symbol.Name, symbol.SymbolZType,this.IsStaticClass);
+            ThisCompilingType.AddProperty(zcp);
         }
 
-        public WordInfo SearchWord(string text)
+        public void AddMethod(ZMethodCompiling zcp)
         {
-            WordInfo info1 = null;
-            if (ClassName == text)
-                info1 = new WordInfo(text, WordKind.TypeName);
-            WordInfo info2 = PropertyContext.SearchWord(text);
-            WordInfo info3 = ProcManagerContext.SearchWord(text);
-            WordInfo newWord = WordInfo.Merge(info1, info1, info3);
-            return newWord;
-        }
-        #endregion
-
-        public void AddMember(SymbolDefProperty symbol)
-        {
-            Symbols.Add(symbol);
-            //MemberDictionary.Add(symbol);
+            ThisCompilingType.AddMethod(zcp);
         }
 
-        public void SetSuperTable(SuperSymbolTable superTable)
+        Dictionary<string, string> _properties = new Dictionary<string, string>();
+        public bool ContainsPropertyName(string name)
         {
-            SuperTable = superTable;
-            CurrentTable.ParentTable = SuperTable;
+            return _properties.ContainsKey(name);
         }
 
-        public ZMethodDesc[] SearchThisProc(ZCallDesc procDesc)
+        public void AddPropertyName(string name)
         {
-            return ProcManagerContext.SearchProc(procDesc);
+            _properties.Add(name, name);
+        }
+
+        public void SetClassName(string name)
+        {
+            ThisCompilingType.SetClassName(name);
+        }
+
+        public void SetIsStatic(bool isStatic)
+        {
+            ThisCompilingType.SetIsStatic(isStatic);
+        }
+
+        public void SetSuperClass(ZClassType baseType)
+        {
+            ThisCompilingType.SetBaseZType(baseType);
+        }
+
+        public string GetClassName()
+        {
+            return ThisCompilingType.ZName;
+        }
+
+        public ZMemberCompiling SeachZProperty(string name)
+        {
+            return ThisCompilingType.SeachDefZProperty(name);
+        }
+
+        public ZClassCompilingType GetZCompilingType()
+        {
+            return this.ThisCompilingType;
+        }
+
+        public bool IsStatic()
+        {
+            return this.ThisCompilingType.IsStatic;
+        }
+
+        public ZClassType GetSuperZType()
+        {
+            return this.ThisCompilingType.BaseZType;
+        }
+
+        public ZMethodInfo[] SearchSuperProc(ZCallDesc procDesc)
+        {
+            return ThisCompilingType.SearchSuperZMethod(procDesc);
+        }
+
+        public ZMethodCompiling[] SearchThisProc(ZCallDesc procDesc)
+        {
+            //return ProcManagerContext.SearchProc(procDesc);
+            return ThisCompilingType.SearchThisZMethod(procDesc);
+        }
+
+        public bool ContainsProc(ZMethodDesc zdesc)
+        {
+            var methods = ThisCompilingType.SearchThisZMethod(zdesc);
+            return methods.Length > 0;
+
+        }
+
+        public void SetTypeBuilder(TypeBuilder typeBuilder)
+        {
+            this.FileContext.ClassContext.EmitContext.ClassBuilder = typeBuilder;
+            this.ThisCompilingType.SetBuilder(typeBuilder);
+        }
+
+        public TypeBuilder GetTypeBuilder( )
+        {
+            return this.ThisCompilingType.ClassBuilder;// (typeBuilder);
+            //this.FileContext.ClassContext.EmitContext.ClassBuilder;  
         }
 
         public class ClassEmitContext

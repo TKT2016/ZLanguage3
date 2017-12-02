@@ -15,24 +15,24 @@ using ZLangRT;
 
 namespace ZCompileCore.AST
 {
-   public  class StmtRepeat:Stmt
+    public class StmtRepeat:Stmt
     {
-       public Token RepeatToken { get; set; }
-       public Token TimesToken { get; set; }
+       public LexToken RepeatToken { get; set; }
+       public LexToken TimesToken { get; set; }
        public Exp TimesExp { get; set; }
        public StmtBlock RepeatBody { get; set; }
 
        SymbolLocalVar IndexSymbol;
        SymbolLocalVar CountSymbol;
        SymbolLocalVar CondiSymbol;
-       protected MethodInfo LTMethod = typeof(Calculater).GetMethod(CompileConstant.Calculater_LTInt, new Type[] { typeof(int), typeof(int) });
+       protected MethodInfo LTMethod = typeof(Calculater).GetMethod(CompileConst.Calculater_LTInt, new Type[] { typeof(int), typeof(int) });
 
        public override void Analy( )
        {
            TimesExp = AnalyExpRaw(); 
            if (TimesExp == null)
            {
-               ErrorE(RepeatToken.Position, "重复语句没有表达式");
+               ErrorF(RepeatToken.Position, "重复语句没有表达式");
            }
            else
            {
@@ -41,7 +41,7 @@ namespace ZCompileCore.AST
                {
                    if(TimesExp.RetType.SharpType!= typeof(int))
                    {
-                       ErrorE(TimesExp.Position, "结果不是整数");
+                       ErrorF(TimesExp.Position, "结果不是整数");
                    }
                }
            }
@@ -55,7 +55,7 @@ namespace ZCompileCore.AST
            ExpRaw rawExp = (ExpRaw)TimesExp;
            ContextExp context = new ContextExp(this.ProcContext, this);
            rawExp.SetContext(context);
-           List<Token> tokens = rawExp.WordSegment();
+           List<LexToken> tokens = rawExp.Seg();
            if (tokens.Count > 0)
            {
                var lastIndex = tokens.Count - 1;
@@ -76,7 +76,7 @@ namespace ZCompileCore.AST
        protected void CreateEachSymbols()
        {
            var procContext = this.ProcContext;
-           var symbols = procContext.Symbols;
+           //var symbols = procContext.Symbols;
 
            int foreachIndex = procContext.CreateRepeatIndex();
            var indexName = "@repeat" + foreachIndex + "_index";
@@ -85,15 +85,15 @@ namespace ZCompileCore.AST
 
            IndexSymbol = new SymbolLocalVar(indexName, ZLangBasicTypes.ZINT);
            IndexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
-           symbols.Add(IndexSymbol);
+           this.ProcContext.AddDefSymbol(IndexSymbol);
 
            CountSymbol = new SymbolLocalVar(countName, ZLangBasicTypes.ZINT);
            CountSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(countName);
-           symbols.Add(CountSymbol);
+           this.ProcContext.AddDefSymbol(CountSymbol);
 
            CondiSymbol = new SymbolLocalVar(condiName, ZLangBasicTypes.ZBOOL);
            CondiSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(condiName);
-           symbols.Add(CondiSymbol);
+           this.ProcContext.AddDefSymbol(CondiSymbol);
        }
 
        int START_INDEX = 0;

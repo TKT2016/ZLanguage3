@@ -1,125 +1,160 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
 using ZCompileCore.Symbols;
 using ZCompileCore.Tools;
 using ZCompileDesc;
-using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
+using ZCompileDesc.Compilings;
+using ZCompileDesc.ZMembers;
 using ZCompileDesc.ZTypes;
 using ZCompileKit.Tools;
+using ZLangRT.Attributes;
 
 namespace ZCompileCore.AST
 {
-    public class PropertyAST : UnitBase
+    /// <summary>
+    /// 属性AST
+    /// </summary>
+    public class PropertyAST : SectionPartProc
     {
-        public Token NameToken;
-        public Exp PropertyValue;
+        public LexToken NameToken;
+        public Exp PropertyValueExp;
 
         string PropertyName;
         ZType PropertyZType;
+        ContextExp PropertyExpContext;
+        ZMemberCompiling ZPropertyCompiling;
 
-        public SymbolDefProperty PropertySymbol { get; private set; }
-
-        public void Analy(NameTypeParser parser, PropertyContextCollection context, ContextProc procContext)
+        bool _isExist = false;
+        public override void AnalyText()
         {
-            var classContext = procContext.ClassContext;
-            this.FileContext = classContext.FileContext;
-            NameTypeParser.ParseResult result = parser.ParseVar(NameToken);
-            if (PropertyValue == null && result == null)
+            ZPropertyCompiling = new ZMemberCompiling();
+            PropertyName = NameToken.GetText();
+            if (this.ClassContext.ContainsPropertyName(PropertyName))
             {
-                PropertyName = NameToken.GetText();
-                PropertyZType = ZLangBasicTypes.ZOBJECT;
-                ErrorE(NameToken.Position, "无法确定属性'{0}'的数据类型", PropertyName);
+                _isExist = true;
+                ErrorF(this.Position, "属性'{0}'重复", PropertyName);
             }
             else
             {
-                if (PropertyValue != null)
-                {
-                    AnalyValue(procContext);
-                }
-
-                if (result != null)
-                {
-                    PropertyName = result.VarName;
-                    PropertyZType = result.ZType;
-                }
-                else
-                {
-                    PropertyName = NameToken.GetText();
-                    PropertyZType = PropertyValue.RetType;
-                }
+                this.ClassContext.AddPropertyName(PropertyName);
+                ZPropertyCompiling.Name = PropertyName;
+                this.ClassContext.AddMember(ZPropertyCompiling);
             }
-
-            if (context.Dict.ContainsKey(PropertyName))
-            {
-                ErrorE(NameToken.Position, "属性'{0}'重复", PropertyName);
-            }
-            else
-            {
-                WordInfo word = new WordInfo(PropertyName, WordKind.MemberName, this);
-                context.Dict.Add(word);
-            }
-
-            PropertySymbol = new SymbolDefProperty(PropertyName, PropertyZType, classContext.IsStaticClass);
-            PropertySymbol.HasDefaultValue = (PropertyValue != null);
-            classContext.AddMember(PropertySymbol);
         }
 
-        PropertyBuilder propertyBuilder;
-        FieldBuilder fieldBuilder;
-        public void EmitName(bool isStatic, TypeBuilder classBuilder)
+        public override void AnalyType()
         {
+            //if (this.PropertyValueExp != null && PropertyValueExp.ToString().IndexOf("图片")!=-1)
+            //{
+            //    Console.WriteLine("图片");
+            //}
+            if (_isExist) return;
+            PropertyZType = AnalyPropertyZType();
+            ZPropertyCompiling.SetMemberType(PropertyZType);
+        }
+
+        private ZType AnalyPropertyZType()
+        {
+            bool isStatic = this.ClassContext.IsStatic();
+            ZPropertyCompiling.SetIsStatic(isStatic);
+            ContextImportUse importUseContext = this.FileContext.ImportUseContext;
+            if (HasValue())
+            {
+                PropertyValueExp = AnalyPropertyValueExp();
+                ZType ztype = PropertyValueExp.RetType;
+                if (ztype != null)
+                {
+                    //PropertyZType = ztype;
+                    return ztype;
+                }
+            }
+            ZType[] ztypes = importUseContext.SearchImportType(this.PropertyName);
+            
+            if (ztypes.Length == 1)
+            {
+                //PropertyZType = ztypes[0];
+                return ztypes[0];
+            }
+             else if (ztypes.Length == 0)
+             {
+                // return ZLangBasicTypes.ZOBJECT;
+             }
+             else
+             {
+                 // return ztypes[1];
+                 //return ZLangBasicTypes.ZOBJECT;
+            }
+            return ZLangBasicTypes.ZOBJECT;
+        }
+
+        public override void AnalyBody()
+        {
+            //if (this.PropertyValueExp != null && PropertyValueExp.ToString().IndexOf("图片") != -1)
+            //{
+            //    Console.WriteLine("图片");
+            //}
+            if (PropertyValueExp != null)
+            {
+              PropertyValueExp=  PropertyValueExp.Analy();
+            }
+        }
+
+        public override void EmitName()
+        {
+            bool isStatic = this.ClassContext.IsStatic();
+            var classBuilder = this.ClassContext.GetTypeBuilder();
+            ZPropertyCompiling.SetIsStatic(isStatic);
             Type propertyType = PropertyZType.SharpType;
-            MethodAttributes methodAttr = getMethodAttr(isStatic);
-            FieldAttributes fieldAttr = getFieldAttr(isStatic);
+            MethodAttributes methodAttr =BuilderUtil.GetMethodAttr(isStatic);
+            FieldAttributes fieldAttr = BuilderUtil.GetFieldAttr(isStatic);
 
-            fieldBuilder = classBuilder.DefineField("_" + PropertyName, propertyType, fieldAttr);
-            propertyBuilder = classBuilder.DefineProperty(PropertyName, PropertyAttributes.None, propertyType, null);
+            _fieldBuilder = classBuilder.DefineField("_" + PropertyName, propertyType, fieldAttr);
+            _propertyBuilder = classBuilder.DefineProperty(PropertyName, PropertyAttributes.None, propertyType, null);
 
-            EmitGet(classBuilder, PropertyName, propertyType, isStatic, fieldBuilder, propertyBuilder, methodAttr);
-            EmitSet(classBuilder, PropertyName, propertyType, isStatic, fieldBuilder, propertyBuilder, methodAttr);
-            PropertySymbol.Property = propertyBuilder;
+            EmitGet(classBuilder, PropertyName, propertyType, isStatic, _fieldBuilder, _propertyBuilder, methodAttr);
+            EmitSet(classBuilder, PropertyName, propertyType, isStatic, _fieldBuilder, _propertyBuilder, methodAttr);
+            SetAttrZCode(_propertyBuilder, PropertyName);
+            ZPropertyCompiling.SetBuilder( _propertyBuilder);
+            
         }
 
-        public void AnalyValue( ContextProc procContext)
+        public override void EmitBody()
         {
-            Exp exp2 = null;
-            ContextExp context = new ContextExp(procContext);
-            PropertyValue.SetContext(context);
-            exp2 = PropertyValue.Parse();
-            exp2 = exp2.Analy();
-            PropertyValue = exp2;
+            if(HasValue())
+            {
+                var method = this.ClassContext.InitPropertyMethod;
+                var IL = method.GetILGenerator();
+                bool isStatic = this.ClassContext.IsStatic();
+                if (!isStatic)
+                {
+                    IL.Emit(OpCodes.Ldarg_0);
+                }
+                PropertyValueExp.Emit();
+                EmitHelper.StormField(IL, _fieldBuilder);
+            }
+            //throw new CCException();
         }
 
-        public void EmitValue(bool isStatic, ILGenerator il)
+        private bool HasValue()
         {
-            if (PropertyValue == null) return;
-            EmitHelper.EmitThis(il, isStatic);
-            PropertyValue.Emit();
-            EmitHelper.StormField(il, fieldBuilder);
+            return this.PropertyValueExp != null;
         }
 
-        MethodAttributes getMethodAttr(bool isStatic)
-        {
-            if (isStatic)
-                return MethodAttributes.Public | MethodAttributes.Static;
-            else
-                return MethodAttributes.Public;
-        }
+        FieldBuilder _fieldBuilder;
+        PropertyBuilder _propertyBuilder;
 
-        FieldAttributes getFieldAttr(bool isStatic)
+        private void SetAttrZCode(PropertyBuilder builder, string name)
         {
-            if (isStatic)
-                return FieldAttributes.Private | FieldAttributes.Static;
-            else
-                return FieldAttributes.Private;
+            Type myType = typeof(ZCodeAttribute);
+            ConstructorInfo infoConstructor = myType.GetConstructor(new Type[] { typeof(string) });
+            CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { name });
+            builder.SetCustomAttribute(attributeBuilder);
         }
 
         private void EmitGet(TypeBuilder classBuilder, string propertyName, Type propertyType, bool isStatic, FieldBuilder field, PropertyBuilder property, MethodAttributes methodAttr)
@@ -139,11 +174,54 @@ namespace ZCompileCore.AST
         {
             MethodBuilder methodSet = classBuilder.DefineMethod("set_" + propertyName, methodAttr, typeof(void), new Type[] { propertyType });
             ILGenerator ilSet = methodSet.GetILGenerator();
-            ilSet.Emit(OpCodes.Ldarg_0);
             EmitHelper.Emit_LoadThis(ilSet, isStatic);
+            if (isStatic)
+            {
+                ilSet.Emit(OpCodes.Ldarg_0);
+            }
+            else
+            {
+                ilSet.Emit(OpCodes.Ldarg_1);
+            }
+
             EmitHelper.StormField(ilSet, field);
             ilSet.Emit(OpCodes.Ret);
             property.SetSetMethod(methodSet);
+        }
+
+        private Exp AnalyPropertyValueExp()
+        {
+            Exp exp1 = PropertyValueExp.Parse();
+            Exp exp2 = exp1.Analy();
+            return exp2;
+            //if(PropertyValueExp is ExpRaw)
+            //{
+            //    ExpRaw rawExp = (ExpRaw)PropertyValueExp;
+            //    if(rawExp.RawTokens.Count==1)
+            //    {
+            //        LexToken tok = rawExp.RawTokens[0];
+            //        if(tok.IsLiteral)
+            //        {
+            //            Exp literalExp = new ExpPropertyValueLiteral(tok);//{ LiteralToken = tok };
+            //            literalExp.SetContext(this.PropertyExpContext);
+            //            return literalExp;
+            //        }
+            //    }
+            //}
+            //return null;
+        }
+
+        
+        public void SetContext(ContextProc procContext)
+        {
+            this.ProcContext = procContext;
+            this.ClassContext = this.ProcContext.ClassContext;
+            this.FileContext = this.ClassContext.FileContext;
+            PropertyExpContext = new ContextExp(procContext);
+            if(PropertyValueExp!=null)
+            {
+                PropertyValueExp.SetContext(this.PropertyExpContext);
+            }
         }
 
         public CodePosition Position
@@ -158,10 +236,10 @@ namespace ZCompileCore.AST
         {
             StringBuilder buff = new StringBuilder();
             buff.Append(this.NameToken.GetText());
-            if (this.PropertyValue != null)
+            if (this.PropertyValueExp != null)
             {
                 buff.Append("=");
-                buff.Append(PropertyValue.ToString());
+                buff.Append(PropertyValueExp.ToString());
             }
             return buff.ToString();
         }

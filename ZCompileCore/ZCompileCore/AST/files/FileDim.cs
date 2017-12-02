@@ -5,10 +5,11 @@ using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Reports;
 using ZCompileDesc.Descriptions;
+using ZCompileDesc.ZTypes;
 
 namespace ZCompileCore.AST
 {
-    public class FileDim : FileType
+    public class FileDim : FileSource
     {
         public SectionImport ImporteSection;
         public SectionUse UseSection;
@@ -23,18 +24,8 @@ namespace ZCompileCore.AST
 
         public void AnalyImport()
         {
-            if (UseSection != null)
-            {
-                ImporteSection.Analy();
-            }
-        }
-
-        public void AnalyUse()
-        {
-            if (UseSection != null)
-            {
-                UseSection.Analy();
-            }
+            base.AnalyImportStruct(ImporteSection);
+            base.AnalyImportTypes(ImporteSection);
         }
 
         string typeName;
@@ -42,29 +33,51 @@ namespace ZCompileCore.AST
         {
             this.FileContext = new ContextFile(this.ProjectContext,this.FileModel);
             DimSection.FileContext = this.FileContext;
-            typeName = DimSection.AnalyName(this.FileContext.FileModel.GetFileNameNoEx());
+            DimSection.AnalyText();
+            DimSection.AnalyType();
+            typeName = DimSection.GetName();//this.FileContext.FileModel.GetFileNameNoEx());
         }
 
         public void EmitTypeName()
         {
-            DimSection.EmitName(this.ProjectContext.EmitContext.ModuleBuilder, this.ProjectContext.ProjectModel.ProjectPackageName);
+            DimSection.EmitName();//this.ProjectContext.EmitContext.ModuleBuilder, this.ProjectContext.ProjectModel.ProjectPackageName);
         }
 
-        public void Compile()
+        public ZDimType Compile()
         {
-            ImporteSection.Analy();
+            SetPartContext();
+            AnalyImport();
             DimSection.AnalyBody();
+            DimSection.EmitName();
             DimSection.EmitBody();
-            ProjectCompileResult compileResult = this.ProjectContext.CompileResult;
-            if (compileResult.Errors.ContainsKey(this.FileContext.FileModel.ZFileInfo))
+            var MessageCollection = this.ProjectContext.MessageCollection;
+            if (MessageCollection.ContainsErrorSrcKey(this.FileContext.FileModel.ZFileInfo.ZFileName))
             {
-                return;
+                return null;
             }
             else
             {
                 var ztype = DimSection.GetCreatedZType();
-                this.ProjectContext.CompileResult.CompiledTypes.Add(ztype);
+                return ztype;
             }
+            //return null;
+        }
+
+        private void SetPartContext()
+        {
+            var fileContext = this.FileContext;
+            if (ImporteSection != null)
+            {
+                ImporteSection.SetContext(fileContext);
+            }
+            if (this.UseSection != null)
+            {
+                this.UseSection.SetContext(fileContext);
+            }
+            if (DimSection != null)
+            {
+                DimSection.SetContext(fileContext);
+            }     
         }
     }
 }

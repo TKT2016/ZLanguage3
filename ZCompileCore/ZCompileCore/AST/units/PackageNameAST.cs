@@ -7,68 +7,106 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 
 namespace ZCompileCore.AST
 {
-    public class PackageNameAST : UnitBase
+    public class PackageNameAST : SectionPartFile
     {
-        public List<Token> Tokens { get; protected set; }
+        public List<LexToken> Tokens { get; protected set; }
         public string PackageFullName { get; protected set; }
         public ZPackageDesc ZPackage { get; protected set; }
-
+       
         public PackageNameAST()
         {
-            Tokens = new List<Token>();
+            Tokens = new List<LexToken>();
         }
 
-        public void Add(Token token)
+        bool isExists = false;
+        public override void AnalyText()
         {
-            Tokens.Add(token);
-        }
-
-        public void Analy(ContextFile fileContext)
-        {
-            this.FileContext = fileContext;
+            ContextImportUse contextiu = this.FileContext.ImportUseContext;
             PackageFullName = string.Join("/", Tokens.Select(p => p.GetText()));
-            LoadPackage(fileContext);
+            if (contextiu.ContainsImportPackageName(PackageFullName))
+            {
+                isExists = true;
+                ErrorF(this.Position, "开发包'{0}'已经导入", PackageFullName);
+            }
+            else
+            {
+                contextiu.AddImportPackageName(PackageFullName);
+            }
         }
 
-        private bool LoadPackage(ContextFile fileContext)
+        public override void AnalyType()
         {
-            var ImportContext = fileContext.ImportContext;
-            var DescDictionary = fileContext.ProjectContext.AssemblyDescDictionary;
+            if (isExists) return;
+            ContextImportUse contextiu = this.FileContext.ImportUseContext;
+            PackageFullName = string.Join("/", Tokens.Select(p => p.GetText()));
+            LoadPackageTypes();
+        }
 
-            if (ImportContext.ContainsPackage(this.PackageFullName))
-            {
-                ErrorE(this.Position, "开发包'{0}'已经导入", PackageFullName);
-                return false;
-            }
-            ZPackageDesc packageDesc = SearchZPackageDesc(this.PackageFullName, DescDictionary);
+        private bool LoadPackageTypes( )
+        {
+            var fileContext = this.FileContext;
+            ZPackageDesc packageDesc = fileContext.ProjectContext.SearchZPackageDesc(this.PackageFullName);
             if (packageDesc == null)
             {
-                ErrorE(this.Position, "不存在'{0}'开发包", PackageFullName);
+                ErrorF(this.Position, "不存在'{0}'开发包", PackageFullName);
                 return false;
             }
             else
             {
-                ImportContext.AddPackage(packageDesc);
+                this.AddPackage(packageDesc);
             }
             return true;
         }
 
-        private ZPackageDesc SearchZPackageDesc(string packageName, Dictionary<Assembly, ZAssemblyDesc> dict)
+        private void AddPackage(ZPackageDesc zdesc)
         {
-            foreach (ZAssemblyDesc assemblyDesc in dict.Values)
+            ContextImportUse contextiu = this.FileContext.ImportUseContext;
+            foreach (var item in zdesc.EnumTypes)
             {
-                ZPackageDesc packageDesc = assemblyDesc.SearhcZPackageDesc(packageName);
-                if (packageDesc != null)
-                    return packageDesc;
+                contextiu.AddImportType(item);
             }
-            return null;
+
+            foreach (ZDimType item in zdesc.DimTypes)
+            {
+                contextiu.AddImportType(item);
+            }
+
+            foreach (var item in zdesc.ClassTypes)
+            {
+                contextiu.AddImportType(item);
+            }
+            return;
         }
-        
+
+        public override void AnalyBody()
+        {
+            
+        }
+
+        public override void EmitName()
+        {
+            
+        }
+
+        public override void EmitBody()
+        {
+            
+        }
+
+        public void SetContext(ContextFile fileContext)
+        {
+            this.FileContext = fileContext;
+        }
+
+        public void Add(LexToken token)
+        {
+            Tokens.Add(token);
+        }
+
         public virtual CodePosition Position
         {
             get

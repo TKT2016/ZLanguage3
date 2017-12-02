@@ -11,8 +11,8 @@ namespace ZCompileCore.AST
 {
    public  class StmtWhile:Stmt
     {
-       public Token DangToken { get; set; }
-       public Token RepeatToken { get; set; }
+       public LexToken DangToken { get; set; }
+       public LexToken RepeatToken { get; set; }
        public Exp ConditionExp { get; set; }
        public StmtBlock WhileBody { get; set; }
 
@@ -29,7 +29,7 @@ namespace ZCompileCore.AST
            ExpRaw rawExp = (ExpRaw)ConditionExp;
            ContextExp context = new ContextExp(this.ProcContext, this);
            rawExp.SetContext(context);
-           List<Token> tokens = rawExp.WordSegment();
+           List<LexToken> tokens = rawExp.Seg();
            if (tokens.Count > 0)
            {
                var lastIndex = tokens.Count - 1;

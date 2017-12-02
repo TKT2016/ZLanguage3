@@ -19,199 +19,119 @@ namespace ZCompileCore.Engines
 {
     public class ZProjectEngine
     {
-        ContextProject projectContext;
+        public ContextProject ProjectContext { get; private set; }
 
+        CompileMessageCollection MessageCollection;
+        ProjectCompileResult result;
         ZProjectModel projectModel;
 
-        List<FileEnum> enumeFiles;
-        List<FileDim> dimFiles;
-        List<FileClass> classFiles;
-
-        public ZProjectEngine()
+        public ZProjectEngine(CompileMessageCollection cmc, ZProjectModel zCompileProjectModel)
         {
-            
+            MessageCollection = cmc;
+            this.projectModel = zCompileProjectModel;
+            result = new ProjectCompileResult();
+            result.MessageCollection = MessageCollection;
+            ProjectContext = new ContextProject(zCompileProjectModel, MessageCollection);
         }
 
-        public ProjectCompileResult Compile(ZProjectModel zCompileProjectModel)
+        public ProjectCompileResult Compile()
         {
-            this.projectModel = zCompileProjectModel;
-            projectContext = new ContextProject(projectModel);
+            if (this.projectModel == null || ProjectContext.ProjectModel==null)
+            {
+                throw new CCException();
+            }
+
             LoadProjectRef();
-            CompileUtil.GenerateBinary(projectContext);
-
-            ParseFiles();
-
-            CompileEnum();
-            AnalyImportUse();
-            AnalyDimAndClassName();
-            EmitDimAndClassName();
- 
-            CompileFileDim();
-            CompileClass();
+            CompileUtil.GenerateBinary(ProjectContext);
+            CompileFiles();
 
             SetEntry();
-            if (zCompileProjectModel.NeedSave)
+            if (this.projectModel.NeedSave)
             {
                 SaveBinary();
             }
 
-            return projectContext.CompileResult;
+            result.CompiledTypes.Clear();
+            result.CompiledTypes.AddRange(this.ProjectContext.CompiledTypes.ToList() );
+
+            return result;
         }
 
-        private void AnalyImportUse()
+        private void CompileFiles()
         {
-            foreach (FileDim dimFile in dimFiles)
-            {
-                dimFile.AnalyImport();
-                dimFile.AnalyUse();
-            }
-
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.AnalyImport();
-                classFile.AnalyUse();
-            }
-        }
-
-        private void CompileClass()
-        {
-            AnalyClassMemberName();
-            EmitClassMemberName();
-            AnalyClassMemberBody();
-            EmitClassMemberBody();
-            CreateClassZType();
-        }
-
-        private void CreateClassZType()
-        {
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.CreateZType();
-            }
-        }
-
-        private void CompileFileDim()
-        {
-            foreach (FileDim dimFile in dimFiles)
-            {
-                dimFile.Compile();
-            }
-
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.CompileDim();
-            }
-        }
-
-        private void EmitDimAndClassName()
-        {
-            foreach (FileDim dimFile in dimFiles)
-            {
-                dimFile.EmitTypeName();
-            }
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.EmitTypeName();
-            }
-        }
-
-        private void AnalyDimAndClassName()
-        {
-            foreach (FileDim dimFile in dimFiles)
-            {
-                dimFile.AnalyTypeName();
-            }
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.AnalyTypeName();
-            }
-        }
-
-        private void AnalyClassImportUser()
-        {
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.AnalyImport();
-                classFile.AnalyUse();
-            }
-        }
-
-        private void ParseFiles()
-        {
-            enumeFiles = new List<FileEnum>();
-            dimFiles = new List<FileDim>();
-            classFiles = new List<FileClass>();
-            ZFileEngine parser = new ZFileEngine(projectContext);
+            ZFileEngine parser = new ZFileEngine(ProjectContext);
             foreach (var item in projectModel.SouceFileList)
             {
-                FileType fileType = parser.Parse(item);
-                if(fileType!=null)
+                FileSource fileType = parser.Parse(item);
+                if (fileType != null)
                 {
-                    if(fileType is FileEnum)
+                    IZDescType genType = null;
+                    if (fileType is FileEnum)
                     {
-                        enumeFiles.Add(fileType as FileEnum);
+                        ZType zenum = (fileType as FileEnum).Compile();
+                        genType = zenum;
                     }
                     else if (fileType is FileDim)
                     {
-                        dimFiles.Add(fileType as FileDim);
+                        ZDimType zdim = (fileType as FileDim).Compile();
+                        genType = zdim;
                     }
                     else if (fileType is FileClass)
                     {
-                        classFiles.Add(fileType as FileClass);
+                        ZClassType zdim = (fileType as FileClass).Compile();
+                        genType = zdim;
                     }
                     else
                     {
-                        throw new CompileCoreException();
+                        throw new CCException();
+                    }
+                    if (genType != null)
+                    {
+                        this.ProjectContext.CompiledTypes.Add(genType);
                     }
                 }
-            }
-        }
-
-        private void CompileEnum()
-        {
-            foreach (FileEnum enumFile in enumeFiles)
-            {
-                enumFile.Compile();
+                else
+                {
+                    throw new CCException();
+                }
             }
         }
 
         private void SaveBinary()
         {
-            if (!this.projectContext.CompileResult.HasError())
+            if (!this.MessageCollection.HasError())
             {
-                string binFileName = projectContext.GetBinaryNameEx();
-                projectContext.EmitContext.AssemblyBuilder.Save(binFileName);
-                CompileUtil.MoveBinary(projectContext);
-                CompileUtil.DeletePDB(projectContext);
-                string exBinFileName = projectContext.GetBinaryNameEx();
-                string toFileFullPath = Path.Combine(projectContext.ProjectModel.BinarySaveDirectoryInfo.FullName, exBinFileName);
-                projectContext.CompileResult.BinaryFilePath = toFileFullPath;
+                string binFileName = ProjectContext.ProjectModel.GetBinaryNameEx();
+                ProjectContext.EmitContext.AssemblyBuilder.Save(binFileName);
+                CompileUtil.MoveBinary(ProjectContext);
+                CompileUtil.DeletePDB(ProjectContext);
+                string toFileFullPath = Path.Combine(ProjectContext.ProjectModel.BinarySaveDirectoryInfo.FullName, binFileName);
+                this.result.BinaryFilePath = toFileFullPath;
             }
         }
 
         private void SetEntry()
         {
-            if (projectContext.ProjectModel.BinaryFileKind != PEFileKinds.Dll && !string.IsNullOrEmpty(projectContext.ProjectModel.EntryClassName))
+            if (ProjectContext.ProjectModel.BinaryFileKind != PEFileKinds.Dll && !string.IsNullOrEmpty(ProjectContext.ProjectModel.EntryClassName))
             {
-                var entryClassName = projectContext.ProjectModel.EntryClassName;
-                projectContext.CompileResult.EntrtyZType = projectContext.CompileResult.GetCompiledType(entryClassName) as ZType;
-                if (projectContext.CompileResult.EntrtyZType == null)
+                var entryClassName = ProjectContext.ProjectModel.EntryClassName;
+                result.EntrtyZType = ProjectContext.CompiledTypes.Get(entryClassName) as ZType;
+                if (result.EntrtyZType == null)
                 {
-                    this.projectContext.Errorf(0, 0, "入口类型'{0}'不存在或编译失败", entryClassName);
+                    this.ProjectContext.Errorf(0, 0, "入口类型'{0}'不存在或编译失败", entryClassName);
                     return;
                 }
-                Type type = projectContext.CompileResult.EntrtyZType.SharpType;
+                Type type = result.EntrtyZType.SharpType;
                 MethodInfo main = type.GetMethod("启动");
                 if (main == null)
                 {
-                    this.projectContext.Errorf(0, 0, "入口类型'{0}'不存在'启动'过程", entryClassName);
+                    this.ProjectContext.Errorf(0, 0, "入口类型'{0}'不存在'启动'过程", entryClassName);
                 }
                 else if (!main.IsStatic)
                 {
-                    this.projectContext.Errorf(0, 0, "入口类型'{0}'不是唯一类型，不能作为启动入口", entryClassName);
+                    this.ProjectContext.Errorf(0, 0, "入口类型'{0}'不是唯一类型，不能作为启动入口", entryClassName);
                 }
-                projectContext.EmitContext.AssemblyBuilder.SetEntryPoint(main, projectContext.ProjectModel.BinaryFileKind);
-
+                ProjectContext.EmitContext.AssemblyBuilder.SetEntryPoint(main, ProjectContext.ProjectModel.BinaryFileKind);
             }
         }
 
@@ -221,7 +141,7 @@ namespace ZCompileCore.Engines
             {
                 foreach (var packageName in projectModel.RefPackageList)
                 {
-                    projectContext.AddPackage(packageName);
+                    ProjectContext.AddPackage(packageName);
                 }
             }
 
@@ -232,48 +152,15 @@ namespace ZCompileCore.Engines
                     try
                     {
                         Assembly asm = Assembly.LoadFile(dll.FullName);
-                        projectContext.AddAssembly(asm);
+                        ProjectContext.AddAssembly(asm);
                     }
                     catch (Exception ex)
                     {
-                        this.projectContext.Errorf(0,0,"加载DLL文件" + dll.Name + "错误:" + ex.Message);
+                        this.ProjectContext.Errorf(0,0,"加载DLL文件" + dll.Name + "错误:" + ex.Message);
                     }
                 }
             }
         }
 
-        private void AnalyClassMemberName()
-        {
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.AnalyClassMemberName();
-            }
-        }
-
-        private void EmitClassMemberName()
-        {
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.EmitClassMemberName();
-            }
-        }
-
-        private void AnalyClassMemberBody()
-        {
-            foreach (FileClass classFile in classFiles)
-            {
-                //classFile.AnalyPropertiesBody();
-                classFile.AnalyProcBody();
-            }
-        }
-
-        private void EmitClassMemberBody()
-        {
-            foreach (FileClass classFile in classFiles)
-            {
-                classFile.EmitPropertiesBody();
-                classFile.EmitProcBody();
-            }
-        }
     }
 }

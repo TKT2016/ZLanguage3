@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZCompileCore.Engines;
+using ZCompileCore.Reports;
+using ZCompileKit.Infoes;
 using ZCompiler;
 using ZDev.Schema.Parses;
 
@@ -30,8 +32,18 @@ namespace ZDev.Forms
 
         public ZProjectModel ShowClass(FileInfo fi)
         {
+            CompileMessageCollection MessageCollection = new CompileMessageCollection();
+            ZCompileFileInfo zf = null;
+            if (fi.Exists == false)
+            {
+                zf = new ZCompileFileInfo(false, fi.FullName, null, null);
+                MessageCollection.AddError(
+                   new CompileMessage(new CompileMessageSrcKey(fi.Name), 0, 0, "项目文件'" + fi.Name + "'不存在"));
+                return null;
+            }
+           
             string[] lines = File.ReadAllLines(fi.FullName);
-            ZProjectModel projectModel = projFileParser.ParseProjectFile(lines, fi.Directory.FullName);
+            ZProjectModel projectModel = projFileParser.ParseProjectFile(MessageCollection, lines, fi.Directory.FullName, zf);
             projectModel.AddRefPackage("Z语言系统");
             projectModel.AddRefPackage("Z标准包");
 

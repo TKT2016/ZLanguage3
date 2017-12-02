@@ -21,7 +21,7 @@ namespace ZCompileCore.AST
         /// <summary>
         /// 报告错误并把分析结果设为false
         /// </summary>
-        protected virtual void ErrorE(CodePosition postion, string msgFormat, params string[] msgParams)
+        protected virtual void ErrorF(CodePosition postion, string msgFormat, params string[] msgParams)
         {
             this.FileContext.Errorf(postion, msgFormat, msgParams);
             AnalyCorrect = false;

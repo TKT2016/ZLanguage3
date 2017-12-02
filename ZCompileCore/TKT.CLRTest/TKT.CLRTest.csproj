@@ -78,6 +78,14 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="S4\DemoAssemblyBuilder.cs" />
+    <Compile Include="S4\FieldBuilder_Sample.cs" />
+    <Compile Include="S4\FieldTest.cs" />
+    <Compile Include="S4\TestPoint.cs" />
+    <Compile Include="S4\ZCCS.cs" />
+    <Compile Include="S4\注册表操作Test.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

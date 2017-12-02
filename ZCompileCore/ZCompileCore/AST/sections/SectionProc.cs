@@ -16,31 +16,58 @@ using ZCompileDesc.Utils;
 using ZCompileDesc.ZTypes;
 using ZCompileDesc.ZMembers;
 using ZCompileDesc;
+using ZCompileDesc.Compilings;
 
 namespace ZCompileCore.AST
 {
-    public class SectionProc : SectionBase
+    public class SectionProc : SectionClassBase
     {
         public ProcName NamePart;
-        public Token RetToken;
+        public LexToken RetToken;
         public StmtBlock Body;
         public ZType RetZType;
-        public ContextProc ProcContext;
+        ContextProc ProcContext;
+        ZMethodCompiling methodCompiling;
 
-        public void AnalyName(NameTypeParser parser)
+        public override void AnalyText()
         {
-            NamePart.ProcContext = this.ProcContext;
-            NamePart.AnalyName(parser);
-            AnalyRet(parser);
+            NamePart.AnalyText();
         }
 
-        public void EmitName()
+        public override void AnalyType()
         {
-            var classBuilder = this.ProcContext.ClassContext.EmitContext.ClassBuilder;
-            var argTypes = NamePart.ProcDesc.DefArgs.Select(P=>P.ZParamType.SharpType).ToArray();
+            bool isStatic = this.ClassContext.IsStatic();
+            AnalyRet();
+            NamePart.AnalyType();
+            ZMethodDesc zmdesc = NamePart.GetZDesc();
+            methodCompiling = new ZMethodCompiling((ZMethodDesc)zmdesc, this.RetZType);
+            methodCompiling.SetIsStatic(isStatic);
+            this.ProcContext.SetMethodCompiling(methodCompiling);
+        }
+
+        public override void AnalyBody()
+        {
+            Body.Analy();
+        }
+
+        public override void EmitName()
+        {
+            //if (this.NamePart.ToString().IndexOf( "清除出界子弹")!=-1)
+            //{
+            //    Console.WriteLine("清除出界子弹");
+            //}
+            var classBuilder = this.ClassContext.GetTypeBuilder();// compilingType.ClassBuilder;
+            bool isStatic = this.ClassContext.IsStatic();
+            //var classBuilder = this.ProcContext.ClassContext.EmitContext.ClassBuilder;
+            ZMethodDesc ProcDesc = NamePart.GetZDesc();
+            List<Type> argTypes = new List<Type>();
+            foreach (var zparam in ProcDesc.DefArgs)
+            {
+                argTypes.Add(zparam.ZParamType.SharpType);
+            }
             var MethodName = NamePart.GetMethodName();
             MethodAttributes methodAttributes;
-            bool isStatic = (this.ProcContext.IsStatic);
+            //bool isStatic = (this.ProcContext.IsStatic);
             if (isStatic)
             {
                 methodAttributes = MethodAttributes.Public | MethodAttributes.Static;
@@ -49,8 +76,8 @@ namespace ZCompileCore.AST
             {
                 methodAttributes = MethodAttributes.Public | MethodAttributes.Virtual;
             }
-
-            MethodBuilder methodBuilder = classBuilder.DefineMethod(MethodName, methodAttributes, RetZType.SharpType, argTypes);
+            MethodBuilder methodBuilder = classBuilder.DefineMethod(MethodName, methodAttributes,
+                RetZType.SharpType, argTypes.ToArray());
             if (MethodName == "启动")
             {
                 Type myType = typeof(STAThreadAttribute);
@@ -62,25 +89,40 @@ namespace ZCompileCore.AST
             {
                 SetAttrZCode(methodBuilder);
             }
-            ProcContext.EmitContext.SetBuilder(methodBuilder);
-            ProcContext.EmitContext.ILout = methodBuilder.GetILGenerator();
+            this.ProcContext.SetBuilder(methodBuilder);
+            this.NamePart.EmitName();
+        }
 
-            List<ZParam> normalArgs = this.ProcContext.ProcDesc.DefArgs;
-            this.NamePart.DefineParameter(isStatic, methodBuilder);
-            this.ProcContext.ProcDesc.ZMethod =
-                new ZMethodInfo(methodBuilder, isStatic, new ZMethodDesc[] { NamePart.ProcDesc }, AccessAttributeEnum.Public);
+        public override void EmitBody()
+        {
+            var IL = this.ProcContext.GetILGenerator();//.ILout;
+            this.ProcContext.LoacalVarList.Reverse();
+            for (int i = 0; i < this.ProcContext.LoacalVarList.Count; i++)
+            {
+                string ident = this.ProcContext.LoacalVarList[i];
+                SymbolLocalVar varSymbol = this.ProcContext.GetDefLocal(ident);
+                varSymbol.VarBuilder = IL.DeclareLocal(varSymbol.SymbolZType.SharpType);
+                varSymbol.VarBuilder.SetLocalSymInfo(varSymbol.SymbolName);
+            }
+
+            Body.Emit();
+            if (this.RetZType.SharpType != typeof(void))
+            {
+                IL.Emit(OpCodes.Ldloc_0);
+            }
+            IL.Emit(OpCodes.Ret);
         }
 
         private void SetAttrZCode(MethodBuilder methodBuilder)
         {
             Type myType = typeof(ZCodeAttribute);
             ConstructorInfo infoConstructor = myType.GetConstructor(new Type[] { typeof(string) });
-            string code = this.NamePart.ProcDesc.ToZCode();
+            string code = this.NamePart.GetZDesc().ToZCode();
             CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { code });
             methodBuilder.SetCustomAttribute(attributeBuilder);
         }
 
-        private bool AnalyRet(NameTypeParser parser)
+        private bool AnalyRet()
         {
             if (RetToken == null)
             {
@@ -88,47 +130,31 @@ namespace ZCompileCore.AST
             }
             else
             {
-                NameTypeParser.ParseResult result = parser.ParseType(RetToken);
-                if (result != null)
+                string retText = RetToken.GetText();
+                var ztypes = this.FileContext.ImportUseContext.SearchZTypesByClassNameOrDimItem(retText);
+                if (ztypes.Length == 1)
                 {
-                    RetZType = result.ZType;
+                    RetZType = ztypes[0];
                     return true;
                 }
                 else
                 {
                     RetZType = ZLangBasicTypes.ZVOID;
-                    errorf(RetToken.Position,"过程的结果'{0}'不存在",RetToken.GetText());
+                    ErrorF(RetToken.Position, "过程的结果'{0}'不存在", RetToken.GetText());
                 }
             }
             this.ProcContext.RetZType = RetZType;
             return false;
         }
 
-        public void AnalyBody()
+
+        public void SetContext(ContextClass classContext)
         {
+            this.ClassContext = classContext;
+            this.FileContext = this.ClassContext.FileContext;
+            this.ProcContext = new ContextProc(this.ClassContext,false);
+            NamePart.SetContext(this.ProcContext);
             Body.ProcContext = this.ProcContext;
-            Body.Analy();
-        }
-
-        public void EmitBody()
-        {
-            var symbols = this.ProcContext.Symbols;
-            var IL = this.ProcContext.EmitContext.ILout;
-            this.ProcContext.LoacalVarList.Reverse();
-            for (int i = 0; i < this.ProcContext.LoacalVarList.Count; i++)
-            {
-                string ident = this.ProcContext.LoacalVarList[i];
-                SymbolLocalVar varSymbol = symbols.Get(ident) as SymbolLocalVar;
-                varSymbol.VarBuilder = IL.DeclareLocal(varSymbol.SymbolZType.SharpType);
-                varSymbol.VarBuilder.SetLocalSymInfo(varSymbol.SymbolName);
-            }
-
-            Body.Emit();
-            if(this.RetZType.SharpType!=typeof(void))
-            {
-                IL.Emit(OpCodes.Ldloc_0);
-            }
-            ProcContext.EmitContext.ILout.Emit(OpCodes.Ret);
         }
 
         public override string ToString()
@@ -140,7 +166,7 @@ namespace ZCompileCore.AST
                 buff.Append(this.RetToken.GetText());
             buff.AppendLine();
             buff.Append(this.Body.ToString());
-            return buff.ToString(); 
+            return buff.ToString();
         }
     }
 }

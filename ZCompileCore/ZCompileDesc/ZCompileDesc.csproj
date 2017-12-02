@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZCompileDesc</RootNamespace>
     <AssemblyName>ZCompileDesc</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -39,10 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\IZDescTypeDictionary.cs" />
+    <Content Include="Collections\IZDescTypeDictionary.cs.TXT" />
     <Compile Include="Collections\IZTypeDictionary.cs" />
-    <Compile Include="Collections\IWordDictionaryList.cs" />
+    <Content Include="Collections\IWordDictionaryList.cs.TXT" />
     <Compile Include="Collections\NamingList.cs" />
+    <Compile Include="Compilings\IZCompilingInfo.cs" />
+    <Compile Include="Compilings\ZMethodCompiling.cs" />
     <Compile Include="Descriptions\ArgDescriptions\ZArg.cs" />
     <Compile Include="Descriptions\ArgDescriptions\ZParam.cs" />
     <Compile Include="Descriptions\BracketDescriptions\ZBracketCallDesc.cs" />
@@ -57,18 +62,20 @@
     <Compile Include="Utils\EnumerableHelper.cs" />
     <Compile Include="ZLangBasicTypes.cs" />
     <Compile Include="Utils\ZDescriptionHelper.cs" />
+    <Compile Include="Compilings\ZConstructorCompiling.cs" />
+    <Compile Include="ZMembers\ZDimItemInfo.cs" />
+    <Compile Include="Compilings\ZMemberCompiling.cs" />
+    <Compile Include="Utils\ZClassTypeHelper.cs" />
     <Compile Include="ZTypes\ZAssemblyDesc.cs" />
     <Compile Include="ZLibRTException.cs" />
+    <Compile Include="ZTypes\ZClassLibType.cs" />
+    <Compile Include="Compilings\ZClassCompilingType.cs" />
     <Compile Include="ZTypes\ZPackageDesc.cs" />
     <Compile Include="Collections\ZPackageDescList.cs" />
-    <Compile Include="Collections\IWordDictionary.cs" />
-    <Compile Include="Utils\IWordDictionaryHelper.cs" />
+    <Content Include="Collections\IWordDictionary.cs.TXT" />
     <Compile Include="Utils\ZDescTypeListHelper.cs" />
     <Compile Include="Utils\ZTypeListHelper.cs" />
-    <Compile Include="Words\WordData.cs" />
-    <Compile Include="Collections\WordDictionary.cs" />
-    <Compile Include="Words\WordInfo.cs" />
-    <Compile Include="Words\WordKind.cs" />
+    <Content Include="Collections\WordDictionary.cs.TXT" />
     <Compile Include="ZMembers\ZEnumItemInfo.cs" />
     <Compile Include="ZMembers\ZFieldInfo.cs" />
     <Compile Include="ZMembers\ZMemberInfo.cs" />
@@ -83,13 +90,17 @@
     <Compile Include="ZTypes\ZType.cs" />
     <Compile Include="ZTypeManager.cs" />
     <Compile Include="ZTypes\ZTypeUtil.cs" />
-    <Compile Include="Utils\ZCodeParser.cs" />
+    <Compile Include="ZCodeParser.cs" />
     <Compile Include="Utils\ProcDescHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZLangRT\ZLangRT.csproj">
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
       <Name>ZLangRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZSegment\ZNLP.csproj">
+      <Project>{3497d4f3-de89-4676-980b-50dab21b824e}</Project>
+      <Name>ZNLP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
       <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>

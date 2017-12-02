@@ -41,9 +41,9 @@
   <ItemGroup>
     <Compile Include="Collections\ArrayTape.cs" />
     <Compile Include="Collections\IName.cs" />
-    <Compile Include="Collections\KeyValuesDictionary.cs" />
-    <Compile Include="Collections\NameDictionary.cs" />
-    <Compile Include="Collections\StringValuesDictionary.cs" />
+    <Compile Include="Collections\KeyListDictionary.cs" />
+    <Content Include="Collections\NameDictionary.cs.TXT" />
+    <Content Include="Collections\StringValuesDictionary.cs.TXT" />
     <Compile Include="Infoes\ZCompileFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\ChineseHelper.cs" />
@@ -52,9 +52,6 @@
     <Compile Include="Tools\ListHelper.cs" />
     <Compile Include="Tools\StringHelper.cs" />
     <Compile Include="Tools\TxtFileEncoding.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Tools\ListHelper.cs.TXT" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

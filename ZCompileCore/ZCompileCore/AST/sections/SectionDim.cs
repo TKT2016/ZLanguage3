@@ -18,77 +18,99 @@ namespace ZCompileCore.AST
 {
     public class SectionDim : SectionBase
     {
-        public Token KeyToken;
-        public Token NameToken;
+        public LexToken KeyToken;
+        public LexToken NameToken;
         public List<DimVarAST> Dims = new List<DimVarAST>();
+
         ZDimType EmitedZType;
         public bool IsInClass;
 
-        string typeName;
-        public string AnalyName(string fileName)
+        string DimName;
+
+        public string GetName()
+        {
+            return DimName;
+        }
+
+        public override void AnalyText()
+        {
+            foreach (DimVarAST item in this.Dims)
+            {
+                item.AnalyText();
+            }
+        }
+
+        public override void AnalyType()
         {
             if (!IsInClass)
             {
-                if (NameToken == null) return null;
-                typeName = NameToken.GetText();
-                return typeName;
+                if (NameToken == null) return;
+                DimName = NameToken.GetText();
             }
             else
             {
-                typeName = fileName + "_Dim";
-                return typeName;
+                string fileName = this.FileContext.FileModel.GetFileNameNoEx();
+                DimName = fileName + "_Dim";
             }
         }
 
-        public ZDimType GetCreatedZType()
+        public override void AnalyBody()
         {
-            if(EmitedZType==null)
+            foreach (var item in Dims)
             {
-                Type type = this.Builder.CreateType();
-                EmitedZType = ZTypeManager.GetByMarkType(type) as ZDimType;
+                item.AnalyBody();
             }
-            return EmitedZType;
         }
 
-        public TypeBuilder Builder;
-        public TypeBuilder EmitName(ModuleBuilder moduleBuilder, string packageName)
+        TypeBuilder Builder;
+        public override void EmitName()
         {
-            string fullName = packageName + "." + typeName;
+            string packageName = this.FileContext.ProjectContext.PackageName;
+            ModuleBuilder moduleBuilder = this.FileContext.ProjectContext.EmitContext.ModuleBuilder;
+            string fullName = packageName + "." + DimName;
             TypeAttributes typeAttrs = TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Abstract | TypeAttributes.BeforeFieldInit;
             Builder = moduleBuilder.DefineType(fullName, typeAttrs);
             SetZAttrClass(Builder);
-            return Builder;
         }
 
-        public bool AnalyBody()
-        {
-            if (Dims.Count == 0) return false;
-            foreach (var item in Dims)
-            {
-                item.Analy();
-            }
-            return true;
-        }
-
-        public void EmitBody()
+        public override void EmitBody()
         {
             var constructorBuilder = Builder.DefineConstructor(
                 MethodAttributes.Private | MethodAttributes.Static, CallingConventions.Standard, new Type[] { });
             ILGenerator IL = constructorBuilder.GetILGenerator();
 
-            foreach(var item in Dims)
+            foreach (var item in Dims)
             {
-                item.Emit(Builder,IL);
+                item.Emit(Builder, IL);
             }
             IL.Emit(OpCodes.Ret);
         }
 
-        protected void SetZAttrClass(TypeBuilder classBuilder)
+        private void SetZAttrClass(TypeBuilder classBuilder)
         {
             Type myType = typeof(ZDimAttribute);
             ConstructorInfo infoConstructor = myType.GetConstructor(new Type[] { });
             CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { });
             classBuilder.SetCustomAttribute(attributeBuilder);
+        }
+
+        public void SetContext(ContextFile fileContext)
+        {
+            this.FileContext = fileContext;
+            foreach (DimVarAST item in this.Dims)
+            {
+                item.SetContext(fileContext);
+            }
+        }
+
+        public ZDimType GetCreatedZType()
+        {
+            if (EmitedZType == null)
+            {
+                Type type = this.Builder.CreateType();
+                EmitedZType = ZTypeManager.GetByMarkType(type) as ZDimType;
+            }
+            return EmitedZType;
         }
 
         public override string ToString()
@@ -109,36 +131,6 @@ namespace ZCompileCore.AST
                     buff.Append(",");
             }
             return buff.ToString();
-        }
-        
-        public class DimVarAST
-        {
-            public Token NameToken;
-            public Token TypeToken;
-            public string DimName;
-            public string DimTypeName;
-
-            public bool Analy()
-            {
-                DimName = NameToken.GetText();
-                DimTypeName = TypeToken.GetText();
-                return true;
-            }
-
-            FieldBuilder fieldBuilder;
-            public FieldBuilder Emit(TypeBuilder classBuilder, ILGenerator il)
-            {
-                FieldAttributes fieldAttr = FieldAttributes.Private | FieldAttributes.Static | FieldAttributes.InitOnly;
-                fieldBuilder = classBuilder.DefineField(DimName, typeof(string), fieldAttr);
-                EmitHelper.LoadString(il, DimTypeName);
-                EmitHelper.StormField(il, fieldBuilder);
-                return fieldBuilder;
-            }
-
-            public override string ToString()
-            {
-                return string.Format("{0}={1}", NameToken.GetText(), TypeToken.GetText());
-            } 
         }
     }
 }

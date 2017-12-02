@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using ZLangRT;
 using ZLangRT.Attributes;
 using Z标准包.绘图.形状;
+using Z标准包.文件系统;
 
 namespace Z标准包.绘图
 {
@@ -51,10 +52,10 @@ namespace Z标准包.绘图
             graphics.DrawString(W.内容,new Font(W.字体类型,W.字体大小),笔刷,W.位置);
         }
 
-        [ZCode("在(Point:point)绘制(Image:image)")]
-        public void 在_绘制(Point point, Image image)
+        [ZCode("在(Point:point)绘制(图片:image)")]
+        public void 在_绘制(Point point, 图片 image)
         {
-            graphics.DrawImage(image,point);
+            graphics.DrawImage(image.ImageInfo,point);
         }
 
         public void 销毁()

@@ -23,5 +23,11 @@ namespace Z语言系统
         {
             Thread.Sleep(t);
         }
+
+        [ZCode("暂停(整数:t)秒")]
+        public static void 暂停_Second(int t)
+        {
+            Thread.Sleep(t*1000);
+        }
     }
 }

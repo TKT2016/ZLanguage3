@@ -33,16 +33,18 @@ namespace ZDev.UI.Compilers
 
         ProjectCompileResult CompileFile(string srcFile)
         {
+            CompileMessageCollection MessageCollection = new CompileMessageCollection();
             FileCompiler compiler = new FileCompiler();
-            ProjectCompileResult result = compiler.Compile(srcFile);
+            ProjectCompileResult result = compiler.Compile(srcFile, MessageCollection);
             return result;
         }
 
         ProjectCompileResult CompileProject(string srcFile)
         {
+            CompileMessageCollection MessageCollection = new CompileMessageCollection();
             FileInfo srcFileInfo = new FileInfo(srcFile);
             ProjectCompiler compiler = new ProjectCompiler();
-            ProjectCompileResult result = compiler.Compile(srcFileInfo);
+            ProjectCompileResult result = compiler.Compile(srcFileInfo, MessageCollection);
             return result;
         }
 

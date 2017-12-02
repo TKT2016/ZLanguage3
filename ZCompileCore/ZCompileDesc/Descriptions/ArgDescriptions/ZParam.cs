@@ -11,7 +11,7 @@ namespace ZCompileDesc.Descriptions
 {
     public class ZParam
     {
-        public bool IsGeneric { get; set; }
+        public bool IsGenericArg { get; set; }
         public string ZParamName { get; set; }
         public ZType ZParamType { get; set; }
         public ParameterInfo ParameterInfo { get; set; }
@@ -20,13 +20,6 @@ namespace ZCompileDesc.Descriptions
         {
  
         }
-
-        //public ZParam( ParameterInfo parameterInfo)
-        //{
-        //    ZParamName = parameterInfo.Name;
-        //    ZParamType = parameterInfo.ParameterType;
-        //    ParameterInfo = parameterInfo;
-        //}
 
         public ZParam(string name, ZType ztype)
         {
@@ -43,8 +36,8 @@ namespace ZCompileDesc.Descriptions
 
         public bool ZEquals(ZParam zparam)
         {
-            if (this.IsGeneric != zparam.IsGeneric) return false;
-            if (IsGeneric) return true;
+            if (this.IsGenericArg != zparam.IsGenericArg) return false;
+            if (IsGenericArg) return true;
             if (this.ZParamType.SharpType == zparam.ZParamType.SharpType) return true;
             //throw new ZLibRTException("Compare超出范围");
             return true;
@@ -52,8 +45,8 @@ namespace ZCompileDesc.Descriptions
 
         public bool ZEquals(ZArg zarg)
         {
-            if (this.IsGeneric != zarg.IsGeneric) return false;
-            if (IsGeneric) return true;
+            //if (this.IsGeneric != zarg.IsGeneric) return false;
+            if (IsGenericArg) return true;
             if (zarg.ZArgType == null || this.ZParamType == null) return false;
             if (ReflectionUtil.IsExtends(zarg.ZArgType.SharpType, this.ZParamType.SharpType)) return true;
             if (ZLambda.IsFn(this.ZParamType.SharpType)) return true;
@@ -63,7 +56,7 @@ namespace ZCompileDesc.Descriptions
 
         public string ToZCode()
         {
-            if(IsGeneric)
+            if(IsGenericArg)
             {
                 var ztype ="类型";
                 return string.Format("{0}:{1}", ztype, ZParamName);

@@ -9,24 +9,29 @@ namespace ZCompileCore.Reports
 {
     public class CompileMessage
     {
-        public ZCompileFileInfo SourceFileInfo { get; set; }
+        public CompileMessageKey Key { get; set; }
 
+        //public string SrcFileName { get; set; }
         public int Line { get; set; }
 
         public int Col { get; set; }
 
-        public string Text { get; set; }
+        public string Content { get; set; }
 
-        //public bool IsWarning { get; set; }
-
-        //public CompileMessageEnum MessageEnum { get; set; }
-
-        public CompileMessage(ZCompileFileInfo srcfile, int line, int col, string text)
+        public CompileMessage(CompileMessageSrcKey key, int line, int col, string text)
         {
-            SourceFileInfo = srcfile;
+            Key = key;
             Line = line;
             Col = col;
-            Text = text;
+            Content = text;
         }
+
+        //public CompileMessage(ZCompileFileInfo srcfile, int line, int col, string text)
+        //{
+        //    SourceFileInfo = srcfile;
+        //    Line = line;
+        //    Col = col;
+        //    Content = text;
+        //}
     }
 }

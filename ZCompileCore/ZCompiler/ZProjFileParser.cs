@@ -6,13 +6,14 @@ using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore;
 using ZCompileCore.Engines;
+using ZCompileCore.Reports;
 using ZCompileKit.Infoes;
 
 namespace ZCompiler
 {
     public class ZProjFileParser
     {
-        public ZProjectModel ParseProjectFile(string[] lines, string folderPath)
+        public ZProjectModel ParseProjectFile(CompileMessageCollection messageCollection, string[] lines, string folderPath, ZCompileFileInfo zfileInfo)
         {
             ZProjectModel projectModel = new ZProjectModel();
             projectModel.NeedSave = true;
@@ -68,7 +69,10 @@ namespace ZCompiler
                 }
                 else
                 {
-                    throw new CompileCoreException("无法识别项目编译指令:" + code);
+                    messageCollection.AddError(
+                    new CompileMessage( new CompileMessageSrcKey( zfileInfo.ZFileName), i+1, 0, "项目指令'" + code + "'无效"));
+                    //return new List<Token>();
+                    //throw new CompileCoreException("无法识别项目编译指令:" + code);
                 }
             }
             return projectModel;

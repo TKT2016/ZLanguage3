@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 using ZLangRT;
 
 namespace ZCompileDesc.ZTypes
 {
-    public class ZPackageDesc : IWordDictionary, IZTypeDictionary, IZDescTypeDictionary
+    public class ZPackageDesc :IZTypeDictionary// IWordDictionary, , IZDescTypeDictionary
     {
         public string Name { get; set; }
         public List<ZDimType> DimTypes { get; protected set; }
@@ -74,29 +73,29 @@ namespace ZCompileDesc.ZTypes
             }
         }
 
-        public bool ContainsWord(string text)
-        {
-            return
-                EnumerableHelper.AnyOne <ZEnumType>(EnumTypes,(ZEnumType zenum)=>zenum.ZName== text)
-                || EnumerableHelper.AnyOne<ZClassType>(ClassTypes, (ZClassType zclass) => zclass.ZName == text) 
-                ||IWordDictionaryHelper.ArrayContainsWord(text, EnumTypes.ToArray()) 
-                || IWordDictionaryHelper.ArrayContainsWord(text, ClassTypes.ToArray()); // this.WordDictionaryList.ContainsWord(text);
-        }
+        //public bool ContainsWord(string text)
+        //{
+        //    return
+        //        EnumerableHelper.AnyOne <ZEnumType>(EnumTypes,(ZEnumType zenum)=>zenum.ZName== text)
+        //        || EnumerableHelper.AnyOne<ZClassType>(ClassTypes, (ZClassType zclass) => zclass.ZName == text) 
+        //        ||IWordDictionaryHelper.ArrayContainsWord(text, EnumTypes.ToArray()) 
+        //        || IWordDictionaryHelper.ArrayContainsWord(text, ClassTypes.ToArray()); // this.WordDictionaryList.ContainsWord(text);
+        //}
 
-        public WordInfo SearchWord(string text)
-        {
-            if (!ContainsWord(text)) return null;
-            ZType ztype = SearchZTypeOne(text);
-            WordInfo info0 = null;
-            if(ztype!=null)
-            {
-                info0 = new WordInfo(text, WordKind.TypeName, ztype);
-            }
-            WordInfo info1 = IWordDictionaryHelper.EnumerableSearchWord(text, EnumTypes);
-            WordInfo info2 = IWordDictionaryHelper.EnumerableSearchWord(text, ClassTypes);
-            WordInfo newWord = WordInfo.Merge(info0,info1, info2);
-            return newWord;
-        }
+        //public WordInfo SearchWord(string text)
+        //{
+        //    if (!ContainsWord(text)) return null;
+        //    ZType ztype = SearchZTypeOne(text);
+        //    WordInfo info0 = null;
+        //    if(ztype!=null)
+        //    {
+        //        info0 = new WordInfo(text, WordKind.TypeName, ztype);
+        //    }
+        //    WordInfo info1 = IWordDictionaryHelper.EnumerableSearchWord(text, EnumTypes);
+        //    WordInfo info2 = IWordDictionaryHelper.EnumerableSearchWord(text, ClassTypes);
+        //    WordInfo newWord = WordInfo.Merge(info0,info1, info2);
+        //    return newWord;
+        //}
 
         public void AddZDescType(IZDescType descType)
         {

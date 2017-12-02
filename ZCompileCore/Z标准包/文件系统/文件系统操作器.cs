@@ -11,62 +11,96 @@ namespace Z标准包.文件系统
     public class 文件系统操作器
     {
         #region 文件夹操作
-        [ZCode("创建(DirectoryInfo:wjj)")]
-        //[ZCode("创建文件夹(DirectoryInfo:wjj)")]
-        public static void 创建(DirectoryInfo wjj)
+
+        [ZCode("创建(文件夹:wjj)")]
+        public static void 创建(文件夹 wjj)
         {
-            wjj.Create();
+            wjj.DirInfo.Create();
         }
 
-        //[ZCode("创建文件夹(string:wjj)")]
-        //public static void 创建文件夹(string wjj)
-        //{
-        //    Directory.CreateDirectory(wjj);
-        //}
-
-        [ZCode("删除(DirectoryInfo:wjj)")]
-        //[ZCode("删除文件夹(DirectoryInfo:wjj)")]
-        public static void 删除(DirectoryInfo wjj)
+        [ZCode("删除(文件夹:wjj)")]
+        public static void 删除(文件夹 wjj)
         {
-            wjj.Delete();
+            Directory.Delete(wjj.DirInfo.FullName, true);
+            //wjj.DirInfo.Delete();
         }
 
-       //[ZCode("删除文件夹(string:wjj)")]
-       // public static void 删除文件夹(string wjj)
-       // {
-       //     if (Directory.Exists(wjj))
-       //         Directory.Delete(wjj);
-       // }
+        [ZCode("复制(文件夹:fromDir)到(文件夹:toDir)")]
+        public static void CopyDir(文件夹 fromDir, 文件夹 toDir)
+        {
+            CopyDir(fromDir.DirInfo.FullName, toDir.DirInfo.FullName);
+        }
+
+        [ZCode("移动(文件夹:fromDir)到(文件夹:toDir)")]
+        public static void MoveDir(文件夹 fromDir, 文件夹 toDir)
+        {
+            MoveDir(fromDir.DirInfo.FullName, toDir.DirInfo.FullName);
+        }
+
+        public static void CopyDir(string fromDir, string toDir)
+        {
+            if (!Directory.Exists(fromDir))
+                return;
+
+            if (!Directory.Exists(toDir))
+            {
+                Directory.CreateDirectory(toDir);
+            }
+
+            string[] files = Directory.GetFiles(fromDir);
+            foreach (string formFileName in files)
+            {
+                string fileName = Path.GetFileName(formFileName);
+                string toFileName = Path.Combine(toDir, fileName);
+                File.Copy(formFileName, toFileName);
+            }
+            string[] fromDirs = Directory.GetDirectories(fromDir);
+            foreach (string fromDirName in fromDirs)
+            {
+                string dirName = Path.GetFileName(fromDirName);
+                string toDirName = Path.Combine(toDir, dirName);
+                CopyDir(fromDirName, toDirName);
+            }
+        }
+
+        public static void MoveDir(string fromDir, string toDir)
+        {
+            if (!Directory.Exists(fromDir))
+                return;
+
+            CopyDir(fromDir, toDir);
+            Directory.Delete(fromDir, true);
+        }
+
         #endregion
 
 
-       #region 文件操作
-       [ZCode("创建(FileInfo:wj)")]
-       //[ZCode("创建文件(FileInfo:wj)")]
-       public static void 创建(FileInfo wj)
-       {
-           wj.Create();
-       }
+        #region 文件操作
 
-       //[ZCode("创建文件(string:wj)")]
-       //public static void 创建文件(string wj)
-       //{
-       //    File.Create(wj);
-       //}
+        [ZCode("创建(文件:wj)")]
+        public static void 创建(文件 wj)
+        {
+            wj.FeInfo.Create();
+        }
 
-       [ZCode("删除(FileInfo:wj)")]
-       //[ZCode("删除文(DirectoryInfo:wj)")]
-       public static void 删除(FileInfo wj)
-       {
-           wj.Delete();
-       }
+        [ZCode("复制(文件:wa)到(文件:wb)")]
+        public static void 复制(文件 wa, 文件 wb)
+        {
+            File.Copy(wa.FullName, wb.FullName);
+        }
 
-       //[ZCode("删除文件(string:wjj)")]
-       //public static void 删除文件(string wj)
-       //{
-       //    if (File.Exists(wj))
-       //        File.Delete(wj);
-       //}
-       #endregion
+        [ZCode("移动(文件:wa)到(文件:wb)")]
+        public static void 移动(文件 wa, 文件 wb)
+        {
+            File.Move(wa.FullName, wb.FullName);
+        }
+
+        [ZCode("删除(文件:wj)")]
+        public static void 删除(文件 wj)
+        {
+            File.Delete(wj.FullName);
+            //wj.FeInfo.Delete();
+        }
+        #endregion
     }
 }

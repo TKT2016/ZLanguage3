@@ -19,7 +19,7 @@ namespace ZCompileCore.Parsers
 
         FileMutilType fileMY;
 
-        public FileMutilType Parse(List<Token> tokens, ContextFile fileContext)
+        public FileMutilType Parse(List<LexToken> tokens, ContextFile fileContext)
         {
             tape = new TokenTape(tokens, fileContext);
             fileMY = new FileMutilType();
@@ -45,9 +45,9 @@ namespace ZCompileCore.Parsers
                     SectionProc section = ParseProc();
                     if (section != null)
                     {
-                        if (section.NamePart.IsConstructor())
+                        if (IsConstructor(section.NamePart))
                         {
-                            SectionConstructor constructor = new SectionConstructor(section);
+                            SectionConstructorDef constructor = new SectionConstructorDef(section);
                             fileMY.AddSection(constructor);
                         }
                         else
@@ -85,7 +85,11 @@ namespace ZCompileCore.Parsers
             }
             else if (headText.EndsWith("类型"))
             {
-                SectionClassName section = ParseClass();
+                // if (headText.StartsWith("物体"))
+                // {
+                //     Console.WriteLine("物体" + headText);
+                // }
+                SectionClassNameDef section = ParseClass();
                 return section;
             }
             else if (headText.EndsWith("属性"))
@@ -96,19 +100,23 @@ namespace ZCompileCore.Parsers
             else
             {
                 SectionProc section = ParseProc();
-                if(section.NamePart.IsConstructor())
+                if (IsConstructor(section.NamePart))
                 {
-                    SectionConstructor constructor = new SectionConstructor(section);
+                    SectionConstructorDef constructor = new SectionConstructorDef(section);
                     return constructor;
                 }
                 else
                 {
                     return section;
                 }        
-                //tape.error("错误的段落");
-                //tape.MoveNext();
-                //return null;
             }
+        }
+
+        private bool IsConstructor(ProcName procName)
+        {
+            if (procName.NameTerms.Count != 1) return false;
+            if (!(procName.NameTerms[0] is ProcBracket)) return false;
+            return true;
         }
 
         #region parse import
@@ -239,30 +247,60 @@ namespace ZCompileCore.Parsers
         private SectionEnum ParseEnum()
         {
             SectionEnum ast = new SectionEnum();
-            Token headToken = tape.Current;
-            ast.KeyToken = new Token("声明", TokenKind.Ident, headToken.Line,headToken.Col);
-            ast.NameToken = new Token(headToken.GetText().Substring(2), TokenKind.Ident, headToken.Line, headToken.Col+2);
+            LexToken headToken = tape.Current;
+            ast.KeyToken = new LexToken("声明", TokenKind.Ident, headToken.Line,headToken.Col);
+            string headText  = headToken.GetText();
+            if(headText.Length>2)
+            {
+                ast.NameToken = new LexToken(headText.Substring(2), TokenKind.Ident, headToken.Line, headToken.Col + 2);
+            }
             tape.MoveNext();
             tape.Match(TokenKind.Colon);
-            //TokenTape tape = new TokenTape(sectionRaw.Content);
-            while (tape.CurrentKind != TokenKind.EOF)
+            ast.Values = ParseEnumBody();
+            return ast;
+        }
+
+
+        private List<LexToken> ParseEnumBody()
+        {
+            CodePosition startPosition = new CodePosition(tape.Current.Line, 1);
+            List<LexToken> list = new List<LexToken>();
+            while (!tape.IsEnd )
             {
-                if (tape.CurrentKind == TokenKind.Ident)
+                if (tape.Current.Col <= startPosition.Col)
                 {
-                    ast.AddValueToken(tape.Current);
-                    tape.MoveNext();
+                    break;
+                }
+                else if (tape.CurrentKind == TokenKind.Ident)
+                {
+                    LexToken tok = ParseEnumItem();
+                    if (tok != null)
+                    {
+                        list.Add(tok);
+                    }
                 }
                 else if (tape.CurrentKind == TokenKind.Comma)
                 {
                     tape.MoveNext();
                 }
+                else if (tape.CurrentKind == TokenKind.NewLine)
+                {
+                    tape.MoveNext();
+                }
                 else
                 {
-                    tape.error(string.Format("定义的约定'{0}'不是正确的名称", tape.Current.GetText()));
+                    tape.error(string.Format("类型'{0}'不是正确的约定项", tape.Current.GetText()));
                     tape.MoveNext();
                 }
             }
-            return ast;
+            return list;
+        }
+
+        private LexToken ParseEnumItem()
+        {
+            LexToken token = tape.Current;
+            tape.MoveNext();
+            return token;
         }
         #endregion
 
@@ -271,30 +309,31 @@ namespace ZCompileCore.Parsers
         private SectionDim ParseDim()
         {
             SectionDim ast = new SectionDim();
-            Token headToken = tape.Current;
+            LexToken headToken = tape.Current;
             if (headToken.GetText() == "声明")
             {
                 ast.KeyToken = headToken;
             }
             else
             {
-                ast.KeyToken = new Token("声明", TokenKind.Ident, headToken.Line, headToken.Col);
-                ast.NameToken = new Token(headToken.GetText().Substring(2), TokenKind.Ident, headToken.Line, headToken.Col + 2);
+                ast.KeyToken = new LexToken("声明", TokenKind.Ident, headToken.Line, headToken.Col);
+                ast.NameToken = new LexToken(headToken.GetText().Substring(2), TokenKind.Ident, headToken.Line, headToken.Col + 2);
             }
             tape.MoveNext();
             tape.Match(TokenKind.Colon);
+            tape.Match(TokenKind.NewLine);
             ast.Dims = ParseDimList();
             return ast;
         }
 
-        private List<SectionDim.DimVarAST> ParseDimList()
+        private List<DimVarAST> ParseDimList()
         {
-            List<SectionDim.DimVarAST> list = new List<SectionDim.DimVarAST>();
+            List<DimVarAST> list = new List<DimVarAST>();
             while (tape.CurrentKind != TokenKind.NewLine && tape.CurrentKind != TokenKind.EOF)
             {
                 if (tape.Current.Kind == TokenKind.Ident)
                 {
-                    SectionDim.DimVarAST dimv = ParseDimVar(tape);
+                    DimVarAST dimv = ParseDimVar(tape);
                     if (dimv != null)
                     {
                         list.Add(dimv);
@@ -302,7 +341,7 @@ namespace ZCompileCore.Parsers
                 }
                 if (tape.CurrentKind == TokenKind.NewLine)
                 {
-                    break;
+                    tape.MoveNext();
                 }
                 else if (tape.CurrentKind == TokenKind.Comma)
                 {
@@ -317,9 +356,9 @@ namespace ZCompileCore.Parsers
             return list;
         }
 
-        private SectionDim.DimVarAST ParseDimVar(TokenTape tape)
+        private DimVarAST ParseDimVar(TokenTape tape)
         {
-            SectionDim.DimVarAST dimv = new SectionDim.DimVarAST();
+            DimVarAST dimv = new DimVarAST();
             dimv.NameToken = tape.Current;
             tape.MoveNext();
             tape.Match(TokenKind.Assign);
@@ -331,15 +370,15 @@ namespace ZCompileCore.Parsers
 
         #region parse class
 
-        private SectionClassName ParseClass()
+        private SectionClassNameDef ParseClass()
         {
-            SectionClassName ast = new SectionClassName();
-            Token headToken = tape.Current;
+            SectionClassNameDef ast = new SectionClassNameDef();
+            LexToken headToken = tape.Current;
             string headFirstText = headToken.GetText();
             if (headFirstText.Length > 2)
             {
                 string baseTypeName = headFirstText.Substring(0, headFirstText.Length - 2);
-                ast.BaseTypeToken = new Token(baseTypeName, TokenKind.Ident, headToken.Line, headToken.Col);
+                ast.BaseTypeToken = new LexToken(baseTypeName, TokenKind.Ident, headToken.Line, headToken.Col);
             }
             else
             {
@@ -375,13 +414,13 @@ namespace ZCompileCore.Parsers
         private SectionProperties ParseProperties()
         {
             SectionProperties ast = new SectionProperties();
-            Token headFistToken = tape.Current;
+            LexToken headFistToken = tape.Current;
             string headFirstText = headFistToken.GetText();
             if (headFirstText.Length > 2)
             {
                 string baseTypeName = headFirstText.Substring(0, headFirstText.Length - 2);
-                ast.TypeToken = new Token(baseTypeName, TokenKind.Ident, headFistToken.Line, headFistToken.Col);
-                ast.KeyToken = new Token("属性", TokenKind.Ident, headFistToken.Line, headFistToken.Col + headFirstText.Length - 2);
+                ast.TypeToken = new LexToken(baseTypeName, TokenKind.Ident, headFistToken.Line, headFistToken.Col);
+                ast.KeyToken = new LexToken("属性", TokenKind.Ident, headFistToken.Line, headFistToken.Col + headFirstText.Length - 2);
             }
             else
             {
@@ -390,18 +429,35 @@ namespace ZCompileCore.Parsers
 
             tape.MoveNext();
             tape.Match(TokenKind.Colon);
+            ast.Properties = ParsePropertyBody();
+            
+            return ast;
+        }
 
-            while (tape.CurrentKind != TokenKind.EOF && tape.CurrentKind!= TokenKind.NewLine)
+        private List<PropertyAST> ParsePropertyBody()
+        {
+            CodePosition startPosition = new CodePosition(tape.Current.Line, 1);
+            //return ParseStmtBlock(startPosition);
+            List<PropertyAST> list = new List<PropertyAST>();
+            while (tape.Current.Col > startPosition.Col)
             {
                 if (tape.CurrentKind == TokenKind.Ident)
                 {
                     PropertyAST property = ParseProperty();
                     if (property != null)
                     {
-                        ast.AddProperty(property);
+                        list.Add(property);
                     }
                 }
                 else if (tape.CurrentKind == TokenKind.Comma)
+                {
+                    tape.MoveNext();
+                }
+                else if (tape.CurrentKind == TokenKind.Semi)
+                {
+                    tape.MoveNext();
+                }
+                else if (tape.CurrentKind == TokenKind.NewLine)
                 {
                     tape.MoveNext();
                 }
@@ -410,16 +466,19 @@ namespace ZCompileCore.Parsers
                     tape.error(string.Format("类型'{0}'不是正确的属性", tape.Current.GetText()));
                     tape.MoveNext();
                 }
+                //PropertyAST propertyAST = ParseProperty();
+                //if (propertyAST != null)
+                //{
+                //    list.Add(propertyAST);
+                //}
             }
-            SkipNewLine();
-            return ast;
+            return list;
         }
 
         private PropertyAST ParseProperty( )
         {
             PropertyAST property = new PropertyAST();
-            //property.SetFileContext(this.filem.FileContext);//.FileContext = this.filem.FileContext;
-            property.FileContext = this.fileMY.FileContext;
+            //property.FileContext = this.fileMY.FileContext;
 
             property.NameToken = tape.Current;
             tape.MoveNext();
@@ -429,7 +488,7 @@ namespace ZCompileCore.Parsers
                 Exp exp = ParseRawExpPropertyValue();
                 if (exp != null)
                 {
-                    property.PropertyValue = exp;
+                    property.PropertyValueExp = exp;
                 }
             }
             return property;
@@ -485,10 +544,6 @@ namespace ZCompileCore.Parsers
                     }
                     tape.MoveNext();
                 }
-                //if (kind == TokenKind.NewLine)
-                //{
-                //    break;
-                //}
                 else if(kind== TokenKind.Comma)
                 {
                     if(bracketCount==-1)
@@ -520,6 +575,51 @@ namespace ZCompileCore.Parsers
             }
             return rexp;
         }
+
+        private Exp ParseRawExpLineComma()
+        {
+            ExpRaw rexp = new ExpRaw();
+            int line = tape.Current.Line;
+            int bracketCount = -1;
+            while (tape.Current.Kind != TokenKind.EOF && tape.Current.Kind != TokenKind.NewLine)
+            {
+                TokenKind kind = tape.Current.Kind;
+                if (kind == TokenKind.Comma)
+                {
+                    break;
+                }
+                else if (kind == TokenKind.LBS)
+                {
+                    rexp.RawTokens.Add(tape.Current);
+                    if (bracketCount == -1)
+                    {
+                        bracketCount = 0;
+                    }
+                    bracketCount++;
+                    tape.MoveNext();
+                }
+                else if (kind == TokenKind.RBS)
+                {
+                    if (bracketCount <= 0)
+                    {
+                        tape.error("多余的右括号");
+                    }
+                    else
+                    {
+                        bracketCount--;
+                        rexp.RawTokens.Add(tape.Current);
+                    }
+                    tape.MoveNext();
+                }
+                
+                else
+                {
+                    rexp.RawTokens.Add(tape.Current);
+                    tape.MoveNext();
+                }
+            }
+            return rexp;
+        }
         #endregion
 
         #region Parse 过程
@@ -538,11 +638,11 @@ namespace ZCompileCore.Parsers
             return ast;
         }
 
-        private Token ParseRetProc( )
+        private LexToken ParseRetProc( )
         {
             if (tape.CurrentKind == TokenKind.Ident)
             {
-                Token headToken = tape.Current;
+                LexToken headToken = tape.Current;
                 tape.MoveNext();
                 if(tape.CurrentKind== TokenKind.NewLine)
                 {
@@ -556,7 +656,7 @@ namespace ZCompileCore.Parsers
         private ProcName ParseProcName( )
         {
             ProcName procName = new ProcName();
-            procName.FileContext = this.fileMY.FileContext;
+            //procName.FileContext = this.fileMY.FileContext;
             while (tape.CurrentKind != TokenKind.EOF && tape.CurrentKind!= TokenKind.NewLine)
             {
                 if (tape.CurrentKind == TokenKind.LBS)
@@ -583,7 +683,7 @@ namespace ZCompileCore.Parsers
         private ProcBracket ParseProcBracket()
         {
             ProcBracket result = new ProcBracket();
-            result.FileContext = this.fileMY.FileContext;
+            //result.FileContext = this.fileMY.FileContext;
             tape.Match(TokenKind.LBS);
             while (tape.CurrentKind != TokenKind.RBS)
             {
@@ -614,7 +714,7 @@ namespace ZCompileCore.Parsers
         private ProcArg ParseProcArg( )
         {
             ProcArg arg = new ProcArg();
-            arg.FileContext = this.fileMY.FileContext;
+            //arg.FileContext = this.fileMY.FileContext;
             if (tape.CurrentKind == TokenKind.Ident)
             {
                 arg.ArgToken = tape.Current;
@@ -635,6 +735,10 @@ namespace ZCompileCore.Parsers
 
         private Stmt ParseStmt()
         {
+            //if (tape.Current.GetText().StartsWith("战场参数"))
+            //{
+             //   Console.WriteLine("战场参数");
+            //}
             if(tape.CurrentKind== TokenKind.NewLine)
             {
                 SkipNewLine();
@@ -661,6 +765,11 @@ namespace ZCompileCore.Parsers
                 Stmt stmt = ParseRepeat();
                 return stmt;
             }
+            else if (kind == TokenKind.Foreach)
+            {
+                Stmt stmt = ParseForeach();
+                return stmt;
+            }
             else if (kind == TokenKind.Catch)
             {
                 Stmt stmt = ParseCatch();
@@ -677,11 +786,6 @@ namespace ZCompileCore.Parsers
                 Stmt stmt = ParseStmtCall();
                 return stmt;
             }
-            //if (stmt != null)
-            //{
-            //    stmt.Deep = deep;
-            //}
-            //return stmt;
         }
 
         private Stmt ParseStmtCall()
@@ -744,6 +848,20 @@ namespace ZCompileCore.Parsers
             //tape.Match(TokenKind.Times);
             return repeatStmt;
         }
+        private Stmt ParseForeach()
+        {
+            StmtForeach foreachStmt = new StmtForeach();
+            foreachStmt.ForeachToken = tape.Current;tape.MoveNext();
+            tape.Match( TokenKind.LBS);
+            foreachStmt.ListExp = ParseRawExpLineComma();
+            tape.Match(TokenKind.Comma);
+            foreachStmt.ItemToken = tape.Current; tape.MoveNext();
+            tape.Match(TokenKind.RBS);
+            foreachStmt.Body = ParseStmtBlock(foreachStmt.ForeachToken.Position);
+            //tape.Match(TokenKind.Times);
+            return foreachStmt;
+        }
+
 
         private Stmt ParseIf()
         {

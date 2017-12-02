@@ -12,7 +12,7 @@ namespace ZCompileCore.AST
 {
     public  class StmtIf:Stmt
     {
-        public Token IfToken;
+        public LexToken IfToken;
         public List<StmtIfTrue> Parts = new List<StmtIfTrue>();
         public StmtBlock ElsePart { get; set; }
 
@@ -86,7 +86,7 @@ namespace ZCompileCore.AST
 
         public class StmtIfTrue : Stmt
         {
-            public Token KeyToken { get; set; }
+            public LexToken KeyToken { get; set; }
             public Exp Condition { get; set; }
             public StmtBlock Body { get; set; }
             public Label CurrentLabel { get; set; }

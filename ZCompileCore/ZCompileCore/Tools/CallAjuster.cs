@@ -40,7 +40,7 @@ namespace ZCompileCore.Tools
                 }
                 else
                 {
-                    throw new CompileCoreException();
+                    throw new CCException();
                 }
             }
             foreach (var pi in paramArr)
@@ -69,7 +69,7 @@ namespace ZCompileCore.Tools
                 }
                 else
                 {
-                    throw new CompileCoreException();
+                    throw new CCException();
                 }
             }
             foreach (var pi in paramArr)

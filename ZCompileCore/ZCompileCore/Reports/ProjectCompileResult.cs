@@ -13,40 +13,19 @@ namespace ZCompileCore.Reports
 {
     public class ProjectCompileResult
     {
-        public string BinaryFilePath { get; set; }
+        public CompileMessageCollection MessageCollection { get; set; }
+        //public List<CompileMessage> Errors { get; set; }
+        //public List<CompileMessage> Warnings { get;set; }
 
-        public KeyValuesDictionary<ZCompileFileInfo, CompileMessage> Errors { get; private set; }
-        public KeyValuesDictionary<ZCompileFileInfo, CompileMessage> Warnings { get; private set; }
-        public List<IZDescType> CompiledTypes { get; private set; }
+        public string BinaryFilePath { get; set; }
+        public List<IZDescType> CompiledTypes { get; set; }
         public ZType EntrtyZType { get; set; }
 
-        public ProjectCompileResult()
+        public ProjectCompileResult() 
         {
-            //Errors = new List<CompileMessage>();
-            //Warnings = new List<CompileMessage>();
-            Errors = new KeyValuesDictionary<ZCompileFileInfo, CompileMessage>();
-            Warnings = new KeyValuesDictionary<ZCompileFileInfo, CompileMessage>();
             CompiledTypes = new List<IZDescType>();
         }
 
-        public bool HasError()
-        {
-            return this.Errors.Count>0;
-        }
-
-        public bool HasWarning()
-        {
-            return this.Warnings.Count > 0;
-        }
-
-        public IZDescType GetCompiledType(string name)
-        {
-            foreach (var type in CompiledTypes)
-            {
-                if (type.ZName == name)
-                    return type;
-            }
-            return null;
-        }
+        
     }
 }

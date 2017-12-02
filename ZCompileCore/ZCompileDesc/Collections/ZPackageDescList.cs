@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 
 namespace ZCompileDesc.Descriptions
 {
-    public class ZPackageDescList : List<ZPackageDesc>, IWordDictionary, IZTypeDictionary
+    public class ZPackageDescList : List<ZPackageDesc>, IZTypeDictionary//,IWordDictionary, 
     {
         public bool Contains(string packageName)
         {
@@ -28,15 +27,15 @@ namespace ZCompileDesc.Descriptions
             return null;
         }
 
-        public bool ContainsWord(string text)
-        {
-            return IWordDictionaryHelper.ArrayContainsWord(text, this); 
-        }
+        //public bool ContainsWord(string text)
+        //{
+        //    return IWordDictionaryHelper.ArrayContainsWord(text, this); 
+        //}
 
-        public WordInfo SearchWord(string text)
-        {
-            return IWordDictionaryHelper.EnumerableSearchWord(text, this); 
-        }
+        //public WordInfo SearchWord(string text)
+        //{
+        //    return IWordDictionaryHelper.EnumerableSearchWord(text, this); 
+        //}
 
         public bool ContainsZType(string zname)
         {

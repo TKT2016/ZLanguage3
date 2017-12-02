@@ -63,60 +63,47 @@ namespace ZCompileDesc
         {
             if (Cache.SNameCache.ContainsKey(sharpName)) return new IZDescType[] { Cache.SNameCache[sharpName] };
             else return new IZDescType[] { };
-            //if (sharpName == "void") return new ZType[]{ ZVOID};
-            //else if (sharpName == "object") return new ZType[] { ZOBJECT };
-            //else if (sharpName == "int") return new ZType[] { ZINT };
-            //else if (sharpName == "float") return new ZType[] { ZFLOAT };
-            //else if (sharpName == "bool") return new ZType[] { ZBOOL };
-            //else if (sharpName == "string") return new ZType[] { ZSTRING };
-
-            //List<ZType> list = new List<ZType>();
-            //foreach (var item in sharpCache.Values)
-            //{
-            //    if (item.SharpType.Name == sharpName)
-            //    {
-            //        list.Add(item as ZType);
-            //    }
-            //}
-            //return list.ToArray();
         }
 
         public static IZDescType[] GetByMarkName(string zname)
         {
             if (Cache.ZNameCache.ContainsKey(zname)) return new IZDescType[] { Cache.ZNameCache[zname] };
             else return new IZDescType[] { };
-            //if (zname == "VOID") return new ZType[] { ZVOID };
-            //else if (zname == "事物") return new ZType[] { ZOBJECT };
-            //else if (zname == "整数") return new ZType[] { ZINT };
-            //else if (zname == "浮点数") return new ZType[] { ZFLOAT };
-            //else if (zname == "判断符") return new ZType[] { ZBOOL };
-            //else if (zname == "文本") return new ZType[] { ZSTRING };
-
-            //List<ZType> list = new List<ZType>();
-            //foreach(var item in sharpCache.Values)
-            //{
-            //    if(item.ZName==zname)
-            //    {
-            //        list.Add(item as ZType);
-            //    }
-            //}
-            //return list.ToArray();
         }
 
         public static IZDescType GetBySharpType(Type type)
         {
             if (type == null) return null;
-            if (Cache.SharpCache.ContainsKey(type)) return Cache.SharpCache[type];
-            else return null;
+            else if (Cache.SharpCache.ContainsKey(type))
+            {
+                return Cache.SharpCache[type];
+            }
+            else if (type.IsGenericType)
+            {
+                if(type.IsGenericTypeDefinition)
+                {
+                    return null;
+                }
+                /* 检查类型的泛型类型是否存在 */
+                Type typeParentGeneric = type.GetGenericTypeDefinition();
+                if (!Cache.SharpCache.ContainsKey(typeParentGeneric))
+                {
+                    return null;
+                }
+                /* 检查类型的参数类型是否存在 */
+                Type[] typeArguments = type.GetGenericArguments();
+                foreach (Type tParam in typeArguments)
+                {
+                    if (!Cache.SharpCache.ContainsKey(tParam))
+                    {
+                        return null;
+                    }
+                }
+                ZType newZtype = ZTypeManager.RegNewGenericType(type);
+                return newZtype;
+            }
 
-            //if (sharpCache.ContainsKey(type))
-            //{
-            //    return sharpCache[type] as ZClassType;
-            //}
-            //else
-            //{
-            //    return null;
-            //}
+            return null;
         }
 
         public static IZDescType GetByMarkType(Type type)
@@ -129,34 +116,18 @@ namespace ZCompileDesc
                 Cache.AddCache(descType);
             }
             return descType;
-            //var zdesctype =  CreateZDescType(type);
-            //if (zdesctype == null) return null;
-            //return zdesctype as ZType;
         }
-
-        //public static IZDescType CreateZDescType(Type type)
-        //{
-        //    if (ztypeCache.ContainsKey(type))
-        //    {
-        //        return ztypeCache[type];
-        //    }
-        //    else
-        //    {
-        //        IZDescType ztype = CreateZTypeImp(type);
-        //        if (ztype != null)
-        //        {
-        //            if (!sharpCache.ContainsKey(ztype.SharpType))
-        //                sharpCache.Add(ztype.SharpType, ztype);
-        //            if (!ztypeCache.ContainsKey(type))
-        //                ztypeCache.Add(type, ztype);
-        //        }
-        //        return ztype;
-        //    }
-        //}
 
         private static IZDescType CreateZTypeImp(Type type)
         {
-            if(AttributeUtil.HasAttribute<ZDimAttribute>(type))
+            if (AttributeUtil.HasAttribute<ZInstanceAttribute>(type))
+            {
+                ZInstanceAttribute zAttr = AttributeUtil.GetAttribute<ZInstanceAttribute>(type);
+                Type sharpType = (zAttr.SharpType == null ? type : zAttr.SharpType);
+                ZClassLibType zclass = new ZClassLibType(type, sharpType, false);
+                return zclass;
+            }
+            else if(AttributeUtil.HasAttribute<ZDimAttribute>(type))
             {
                 ZDimType zdim = new ZDimType(type);
                 return zdim;
@@ -170,16 +141,10 @@ namespace ZCompileDesc
             {
                 ZStaticAttribute zAttr = AttributeUtil.GetAttribute<ZStaticAttribute>(type);
                 Type sharpType = (zAttr.SharpType == null ? type : zAttr.SharpType);
-                ZClassType zclass = new ZClassType(type, sharpType, true);
+                ZClassLibType zclass = new ZClassLibType(type, sharpType, true);
                 return zclass;
             }
-            else if (AttributeUtil.HasAttribute<ZInstanceAttribute>(type))
-            {
-                ZInstanceAttribute zAttr = AttributeUtil.GetAttribute<ZInstanceAttribute>(type);
-                Type sharpType = (zAttr.SharpType == null ? type : zAttr.SharpType);
-                ZClassType zclass = new ZClassType(type, sharpType, false);
-                return zclass;
-            }
+           
             return null;
         }
 

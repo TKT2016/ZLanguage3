@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 using ZLangRT.Attributes;
 using ZLangRT.Utils;
@@ -15,6 +14,11 @@ namespace ZCompileDesc.ZMembers
     {
         public PropertyInfo MarkProperty { get; set; }
         public PropertyInfo SharpProperty { get; set; }
+
+        internal ZPropertyInfo( )
+        {
+
+        }
 
         public ZPropertyInfo(PropertyInfo propertyInfo)
         {
@@ -37,11 +41,21 @@ namespace ZCompileDesc.ZMembers
             else
                 IsStatic = MarkProperty.GetSetMethod().IsStatic;
 
-            ZNames = ZDescriptionHelper.GetZNames(MarkProperty);
+            //ZNames = ZDescriptionHelper.GetZNames(MarkProperty);
             CanRead = SharpProperty.GetGetMethod()!=null;
             CanWrite = SharpProperty.GetSetMethod() != null;
 
             AccessAttribute = ReflectionUtil.GetAccessAttributeEnum(SharpProperty);
+        }
+
+        string[] _znames = null;
+        public override string[] GetZNames()
+        {
+            if (_znames == null)
+            {
+                _znames = ZDescriptionHelper.GetZNames(MarkProperty);
+            }
+            return _znames;
         }
 
         public override ZType MemberZType
@@ -56,7 +70,8 @@ namespace ZCompileDesc.ZMembers
 
         public override string ToString()
         {
-            return this.MarkProperty.Name +"("+ string.Join(",",ZNames)+")";
+            var names = this.GetZNames();
+            return this.MarkProperty.Name + "(" + string.Join(",", names) + ")";
         }
     }
 }

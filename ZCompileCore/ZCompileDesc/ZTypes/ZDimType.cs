@@ -4,12 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZCompileDesc.Collections;
-using ZCompileDesc.Words;
+using ZCompileDesc.ZMembers;
 using ZLangRT.Utils;
 
 namespace ZCompileDesc.ZTypes
 {
-    public class ZDimType : IZDescType, IWordDictionary
+    public class ZDimType : IZDescType//, IWordDictionary
     {
         public Type MarkType { get; protected set; }
         public Type SharpType { get; private set; }
@@ -28,14 +28,14 @@ namespace ZCompileDesc.ZTypes
             }
         }
 
-        Dictionary<string, string> _Dims;
-        public Dictionary<string, string> Dims
+        Dictionary<string, ZDimItemInfo> _Dims;
+        public Dictionary<string, ZDimItemInfo> Dims
         {
             get
             {
                 if (_Dims == null)
                 {
-                    _Dims = new Dictionary<string, string>();
+                    _Dims = new Dictionary<string, ZDimItemInfo>();
                     FieldInfo[] fields = this.SharpType.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                     foreach (FieldInfo fieldInfo in fields)
                     {
@@ -43,30 +43,17 @@ namespace ZCompileDesc.ZTypes
                         if (!ReflectionUtil.IsDeclare(SharpType, fieldInfo)) continue;
                         
                         string propertyValue = fieldInfo.GetValue(null) as string;
-                        if(!string.IsNullOrEmpty(propertyValue))
-                        {
-                            _Dims.Add(fieldInfo.Name, propertyValue);
-                        }
+                        ZDimItemInfo zd = new ZDimItemInfo(fieldInfo.Name, propertyValue);
+                        Dims.Add(fieldInfo.Name, zd);
+                        //if(!string.IsNullOrEmpty(propertyValue))
+                        //{
+                        //    _Dims.Add(fieldInfo.Name, propertyValue);
+                        //}
                     }
                 }
                 return _Dims;
             }
         }
-
-
-        #region IWordDictionary实现
-        public bool ContainsWord(string text)
-        {
-            return Dims.ContainsKey(text);
-        }
-
-        public WordInfo SearchWord(string text)
-        {
-            if (!ContainsWord(text)) return null;
-            WordInfo info1 = new WordInfo(text, WordKind.DimName);
-            return info1;
-        }
-        #endregion
 
         public override string ToString()
         {

@@ -9,56 +9,87 @@ using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
 using ZCompileCore.Symbols;
 using ZCompileCore.Tools;
+using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
+using ZCompileDesc.ZTypes;
 
 namespace ZCompileCore.AST
 {
-    public class SectionProperties : SectionBase
+    public class SectionProperties : SectionClassBase
     {
-        public Token TypeToken;
-        public Token KeyToken;
+        public LexToken TypeToken;
+        public LexToken KeyToken;
         public List<PropertyAST> Properties = new List<PropertyAST>();
-        public ContextClass ClassContext;
-        ContextProc ProcContext;
+        ContextProc PropertiesInitProcContext;
 
         public void AddProperty(PropertyAST property)
         {
             Properties.Add(property);
         }
 
-        public void AnalyName(NameTypeParser parser)
+        public override void AnalyText()
         {
-            this.ProcContext = new ContextProc(this.ClassContext);
-            foreach(var item in Properties)
+            foreach (PropertyAST item in this.Properties)
             {
-                item.Analy(parser, this.ClassContext.PropertyContext, this.ProcContext);
+                item.AnalyText();
             }
         }
 
-        public void EmitName(bool isStatic, TypeBuilder classBuilder)
+        public override void AnalyType()
         {
-            MethodAttributes methodAttr = MethodAttributes.Private;
-            if (isStatic)
-                methodAttr = MethodAttributes.Private | MethodAttributes.Static;
-            InitPropertyMethod = classBuilder.DefineMethod("__InitPropertyMethod", methodAttr, typeof(void), null);
-            this.ClassContext.InitPropertyMethod = this.InitPropertyMethod;
-            foreach (var item in Properties)
+            foreach (PropertyAST item in this.Properties)
             {
-                item.EmitName( isStatic,  classBuilder);
+                item.AnalyType();
             }
         }
 
-        public MethodBuilder InitPropertyMethod { get; private set; }
-
-        public void EmitValue(bool isStatic, TypeBuilder classBuilder)
+        public override void AnalyBody()
         {
-            ILGenerator il = InitPropertyMethod.GetILGenerator();
-            this.ProcContext.EmitContext.ILout = il;
-            foreach (var item in Properties)
+            foreach (PropertyAST item in this.Properties)
             {
-                item.EmitValue(isStatic,il);
+                item.AnalyBody();
+            }
+        }
+
+        public override void EmitName()
+        {
+            var classBuilder = this.ClassContext.GetTypeBuilder();
+            bool isStatic = this.ClassContext.IsStatic();
+            Type[] argTypes = Type.EmptyTypes;
+            if(!isStatic)
+            {
+                argTypes = new Type[] { classBuilder };
+            }
+            MethodAttributes methodAttribute=MethodAttributes.Private | MethodAttributes.Static;
+            initMethodBuilder = classBuilder.DefineMethod(CompileConst.InitMemberValueMethodName, methodAttribute, typeof(void), argTypes);
+            this.ClassContext.InitPropertyMethod = initMethodBuilder;
+            this.PropertiesInitProcContext.SetBuilder (initMethodBuilder);
+            //this.PropertiesInitProcContext.EmitContext.ILout = initMethodBuilder.GetILGenerator();
+            foreach (PropertyAST item in this.Properties)
+            {
+                item.EmitName();
+            }
+        }
+        MethodBuilder initMethodBuilder;
+        public override void EmitBody()
+        {
+            ILGenerator il = initMethodBuilder.GetILGenerator();
+            foreach (PropertyAST item in this.Properties)
+            {
+                item.EmitBody();
             }
             il.Emit(OpCodes.Ret);
+        }
+
+        public void SetContext(ContextClass classContext)
+        {
+            this.ClassContext = classContext;
+            this.FileContext = this.ClassContext.FileContext;
+            PropertiesInitProcContext = new ContextProc(this.ClassContext,true);
+            foreach (PropertyAST item in this.Properties)
+            {
+                item.SetContext(this.PropertiesInitProcContext);
+            }
         }
 
         public override string ToString()

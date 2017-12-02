@@ -66,7 +66,7 @@ namespace ZDev
             }
             else
             {
-                cvf = new EditorDockForm();
+                cvf = newEditorDockForm();
                 cvf.OpenFile(fi);
                 cvf.ParentDockPanel = this.MainDockPanel;
                 cvf.Show(this.MainDockPanel);
@@ -96,9 +96,10 @@ namespace ZDev
             }
         }
         int newIndex = 1;
+
         void NewFile()
         {
-            EditorDockForm cvf = new EditorDockForm();
+            EditorDockForm cvf = newEditorDockForm();
             cvf.NewFile(newIndex);
             cvf.ParentDockPanel = this.MainDockPanel;
             cvf.Editor.NewFile();
@@ -106,10 +107,17 @@ namespace ZDev
             newIndex++;
         }
 
+        private EditorDockForm newEditorDockForm()
+        {
+            EditorDockForm cvf = new EditorDockForm();
+            return cvf;
+        }
+
         private void newStripButton_Click(object sender, EventArgs e)
         {
             NewFile();
         }
+
         private void openToolStripButton_Click(object sender, EventArgs e)
         {
             dialogOpenFile();
@@ -117,8 +125,20 @@ namespace ZDev
 
         EditorDockForm GetCurrentEditor()
         {
-            EditorDockForm editor = MainDockPanel.ActiveDocument as EditorDockForm;
-            return editor;
+            EditorDockForm cvf = MainDockPanel.ActiveDocument as EditorDockForm;
+            if (cvf!=null && cvf.Editor!=null)
+            {
+                if(cvf.Editor.KeyDownAction == null)
+                {
+                    cvf.Editor.KeyDownAction = (sender, e) => { 
+                        if( KeyDownCtrlS(sender, e))
+                        {
+                            e.SuppressKeyPress = true;//阻止 Ctrl+S [DC3]
+                        }  
+                    };
+                }
+            }
+            return cvf;
         }
 
         EditorDockForm FindEditorForm(FileInfo fi)
@@ -191,10 +211,17 @@ namespace ZDev
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (KeyDownCtrlS(sender, e)) return;
+        }
+
+        private bool KeyDownCtrlS(object sender, KeyEventArgs e)
+        {
             if (e.Control && e.KeyCode == Keys.S)
             {
                 saveText();
+                return true;
             }
+            return false;
         }
 
         private void mainDockPanel_ActiveDocumentChanged(object sender, EventArgs e)
@@ -227,9 +254,6 @@ namespace ZDev
             Run();
         }
 
-        //private Process CurrentProcess { get; set; }
-
-        //ProjectCompiler compiler = new ProjectCompiler();
         private void Run()
         {
             var editorForm = GetCurrentEditor();
@@ -240,7 +264,7 @@ namespace ZDev
             ZDevCompiler compiler = new ZDevCompiler(editorForm.Editor.CurrentFile);
             ProjectCompileResult results = compiler.Compile();
             this.msgDock.ShowErrors(results);
-            if (!results.HasError())//results.Errors.Count == 0)
+            if (!results.MessageCollection.HasError())//results.Errors.Count == 0)
             {
                 try
                 {

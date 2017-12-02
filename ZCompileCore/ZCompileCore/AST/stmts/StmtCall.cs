@@ -14,6 +14,10 @@ namespace ZCompileCore.AST
 
         public override void Analy()
         {
+            //if (this.ToString().StartsWith("清除出界子弹"))
+            //{
+            //    Console.WriteLine("清除出界子弹");
+            //}
             var tempExp1 = CallExp;
             var CallExp2 = ParseExp(tempExp1);
             var CallExp3 = CallExp2.Analy();
@@ -35,6 +39,10 @@ namespace ZCompileCore.AST
 
         public override void Emit()
         {
+            //if (this.ToString().StartsWith("子弹群添加Z"))
+            //{
+            //    Console.WriteLine("子弹群添加Z");
+            //}
             CallExp.Emit();
             if (CallExp.RetType.SharpType != typeof(void))
             {

@@ -17,17 +17,6 @@ namespace ZCompileCore.Lex
         //RBB,//}
         //GoesTo,// ->
         //Dot,//.
-
-        /// <summary>
-        /// 逗号 , 
-        /// </summary>
-        Comma,//,
-
-        /// <summary>
-        /// 分号 ;
-        /// </summary>
-        Semi,//;
-   
         ADD,//+
         SUB,//-
         MUL,//*
@@ -52,12 +41,11 @@ namespace ZCompileCore.Lex
         //Switch,
         //Case,
         //For,
-        //Foreach,
         //While,//循环当
         Repeat,//重复
         Dang,//当
         Times,//次
-        //Foreach,//循环每一个
+        Foreach,//循环每一个
         Catch,//捕捉
         Each,//每一个
         //Break,
@@ -94,7 +82,6 @@ namespace ZCompileCore.Lex
         Ident,
         Caption,//说明
         //IdentStmt,
-       
         //Start,
 
         /// <summary>
@@ -102,6 +89,15 @@ namespace ZCompileCore.Lex
         /// </summary>
         Colon,//:
         //Colond,//::双冒号
+        /// <summary>
+        /// 逗号 , 
+        /// </summary>
+        Comma,//,
+
+        /// <summary>
+        /// 分号 ;
+        /// </summary>
+        Semi,//;
         //LibType,
         //LibMember,
         //LibMethod,

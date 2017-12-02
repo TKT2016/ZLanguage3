@@ -19,6 +19,12 @@ namespace ZCompileKit.Collections
         T NullT;
         int length;
 
+        public ArrayTape(T[] array)
+            : this(array, default(T))
+        {
+          
+        }
+
         public ArrayTape(T[] array,T nullt)
         {
             this.array = array;

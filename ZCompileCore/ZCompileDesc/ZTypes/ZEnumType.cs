@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZMembers;
 using ZLangRT.Attributes;
 using ZLangRT.Utils;
@@ -17,6 +16,9 @@ namespace ZCompileDesc.ZTypes
     {
         public ZEnumAttribute MarkAttribute { get; protected set; }
         public ZEnumItemInfo[] EnumElements { get; protected set; }
+        public Type MarkType { get; protected set; }
+        public Type SharpType { get; protected set; }
+        public AccessAttributeEnum AccessAttribute { get; protected set; }
 
         public ZEnumType(Type type)
         {
@@ -47,6 +49,10 @@ namespace ZCompileDesc.ZTypes
 
         protected ZEnumItemInfo[] GetEnumElements(Type defType, Type sharpType)
         {
+            //if (defType.Name == "子弹类型")
+            //{
+            //    Console.WriteLine("子弹类型");
+            //}
             List<ZEnumItemInfo> flist = new List<ZEnumItemInfo>();
 
             FieldInfo[] fields = ZTypeUtil.GetEnumItems(defType);
@@ -62,47 +68,12 @@ namespace ZCompileDesc.ZTypes
             return flist.ToArray();
         }
 
-        //protected override WordDictionary GetWordTable()
-        //{
-        //    WordDictionary dict = new WordDictionary(this.ZName);
-        //    foreach(ZEnumElementInfo zele in EnumElements )
-        //    {
-        //        WordInfo[] words = zele.GetWordInfos();
-        //        foreach (WordInfo word in words)
-        //        {
-        //            dict.Add(word);
-        //        }
-        //    }
-        //    return dict;
-        //}
-
-        public override bool ContainsWord(string text)
-        {
-            foreach(ZEnumItemInfo zele in EnumElements )
-            {
-                if (zele.ContainsWord(text))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public override WordInfo SearchWord(string text)
-        {
-            foreach (ZEnumItemInfo zele in EnumElements)
-            {
-                if (zele.ContainsWord(text))
-                {
-                    return zele.SearchWord(text);
-                }
-            }
-            return null;
-        }
-
         public override string ToString()
         {
             return this.MarkType.Name + "-" + this.SharpType.Name;
         }
+
+        public virtual string ZName { get { return MarkType.Name; } }
+        public virtual bool IsMarkSelf { get { return MarkType == SharpType; } }
     }
 }

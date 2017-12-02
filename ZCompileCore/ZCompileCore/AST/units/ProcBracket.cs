@@ -5,12 +5,11 @@ using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
 using ZCompileCore.Symbols;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 
 namespace ZCompileCore.AST
 {
-    public class ProcBracket : UnitBase
+    public class ProcBracket : SectionPartProc
     {
         public List<ProcArg> Args { get; private set; }
 
@@ -19,31 +18,82 @@ namespace ZCompileCore.AST
             Args = new List<ProcArg>();
         }
 
-        public ContextProc ProcContext;
+        public override void AnalyText()
+        {
+            foreach (var item in Args)
+            {
+                item.AnalyText();
+            }
+        }
+
+        public override void AnalyType()
+        {
+            foreach (var item in Args)
+            {
+                item.AnalyType();
+            }
+        }
+
+        public override void AnalyBody()
+        {
+            foreach (var item in Args)
+            {
+                item.AnalyBody();
+            }
+        }
+
+        public override void EmitName()
+        {
+            foreach (var item in Args)
+            {
+                item.EmitName();
+            }
+        }
+
+        public override void EmitBody()
+        {
+            foreach (var item in Args)
+            {
+                item.EmitBody();
+            }
+        }
+
+        public void SetContext(ContextProc procContext)
+        {
+            this.ProcContext = procContext;
+            this.ClassContext = this.ProcContext.ClassContext;
+            this.FileContext = this.ClassContext.FileContext;
+            foreach (var item in Args)
+            {
+                item.SetContext(procContext);
+            }
+        }
+
+        //public ContextProc ProcContext;
 
         public void Add(ProcArg arg)
         {
             Args.Add(arg);
         }
 
-        public void Analy(ContextProc ProcContext, NameTypeParser parser)
-        {
-            this.ProcContext = ProcContext;
-            foreach(var arg in Args)
-            {
-                arg.Analy(ProcContext,parser);
-            }
-        }
+        //public void Analy(ContextProc ProcContext, TypeArgParser parser)
+        //{
+        //    this.ProcContext = ProcContext;
+        //    foreach(var arg in Args)
+        //    {
+        //        arg.Analy(ProcContext,parser);
+        //    }
+        //}
 
         private ZBracketDefDesc _ZBracketDefDesc;
-        public ZBracketDefDesc GetZBracketDefDesc()
+        public ZBracketDefDesc GetZDesc()
         {
             if (_ZBracketDefDesc==null)
             {
                 _ZBracketDefDesc = new ZBracketDefDesc();
-                foreach(var item in Args)
+                foreach(ProcArg item in Args)
                 {
-                    var zarg = item.ZParam;
+                    var zarg = item.GetZParam();
                     _ZBracketDefDesc.Add(zarg);
                 }
             }

@@ -3,3 +3,8 @@ E:\MySource\Zyy\Z3\ZCompileCore\ZLangRT\bin\Release\ZLangRT.pdb
 E:\MySource\Zyy\Z3\ZCompileCore\ZLangRT\obj\Release\ZLangRT.csprojResolveAssemblyReference.cache
 E:\MySource\Zyy\Z3\ZCompileCore\ZLangRT\obj\Release\ZLangRT.dll
 E:\MySource\Zyy\Z3\ZCompileCore\ZLangRT\obj\Release\ZLangRT.pdb
+E:\MySource\Zyy\Z4\ZCompileCore\ZLangRT\bin\Release\ZLangRT.dll
+E:\MySource\Zyy\Z4\ZCompileCore\ZLangRT\bin\Release\ZLangRT.pdb
+E:\MySource\Zyy\Z4\ZCompileCore\ZLangRT\obj\Release\ZLangRT.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z4\ZCompileCore\ZLangRT\obj\Release\ZLangRT.dll
+E:\MySource\Zyy\Z4\ZCompileCore\ZLangRT\obj\Release\ZLangRT.pdb

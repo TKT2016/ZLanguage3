@@ -215,15 +215,15 @@ namespace ZCompileKit.Tools
             }
         }
 
-        public static void EmitCallBaseConstructorZero(ILGenerator IL,Type type)
-        {
-            ConstructorInfo zeroConstructor = type.GetConstructor(new Type[] { });
-            if (zeroConstructor != null)
-            {
-                EmitHelper.Emit_LoadThis(IL);
-                IL.Emit(OpCodes.Call, zeroConstructor);
-            }
-        }
+        //public static void EmitCallBaseConstructorZero(ILGenerator IL,Type type)
+        //{
+        //    ConstructorInfo zeroConstructor = type.GetConstructor(new Type[] { });
+        //    if (zeroConstructor != null)
+        //    {
+        //        EmitHelper.Emit_LoadThis(IL);
+        //        IL.Emit(OpCodes.Call, zeroConstructor);
+        //    }
+        //}
 
         //public static void CallDynamic(ILGenerator il, ZMethodInfo exMethod)
         //{
@@ -260,10 +260,10 @@ namespace ZCompileKit.Tools
                 il.Emit(OpCodes.Callvirt, method);
         }*/
 
-        public static void Emit_LoadThis(ILGenerator il)
-        {
-            il.Emit(OpCodes.Ldarg_0);
-        }
+        //public static void Emit_LoadThis(ILGenerator il)
+        //{
+        //    il.Emit(OpCodes.Ldarg_0);
+        //}
 
         public static void Emit_LoadThis(ILGenerator il, bool isStatic)
         {

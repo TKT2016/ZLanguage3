@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ZCompileCore.Reports;
 using ZLangRT;
@@ -11,16 +12,19 @@ namespace ZCompiler
 {
     public class MainEntry
     {
-        static void Main(string[] args)
+        [STAThread]
+        static void Main2(string[] args)
         {
             if (args.Length == 0)
             {
-                args = new string[] { "Sample/test.zyy" };
-                args = new string[] { "Sample/测试重复.zyy" };
+                //args = new string[] { "Sample/test.zyy" };
+                //args = new string[] { "Sample/测试重复.zyy" };
                 //args = new string[] { "Sample/测试矩形构造函数.zyy" };
                 //args = new string[] { "Sample/测试强制转换.zyy" };
                 //args = new string[] { "Sample/测试属性默认值.zyy" };
                 //args = new string[] { "Sample/测试文件创建.zyy" };
+
+                args = new string[] { "Sample/小飞机游戏/小飞机游戏.zxm" };
             }
               
             CompileCmdModel cmdm = ParseArgs(args);
@@ -38,25 +42,27 @@ namespace ZCompiler
 
         static ProjectCompileResult Compile(CompileCmdModel model)
         {
+            CompileMessageCollection MessageCollection = new CompileMessageCollection();
+
             ProjectCompileResult result = null;
             if(model.IsCompileProject)
             {
-                result = CompileFile(model.SrcFile);
+                result = CompileFile(model.SrcFile, MessageCollection);
             }
             else
             {
-                result = CompileProject(model.SrcFile);
+                result = CompileProject(model.SrcFile, MessageCollection);
             }
             if(model.IsShowError)
             {
-                if(result.HasError())
+                if (MessageCollection.HasError())
                 {
                     ShowErrors(result);
                 }
             }
             if(model.IsRun)
             {
-                if (result.HasError()==false)
+                if (MessageCollection.HasError() == false)
                 {
                     Run(result);
                 }
@@ -92,18 +98,18 @@ namespace ZCompiler
             }
         }
 
-        static ProjectCompileResult CompileFile(string srcFile)
+        static ProjectCompileResult CompileFile(string srcFile, CompileMessageCollection MessageCollection)
         {
             FileCompiler compiler = new FileCompiler();
-            ProjectCompileResult result = compiler.Compile(srcFile);
+            ProjectCompileResult result = compiler.Compile(srcFile, MessageCollection);
             return result;
         }
 
-        static ProjectCompileResult CompileProject(string srcFile)
+        static ProjectCompileResult CompileProject(string srcFile, CompileMessageCollection MessageCollection)
         {
             FileInfo srcFileInfo = new FileInfo(srcFile);
             ProjectCompiler compiler = new ProjectCompiler();
-            ProjectCompileResult result = compiler.Compile(srcFileInfo);
+            ProjectCompileResult result = compiler.Compile(srcFileInfo, MessageCollection);
             return result;
         }
 
@@ -111,22 +117,33 @@ namespace ZCompiler
         {
             StringBuilder buffBuilder = new StringBuilder();
             //buffBuilder.AppendFormat("文件'{0}'有以下错误:\n", srcFile);
-            foreach (CompileMessage compileMessage in compileResult.Errors.ValuesToList())
+            foreach (CompileMessage compileMessage in compileResult.MessageCollection.Errors)
             {
                 if (compileMessage.Line > 0 || compileMessage.Col > 0)
                 {
-                    buffBuilder.AppendFormat(" {2} 第{0}行,第{1}列", compileMessage.Line, compileMessage.Col, compileMessage.SourceFileInfo.ZFileName);
+                    buffBuilder.AppendFormat(" {2} 第{0}行,第{1}列", compileMessage.Line, compileMessage.Col, compileMessage.Key.ToString());
                 }
-                buffBuilder.AppendFormat("错误:{0}\n", compileMessage.Text);
+                buffBuilder.AppendFormat("错误:{0}\n", compileMessage.Content);
             }
             Console.WriteLine(buffBuilder.ToString());
             Console.ReadKey();
         }
-       
+
+        private static Type CompiledMainType = null;
         public static void Run(ProjectCompileResult result)
         {
-            Type type = result.EntrtyZType.SharpType;
-            Invoker.Call(type, "启动");
+            if (result.EntrtyZType != null)
+            {
+                CompiledMainType = result.EntrtyZType.SharpType;
+                Thread newThread = new Thread(new ThreadStart(RunMainTypeEntry));
+                newThread.SetApartmentState(ApartmentState.STA);
+                newThread.Start();
+            }
+        }
+
+        private static void RunMainTypeEntry()
+        {
+            Invoker.Call(CompiledMainType, "启动");
         }
     }
 }

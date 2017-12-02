@@ -10,258 +10,277 @@ using ZCompileCore.Parsers;
 using ZCompileCore.Reports;
 using ZCompileDesc;
 using ZCompileDesc.Collections;
+using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 using ZCompileKit;
 
 namespace ZCompileCore.AST
 {
-    public class FileClass : FileType
+    public class FileClass : FileSource
     {
         public SectionImport ImporteSection;
         public SectionUse UseSection;
         public SectionDim DimSection;
-
-        public SectionClassName ClassSection;
-        public SectionProperties PropertiesesSection;
+        public SectionClassNameBase ClassNameSection;
+        public SectionProperties PropertiesSection;
         public List<SectionProc> Proces;
-        List<SectionConstructor> Constructors = new List<SectionConstructor> ();
-
+        public List<SectionConstructorBase> Constructors = new List<SectionConstructorBase>();
+        ContextClass ClassContext;
         public FileClass(ContextFile fileContext, FileMutilType fmt)
         {
             this.FileContext = fileContext;
-            ClassSection = fmt.Classes[0];
+            this.ClassContext = new ContextClass(this.FileContext);
+            this.FileContext.ClassContext = this.ClassContext;
+
+            ClassNameSection = fmt.Classes[0];
             ImporteSection = fmt.ImporteSection;
             Proces = fmt.Proces;
             UseSection = fmt.UseSection;
-            Constructors = fmt.Constructors;
+            Constructors.AddRange(fmt.Constructors);
             if (fmt.Dimes.Count > 0)
             {
                 DimSection = fmt.Dimes[0];
             }
             if (fmt.Propertieses.Count > 0)
             {
-                PropertiesesSection = fmt.Propertieses[0];
+                PropertiesSection = fmt.Propertieses[0];
             }
         }
 
-        public void AnalyTypeName()
+        public ZClassType Compile()
         {
-            if (ImporteSection != null) ImporteSection.FileContext = this.FileContext;
-            if (UseSection != null) UseSection.FileContext = this.FileContext;
-           
+            ParseAddDefault();//分析补充默认
+            SetPartContext(this.FileContext);
+            Analy_ImportUse();//分析导入使用
 
-            if (ClassSection != null) ClassSection.FileContext = this.FileContext;
+            CompileClassName();//编译类名
+            CompileClassStruct();//编译结构
+            CompileBody();//编译属性值、构造函数体、过程体
 
-            string fileName = this.FileContext.FileModel.GetFileNameNoEx();
-
-            if (DimSection != null)
-            {
-                DimSection.FileContext = this.FileContext;
-                DimSection.IsInClass = true;
-                DimSection.AnalyName(fileName);
-            }
-
-            ClassSection.Analy(this.FileModel.GetFileNameNoEx(), this.FileContext.ClassContext);
-            this.FileContext.ClassContext.IsStaticClass = ClassSection.IsStatic;
+            var ztype = this.CreateZType();
+            return ztype;
         }
 
-        public void CompileDim()
+        private void CompileBody()
         {
-            ProjectCompileResult compileResult = this.ProjectContext.CompileResult;
-            if(this.DimSection!=null)
+            AnalyCompilingBody();
+            EmitCompilingBody();
+        }
+
+        private void CompileClassStruct()
+        {
+            ParseClassStructText();
+            AnalyClassStructType();
+            EmitCompilingStruct();
+            this.FileContext.ImportUseContext.ImportCompiling_Body(this.ClassContext.GetZCompilingType());
+        }
+
+        private void CompileClassName()
+        {
+            ClassNameSection.AnalyText();
+            ClassNameSection.AnalyType();
+            ClassNameSection.EmitName();
+            this.FileContext.ImportUseContext.AddCompiling_Name(this.ClassContext.GetZCompilingType());
+        }
+
+        private void ParseAddDefault()
+        {
+            if (this.Constructors.Count == 0)
             {
-                DimSection.AnalyBody();
-                if (!HasError())
+                SectionConstructorDefault scd = new SectionConstructorDefault();
+                this.Constructors.Add(scd);
+            }
+            if (ClassNameSection == null)
+            {
+                ClassNameSection = new SectionClassNameDefault();
+                ClassNameSection.SetContext(this.ClassContext);
+            }
+        }
+
+        private void EmitCompilingBody( )
+        {
+            if (PropertiesSection != null)
+            {
+                PropertiesSection.EmitBody();
+            }
+            if (Proces.Count > 0)
+            {
+                foreach (var item in Proces)
                 {
-                    DimSection.EmitBody();
-                }
-
-                if (!HasError())
-                {
-                    var ztype = DimSection.GetCreatedZType();
-                    this.ProjectContext.CompileResult.CompiledTypes.Add(ztype);
-                }
-            }
-        }
-
-        public void AnalyDim()
-        {
-            if (DimSection != null)
-            {
-                DimSection.AnalyBody();
-            }
-        }
-
-        public void EmitDim()
-        {
-            if (DimSection != null)
-            {
-                if (!HasError())
-                {
-                    DimSection.EmitBody();
-                }
-            }
-        }
-
-        public void EmitTypeName()
-        {
-            ModuleBuilder moduleBuilder= this.ProjectContext.EmitContext.ModuleBuilder;
-            string packageName = this.ProjectContext.ProjectModel.ProjectPackageName;
-            if (DimSection!=null)
-                DimSection.EmitName(moduleBuilder, packageName);
-            TypeBuilder typeBuilder = ClassSection.Emit(moduleBuilder, packageName);
-            this.FileContext.ClassContext.EmitContext.ClassBuilder = typeBuilder;
-        }
-
-        public void AnalyImport()
-        {
-            ImporteSection.FileContext = this.FileContext;
-            ImporteSection.Analy();
-        }
-
-        public void AnalyUse()
-        {
-            UseSection.FileContext = this.FileContext;
-            UseSection.Analy();
-        }
-
-        IWordDictionaryList _TypeDimCollection;
-        public IWordDictionary GetTypeDimWords()
-        {
-            if(_TypeDimCollection==null)
-            {
-                _TypeDimCollection = new IWordDictionaryList();
-                _TypeDimCollection.Add(this.FileContext.ImportContext.TypeNameDict);
-                if (DimSection != null)
-                {
-                    this.FileContext.UseContext.UseZDimList.Insert(0, DimSection.GetCreatedZType());
-                }
-                _TypeDimCollection.Add(this.FileContext.UseContext.GetUseDimWords() );
-            }
-            return _TypeDimCollection;
-        }
-
-        public void AnalyClassMemberName()
-        {
-            var tyedimNames = GetTypeDimWords();
-            NameTypeParser parser = new NameTypeParser(tyedimNames);
-            if (PropertiesesSection != null)
-            {
-                PropertiesesSection.ClassContext = this.FileContext.ClassContext;
-                PropertiesesSection.FileContext = this.FileContext;
-                PropertiesesSection.AnalyName(parser);
-            }
-            if (Constructors.Count > 0)
-            {
-                foreach (SectionConstructor item in this.Constructors)
-                {
-                    item.FileContext = this.FileContext;
-                    item.ProcContext = new ContextProc(this.FileContext.ClassContext);
-                    item.ProcContext.IsConstructor = true;
-                    this.FileContext.ClassContext.ProcManagerContext.AddContext(item.ProcContext);
-                    item.AnalyName(parser);
+                    item.EmitBody();
                 }
             }
-            else
+            foreach (var item in Constructors)
             {
-                DefaultConstructor = new SectionConstructorDefault();
-                DefaultConstructor.FileContext = this.FileContext;
-                DefaultConstructor.ProcContext = new ContextProc(this.FileContext.ClassContext);
-                DefaultConstructor.ProcContext.IsConstructor = true;
-                this.FileContext.ClassContext.ProcManagerContext.AddContext(DefaultConstructor.ProcContext);
-            }
-
-            foreach (SectionProc item in Proces)
-            {
-                item.FileContext = this.FileContext;
-                item.ProcContext = new ContextProc(this.FileContext.ClassContext);
-                this.FileContext.ClassContext.ProcManagerContext.AddContext(item.ProcContext);//this.ClassContext.ProcManagerContext.Add(item.ProcContext);
-                item.AnalyName(parser);
-            }
-        }
-        SectionConstructorDefault DefaultConstructor;
-        public void EmitClassMemberName()
-        {
-            if (PropertiesesSection != null)
-                PropertiesesSection.EmitName(ClassSection.IsStatic, ClassSection.Builder);
-            if (Constructors.Count > 0)
-            {
-                foreach (SectionConstructor item in Constructors)
-                {
-                    item.EmitName();
-                }
-            }
-            else
-            {
-                DefaultConstructor.EmitName();
-            }
-            foreach (SectionProc item in Proces)
-            {
-                item.EmitName();
+                item.EmitBody();
             }
         }
 
-        public void EmitPropertiesBody()
+        private void AnalyCompilingBody( )
         {
-            if (PropertiesesSection != null)
-                PropertiesesSection.EmitValue(ClassSection.IsStatic, ClassSection.Builder);
-        }
-
-        public void AnalyProcBody()
-        {
-            if (Constructors.Count > 0)
+            if (PropertiesSection != null)
             {
-                foreach (SectionConstructor item in Constructors)
+                PropertiesSection.AnalyBody();
+            }
+            if (Proces.Count > 0)
+            {
+                foreach (var item in Proces)
                 {
                     item.AnalyBody();
                 }
             }
-            else
-            {
-                DefaultConstructor.EmitBody();
-            }
-            foreach (SectionProc item in Proces)
+            foreach (var item in Constructors)
             {
                 item.AnalyBody();
             }
         }
 
-        public void EmitProcBody()
+        private void EmitCompilingStruct( )
         {
-            if (!HasError())
+            if (PropertiesSection != null)
             {
-                foreach (SectionConstructor item in Constructors)
+                PropertiesSection.EmitName();
+            }
+            if (Proces.Count > 0)
+            {
+                foreach (var item in Proces)
                 {
-                    item.EmitBody();
+                    item.EmitName();
                 }
-                foreach (SectionProc item in Proces)
-                {
-                    item.EmitBody();
-                }
+            }
+            foreach (var item in Constructors)
+            {
+                item.EmitName();
             }
         }
 
-        public void CreateZType()
+        private void AnalyClassStructType( )
         {
-            ProjectCompileResult compileResult = this.ProjectContext.CompileResult;
+            if (PropertiesSection != null)
+            {
+                PropertiesSection.AnalyType();
+            }
+            if (Proces.Count > 0)
+            {
+                foreach (var item in Proces)
+                {
+                    item.AnalyType();
+                }
+            }
+            foreach (var item in Constructors)
+            {
+                item.AnalyType();
+            }
+        }
+
+        private void EmitTypeName()
+        {
+            ClassNameSection.EmitName();
+        }
+
+        private void Analy_ImportUse()
+        {
+            //AddDefaultPackage();//在ContextFileTypes中已经导入
+            base.AnalyImportStruct(ImporteSection);
+            base.AnalyImportTypes(ImporteSection);
+
+            if (this.UseSection != null)
+            {
+                this.UseSection.AnalyText();
+                this.UseSection.AnalyType();
+            }
+        }
+
+        private void ParseClassStructText()
+        {
+            if (DimSection != null)
+            {
+                DimSection.AnalyText();
+            }
+            //if (ClassNameSection != null)
+            //{
+            //    ClassNameSection.AnalyText();
+            //}
+            //else
+            //{
+            //    string className = className = this.FileContext.FileModel.GetFileNameNoEx();
+            //    this.FileContext.ClassContext.SetClassName(className);
+            //}
+
+            if (PropertiesSection != null)
+            {
+                PropertiesSection.AnalyText();
+            }
+
+            if (Proces.Count > 0)
+            {
+                foreach (var item in Proces)
+                {
+                    item.AnalyText();
+                }
+            }
+
+            foreach (var item in Constructors)
+            {
+                item.AnalyText();
+            }
+        }
+
+        private void SetPartContext(ContextFile fileContext)
+        {
+            if (ImporteSection != null)
+            {
+                ImporteSection.SetContext(fileContext);
+            }
+            if (this.UseSection != null)
+            {
+                this.UseSection.SetContext(fileContext);
+            }
+            if (DimSection != null)
+            {
+                DimSection.SetContext(fileContext);
+            }
+            ContextClass classContext = fileContext.ClassContext;
+            if (ClassNameSection != null)
+            {
+                ClassNameSection.SetContext(classContext);
+            }
+            if (PropertiesSection != null)
+            {
+                PropertiesSection.SetContext(classContext);
+            }
+            if (Proces.Count > 0)
+            {
+                foreach (var item in Proces)
+                {
+                    item.SetContext(classContext);
+                }
+            }
+            foreach (var item in Constructors)
+            {
+                item.SetContext(classContext);
+            }
+        }
+
+        private ZClassType CreateZType()
+        {
             if (!HasError())
             {
-                Type type = this.ClassSection.Builder.CreateType();
+                Type type = this.ClassContext.GetTypeBuilder().CreateType();
                 IZDescType ztype = ZTypeManager.GetByMarkType(type);
-                this.FileContext.EmitedZClass = ztype as ZType;
-                this.ProjectContext.CompileResult.CompiledTypes.Add(ztype);
+                ZClassType zclasstype = (ZClassType)ztype;
+                this.FileContext.EmitedIZDescType = zclasstype;
+                return zclasstype;
             }
+            return null;
         }
 
         private bool HasError()
         {
-            ProjectCompileResult compileResult = this.ProjectContext.CompileResult;
-            var fi = this.FileContext.FileModel.ZFileInfo;
-            bool b= compileResult.Errors.ContainsKey(fi);
-            return b;
+            var MessageCollection = this.ProjectContext.MessageCollection;
+            return (MessageCollection.ContainsErrorSrcKey(this.FileContext.FileModel.ZFileInfo.ZFileName));
         }
     }
 }

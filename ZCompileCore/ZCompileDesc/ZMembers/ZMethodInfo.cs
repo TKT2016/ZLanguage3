@@ -7,21 +7,40 @@ using System.Text;
 using ZLangRT.Attributes;
 using ZLangRT.Utils;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.ZTypes;
 
 namespace ZCompileDesc.ZMembers
 {
-    public class ZMethodInfo : IWordDictionary
+    public class ZMethodInfo //: IWordDictionary
     {
-        public MethodInfo MarkMethod { get; private set; }
-        public MethodInfo SharpMethod { get; private set; }
+        public MethodInfo MarkMethod { get; protected set; }
+        public MethodInfo SharpMethod { get; protected set; }
         public bool IsStatic { get; protected set; }
-        public ZType RetZType { get { return ZTypeManager.GetBySharpType(SharpMethod.ReturnType) as ZType; } }
+
+        public List<ZParam> DefArgs { get { return ZDesces[0].DefArgs; } }
         public ZMethodDesc[] ZDesces { get; protected set; }
         public AccessAttributeEnum AccessAttribute { get; protected set; }
+        protected ZType _RetZType;
+        public virtual ZType RetZType
+        {
+            get
+            {
+                if (_RetZType == null)
+                {
+                    Type rtype = SharpMethod.ReturnType;
+                    _RetZType = ZTypeManager.GetBySharpType(rtype) as ZType;
+
+                }
+                return _RetZType;
+            }
+        }
+
+        internal ZMethodInfo( )
+        {
+            
+        }
 
         public ZMethodInfo(MethodInfo method)
         {
@@ -48,60 +67,60 @@ namespace ZCompileDesc.ZMembers
 
         protected void Init()
         {
-            //RetZType = ZTypeCache.GetBySharpType(SharpMethod.ReturnType) as ZType;
             IsStatic = SharpMethod.IsStatic;
             ZDesces = GetProcDesc(MarkMethod, SharpMethod);
             AccessAttribute = ReflectionUtil.GetAccessAttributeEnum(SharpMethod);
         }
 
-        public bool ContainsWord(string text)
-        {
-            if (ParamsContainsWord(text)) return true;
-            if (NameContainsWord(text)) return true;
-            return false;
-        }
+        //public bool ContainsWord(string text)
+        //{
+        //    if (ParamsContainsWord(text)) return true;
+        //    if (NameContainsWord(text)) return true;
+        //    return false;
+        //}
 
-        private bool ParamsContainsWord(string text)
-        {
-            var paramsArr = this.SharpMethod.GetParameters();
-            foreach (var item in paramsArr)
-            {
-                if (item.Name == text)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private bool ParamsContainsWord(string text)
+        //{
+        //    var paramsArr = this.SharpMethod.GetParameters();
+        //    foreach (var item in paramsArr)
+        //    {
+        //        if (item.Name.Length == 1) continue;//参数名称一个字符不加入字典
+        //        if (item.Name == text)
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
-        private bool NameContainsWord(string text)
-        {
-            foreach (ZMethodDesc part in this.ZDesces)
-            {
-                if (part.ContainsWord(text))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private bool NameContainsWord(string text)
+        //{
+        //    foreach (ZMethodDesc part in this.ZDesces)
+        //    {
+        //        if (part.ContainsWord(text))
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
-        public WordInfo SearchWord(string text)
-        {
-            WordInfo info1 = null;
-            WordInfo info2 = null;
+        //public WordInfo SearchWord(string text)
+        //{
+        //    WordInfo info1 = null;
+        //    WordInfo info2 = null;
 
-            if(ParamsContainsWord(text))
-            {
-                info1 = new WordInfo( text, WordKind.ParamName,this );
-            }
-            if (NameContainsWord(text))
-            {
-                info2 = new WordInfo(text, WordKind.ProcNamePart, this);
-            }
-            WordInfo newWord = WordInfo.Merge(info1, info2);
-            return newWord;
-        }
+        //    if(ParamsContainsWord(text))
+        //    {
+        //        info1 = new WordInfo( text, WordKind.ParamName,this );
+        //    }
+        //    if (NameContainsWord(text))
+        //    {
+        //        info2 = new WordInfo(text, WordKind.ProcNamePart, this);
+        //    }
+        //    WordInfo newWord = WordInfo.Merge(info1, info2);
+        //    return newWord;
+        //}
 
         public virtual bool HasZProcDesc(ZCallDesc procDesc)
         {

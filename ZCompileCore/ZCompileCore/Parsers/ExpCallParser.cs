@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using ZCompileCore.AST;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.Words;
 using ZCompileKit;
 
 namespace ZCompileCore.Parsers
@@ -73,11 +73,11 @@ namespace ZCompileCore.Parsers
             {
                 ParseBracket(subExp);
             }
-            else if (subExp is ExpType)
+            else if (subExp is ExpTypeUnsure)
             {
                 ParseType(subExp);
             }
-            else if (subExp is ExpVar)
+            else if (subExp is ExpVarBase)
             {
                 ParseAsArg(subExp);
             }
@@ -97,10 +97,20 @@ namespace ZCompileCore.Parsers
             {
                 ParseAsArg(subExp);
             }
+            else if (subExp is ExpTypeBase)
+            {
+                ParseAsExpTypeBase(subExp);
+            }
             else
             {
-                throw new CompileCoreException();
+                throw new CCException();
             }
+        }
+
+        private void ParseAsExpTypeBase(Exp subExp)
+        {
+            tape.MoveNext();
+            return;
         }
 
         private Exp AnalyCurrent()
@@ -128,25 +138,20 @@ namespace ZCompileCore.Parsers
 
         private void ParseNew(Exp firstExp)
         {
-            var expType = firstExp as ExpType;
+            var expType = firstExp as ExpTypeUnsure;
             tape.MoveNext();
             Exp nextExp = AnalyCurrent();
-            if(nextExp is ExpBracket)
+            if((nextExp is ExpBracket) )
             {
                 var bracketexp = nextExp as ExpBracket;
-                ExpNew expNew = new ExpNew(expType,bracketexp);
-                expNew.SetContext(this.expContext);
-                Exp expArg = expNew.Analy();
-                ParseAsArg(expArg);
+                AnalyNewExp(expType, bracketexp);
             }
-            else if ((nextExp is ExpVar) || nextExp is ExpLiteral)
+            else if ((nextExp is ExpVarBase) || nextExp is ExpLiteral)
             {
                 var bracketexp = new ExpBracket(nextExp);
                 bracketexp.SetContext(this.expContext);
-                ExpNew expNew = new ExpNew(expType, bracketexp);
-                expNew.SetContext(this.expContext);
                 bracketexp.AnalyRet();
-                ParseAsArg(bracketexp);
+                AnalyNewExp(expType, bracketexp);
             }
             else
             {
@@ -156,6 +161,15 @@ namespace ZCompileCore.Parsers
                 newExpList.Add(bracket);
                 ParseExp(nextExp);
             }
+        }
+
+        private ExpNew AnalyNewExp(ExpTypeUnsure expType, ExpBracket expBracket)
+        {
+            ExpNew expNew = new ExpNew(expType, expBracket);
+            expNew.SetContext(this.expContext);
+            Exp expArg = expNew.Analy();
+            ParseAsArg(expArg);
+            return expNew;
         }
 
         private void ParseBracket(Exp subExp)

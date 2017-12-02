@@ -8,58 +8,79 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
 using ZCompileCore.Tools;
+using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.ZTypes;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.AST
 {
-    public class SectionConstructorDefault : SectionBase
+    public class SectionConstructorDefault : SectionConstructorBase
     {
-        public ContextProc ProcContext;
-
         public SectionConstructorDefault()
         {
             
         }
 
-        public void EmitName()
+        public override void AnalyText()
         {
-            var classBuilder = this.ProcContext.ClassContext.EmitContext.ClassBuilder;
+            return;
+        }
+
+        public override void AnalyType()
+        {
+            return;
+        }
+
+        public override void AnalyBody()
+        {
+            return;
+        }
+
+        public override void EmitName()
+        {
+            bool isStatic = this.ProcContext.IsStatic();
+            //var classContext = this.FileContext.ClassContext;
+            var classBuilder = this.ClassContext.GetTypeBuilder();
+
+            //var classBuilder = this.ProcContext.ClassContext.EmitContext.ClassBuilder;
             MethodAttributes methodAttributes;
             CallingConventions callingConventions;
-            bool isSstatic = (this.ProcContext.IsStatic);
-            if (isSstatic)
+            //bool isSstatic = (this.ProcContext.IsStatic);
+            if (isStatic)
             {
                 methodAttributes = MethodAttributes.Private | MethodAttributes.Static;
                 callingConventions = CallingConventions.Standard;
             }
             else
             {
-                methodAttributes = MethodAttributes.Public ;//| MethodAttributes.Virtual;
+                methodAttributes = MethodAttributes.Public;//| MethodAttributes.Virtual;
                 callingConventions = CallingConventions.HasThis;
             }
             var argTypes = new Type[] { };
             ConstructorBuilder constructorBuilder = classBuilder.DefineConstructor(methodAttributes, callingConventions, argTypes);
-            ProcContext.EmitContext.SetBuilder(constructorBuilder);
-            ProcContext.EmitContext.ILout = constructorBuilder.GetILGenerator();
+            ProcContext.SetBuilder(constructorBuilder);
+            //ProcContext.EmitContext.ILout = constructorBuilder.GetILGenerator();
         }
 
-        public void AnalyBody()
+        public override void EmitBody()
         {
-       
+            ILGenerator IL = this.ProcContext.GetILGenerator();//.EmitContext.ILout;
+            EmitCallSuper(IL);
+            EmitCallInitPropertyMethod(IL);
+            IL.Emit(OpCodes.Ret);
         }
 
-        public void EmitBody()
+        public override void SetContext(ContextClass classContext)
         {
-            ILGenerator IL = this.ProcContext.EmitContext.ILout;
-            if (!this.ProcContext.IsStatic)
-            {
-                EmitHelper.EmitCallBaseConstructorZero(IL, this.ProcContext.ClassContext.BaseZType.SharpType);
-            }
-            if (this.ProcContext.ClassContext.InitPropertyMethod != null)
-                EmitHelper.CallDynamic(IL, this.ProcContext.ClassContext.InitPropertyMethod);
-            ProcContext.EmitContext.ILout.Emit(OpCodes.Ret);
+            this.ClassContext = classContext;
+            this.FileContext = this.ClassContext.FileContext;
+            this.ProcContext = new ContextProc(this.ClassContext,true);
+        }
+
+        public override string ToString()
+        {
+            return "( )";
         }
     }
 }

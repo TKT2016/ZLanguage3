@@ -26,34 +26,36 @@ namespace ZDev.Forms
 
         public void ShowErrors(ProjectCompileResult result)
         {      
-            if (result.HasError())
+            if (result.MessageCollection.HasError())
             {
-                List<CompileMessage> errors = result.Errors.ValuesToList();
+                List<CompileMessage> errors = result.MessageCollection.Errors;
                 foreach (var error in errors)
                 {
                     ListViewItem item = new ListViewItem();
                     //item.SubItems.Add("错误");
-                    item.SubItems.Add(error.SourceFileInfo.ZFileName);
+                    string src = (error.Key as CompileMessageSrcKey).SrcFileName;
+                    item.SubItems.Add(src);
                     item.SubItems.Add(error.Line.ToString());
                     item.SubItems.Add(error.Col.ToString());
-                    item.SubItems.Add(error.Text);
+                    item.SubItems.Add(error.Content);
                     item.ImageIndex = 0;
                     errorlistView.Items.Add(item);
                 }
                 this.msgTab.SelectedTab = this.errorTabPage;
             }
 
-            if (result.HasWarning())
+            if (result.MessageCollection.HasWarning())
             {
-                List<CompileMessage> warnings = result.Warnings.ValuesToList();
+                List<CompileMessage> warnings = result.MessageCollection.Warnings;
                 foreach (var warning in warnings)
                 {
                     ListViewItem item = new ListViewItem();
                     //item.SubItems.Add("警告");
-                    item.SubItems.Add(warning.SourceFileInfo.ZFileName);
+                    string src = (warning.Key as CompileMessageSrcKey).SrcFileName;
+                    item.SubItems.Add(src);
                     item.SubItems.Add(warning.Line.ToString());
                     item.SubItems.Add(warning.Col.ToString());
-                    item.SubItems.Add(warning.Text);
+                    item.SubItems.Add(warning.Content);
                     item.ImageIndex = 1;
                     errorlistView.Items.Add(item);
                 }

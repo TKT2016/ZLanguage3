@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZCompileDesc.Utils;
-using ZCompileDesc.Words;
 using ZCompileDesc.ZTypes;
 using ZLangRT.Utils;
 
@@ -35,10 +34,20 @@ namespace ZCompileDesc.ZMembers
         private void Init()
         {
             IsStatic = SharpField.IsStatic;
-            ZNames = ZDescriptionHelper.GetZNames(MarkField);
+            //ZNames = ZDescriptionHelper.GetZNames(MarkField);
             CanRead = true;
             CanWrite = false;
             AccessAttribute = AccessAttributeEnum.Public;
+        }
+
+        string[] _znames = null;
+        public override string[] GetZNames()
+        {
+            if (_znames == null)
+            {
+                _znames = ZDescriptionHelper.GetZNames(MarkField);
+            }
+            return _znames;
         }
 
         public object Value
@@ -49,12 +58,12 @@ namespace ZCompileDesc.ZMembers
             }
         }
 
-        public override WordInfo SearchWord(string text)
-        {
-            if (!HasZName(text)) return null;
-            WordInfo info = new WordInfo(text, WordKind.EnumElement, this);
-            return info;
-        }
+        //public override WordInfo SearchWord(string text)
+        //{
+        //    if (!HasZName(text)) return null;
+        //    WordInfo info = new WordInfo(text, WordKind.EnumElement, this);
+        //    return info;
+        //}
 
         public override string SharpMemberName
         {
@@ -68,7 +77,8 @@ namespace ZCompileDesc.ZMembers
 
         public override string ToString()
         {
-            return this.MarkField.Name + "(" + string.Join(",", ZNames) + ")";
+            var names = GetZNames();
+            return this.MarkField.Name + "(" + string.Join(",", names) + ")";
         }
     }
 }
