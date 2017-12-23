@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -21,6 +20,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpCallSingleUse : ExpCallSingle
     {
+        protected ZLMethodInfo Method;
         public ExpCallSingleUse(LexToken token)
         {
             VarToken = token;
@@ -34,9 +34,9 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZMethodInfo SearchZMethod(string name)
+        private ZLMethodInfo SearchZMethod(string name)
         {
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
             ContextImportUse contextiu = this.FileContext.ImportUseContext;
             return contextiu.SearchUseMethod(calldesc)[0];

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using ZCompileCore.Contexts;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
 using System.Linq;
 using ZCompileKit.Tools;
 using ZLangRT.Utils;
 using ZCompileCore.ASTExps;
+using ZCompileDesc.Utils;
 
 namespace ZCompileCore.AST
 {
@@ -42,7 +41,7 @@ namespace ZCompileCore.AST
             BracketExp = AnalySubExp(BracketExp) as ExpBracket; 
             if (!AnalyCorrect) return this;
 
-            if (IsListClass())
+            if (ZTypeUtil.IsListClass(TypeExp.RetType))//(IsListClass())
             {
                 ExpNewList newListExp = new ExpNewList(this.ExpContext,TypeExp, BracketExp);
                 return newListExp.Analy();
@@ -64,7 +63,7 @@ namespace ZCompileCore.AST
             {
                 Exp argExp = BracketExp.InneExps[0];
 
-                if(ReflectionUtil.IsExtends(argExp.RetType.SharpType,TypeExp.RetType.SharpType))
+                if (ZTypeUtil.IsExtends(argExp.RetType, TypeExp.RetType))//(ReflectionUtil.IsExtends(argExp.RetType.SharpType,TypeExp.RetType.SharpType))
                 {
                     return argExp;
                 }
@@ -77,7 +76,7 @@ namespace ZCompileCore.AST
 
         private Exp AnalyNewExpOneArg()
         {
-            ZConstructorInfo ZConstructor = SearchZConstructor();
+            ZLConstructorInfo ZConstructor = SearchZConstructor();
             if (ZConstructor == null)
             {
                 //强制转换类型
@@ -97,21 +96,23 @@ namespace ZCompileCore.AST
             return castExp.Analy();
         }
 
-        private ZConstructorInfo SearchZConstructor()
+        private ZLConstructorInfo SearchZConstructor()
         {
             int argsCount = BracketExp.Count;
             NewAnalyInfo = new NewExpAnalyInfo();
 
             var args = BracketExp.GetCallDesc();
-            NewAnalyInfo.NewDesc = new ZNewDesc(args);
-            ZConstructorInfo ZConstructor = (TypeExp.RetType as ZClassType).FindDeclaredZConstructor(NewAnalyInfo.NewDesc);
-            return ZConstructor;
+            NewAnalyInfo.NewDesc = new ZNewCall(this.TypeExp.ToString(), args);
+            //ZLConstructorInfo ZConstructor = (TypeExp.RetType as ZLClassInfo).SearchDeclaredZConstructor(NewAnalyInfo.NewDesc)[0];
+            //return ZConstructor;
+            var ZConstructors = (TypeExp.RetType as ZLClassInfo).SearchDeclaredZConstructor(NewAnalyInfo.NewDesc);
+            if (ZConstructors.Length == 0) return null;
+            else return ZConstructors[0];
         }
-
 
         private Exp AnalyNewExp()
         {
-            ZConstructorInfo ZConstructor = SearchZConstructor();
+            ZLConstructorInfo ZConstructor = SearchZConstructor();
             if (ZConstructor == null)
             {
                 ErrorF(BracketExp.Position, "没有正确的创建过程");
@@ -123,7 +124,7 @@ namespace ZCompileCore.AST
             return this;
         }
 
-        private void AnlaySearchedConstructor(ZConstructorInfo ZConstructor)
+        private void AnlaySearchedConstructor(ZLConstructorInfo ZConstructor)
         {
             RetType = TypeExp.RetType;
             NewAnalyInfo.SearchedZConstructor = ZConstructor;
@@ -131,13 +132,13 @@ namespace ZCompileCore.AST
             NewAnalyInfo.AdjustArgExps();
         }
 
-        private bool IsListClass()
-        {
-             Type subjectType = TypeExp.RetType.SharpType;
-            if (!subjectType.Name.StartsWith(CompileConst.ZListClassZName)) return false;
-            if (subjectType.Namespace!= CompileConst.LangPackageName) return false;
-            return true;
-        }
+        //private bool IsListClass()
+        //{
+        //     Type subjectType = TypeExp.RetType.SharpType;
+        //    if (!subjectType.Name.StartsWith(CompileConst.ZListClassZName)) return false;
+        //    if (subjectType.Namespace!= CompileConst.LangPackageName) return false;
+        //    return true;
+        //}
 
         public override void Emit()
         {

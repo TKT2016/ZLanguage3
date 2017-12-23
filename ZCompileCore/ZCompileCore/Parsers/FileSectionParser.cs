@@ -634,6 +634,7 @@ namespace ZCompileCore.Parsers
             {
                 return null;
             }
+            SkipNewLine();
             ast.Body = ParseProcBody();
             return ast;
         }
@@ -656,7 +657,10 @@ namespace ZCompileCore.Parsers
         private ProcName ParseProcName( )
         {
             ProcName procName = new ProcName();
-            //procName.FileContext = this.fileMY.FileContext;
+            //if (tape.Current.GetText().IndexOf("响应")!=-1)
+            //{
+            //   Console.WriteLine("响应");
+            //}
             while (tape.CurrentKind != TokenKind.EOF && tape.CurrentKind!= TokenKind.NewLine)
             {
                 if (tape.CurrentKind == TokenKind.LBS)
@@ -689,7 +693,7 @@ namespace ZCompileCore.Parsers
             {
                 if (tape.CurrentKind == TokenKind.Ident)
                 {
-                    ProcArg arg = ParseProcArg();
+                    ProcParameter arg = ParseProcArg();
                     if (arg != null)
                     {
                         result.Add(arg);
@@ -711,9 +715,9 @@ namespace ZCompileCore.Parsers
             return result;
         }
 
-        private ProcArg ParseProcArg( )
+        private ProcParameter ParseProcArg( )
         {
-            ProcArg arg = new ProcArg();
+            ProcParameter arg = new ProcParameter();
             //arg.FileContext = this.fileMY.FileContext;
             if (tape.CurrentKind == TokenKind.Ident)
             {
@@ -848,6 +852,7 @@ namespace ZCompileCore.Parsers
             //tape.Match(TokenKind.Times);
             return repeatStmt;
         }
+
         private Stmt ParseForeach()
         {
             StmtForeach foreachStmt = new StmtForeach();

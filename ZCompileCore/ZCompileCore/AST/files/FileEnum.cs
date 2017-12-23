@@ -5,7 +5,7 @@ using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Reports;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+
 
 namespace ZCompileCore.AST
 {
@@ -19,7 +19,7 @@ namespace ZCompileCore.AST
             EnumSections = enumSections;
         }
 
-        public ZEnumType Compile()
+        public ZLEnumInfo Compile()
         {
             SetContext(this.FileContext);
             var MessageCollection = this.ProjectContext.MessageCollection;
@@ -34,7 +34,7 @@ namespace ZCompileCore.AST
                     var builder = this.ProjectContext.EmitContext.ModuleBuilder;
                     var packageName = this.ProjectContext.ProjectModel.ProjectPackageName;
                     var fileName = this.FileContext.FileModel.GetFileNameNoEx();
-                    ZEnumType ztype = enumSection.Compile(builder, packageName, fileName);
+                    ZLEnumInfo ztype = enumSection.Compile(builder, packageName, fileName);
                     return ztype;
                 }
             }

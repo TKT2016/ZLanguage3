@@ -10,15 +10,14 @@ using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using System.Reflection;
-using ZCompileDesc.ZMembers;
 
 namespace ZCompileCore.AST
 {
     public class ExpCallThis : ExpCallAnalyedBase
     {
         //ZMethodDesc SearchedProcDesc;
-        ZMethodInfo ZMethod;
-        public ExpCallThis(ContextExp context, ZCallDesc expProcDesc, ZMethodInfo searchedMethod, Exp srcExp, List<Exp> argExps)
+        ZCMethodInfo ZMethod;
+        public ExpCallThis(ContextExp context, ZMethodCall expProcDesc, ZCMethodInfo searchedMethod, Exp srcExp, List<Exp> argExps)
         {
             this.ExpContext = context;
             this.ExpProcDesc = expProcDesc;
@@ -37,18 +36,18 @@ namespace ZCompileCore.AST
         {
             EmitSubject();
             EmitArgsThis(ZMethod, ArgExps);
-            EmitHelper.CallDynamic(IL, ZMethod.SharpMethod);
+            EmitHelper.CallDynamic(IL, ZMethod.MethodBuilder);//.SharpMethod);
             EmitConv();
         }
 
-        protected void EmitArgsThis(ZMethodInfo zdesc, List<Exp> expArgs)
+        protected void EmitArgsThis(ZCMethodInfo zdesc, List<Exp> expArgs)
         {
-            var paramArr = zdesc.DefArgs.ToArray();
+            var paramArr = zdesc.ZParams;
             List<Exp> expArgsNew = CallAjuster.AdjustExps(paramArr, expArgs);
             EmitArgsExp(paramArr, expArgs.ToArray());
         }
 
-        protected void EmitArgsExp(ZParam[] paramInfos, Exp[] args)
+        protected void EmitArgsExp(ZCParamInfo[] paramInfos, Exp[] args)
         {
             var size = paramInfos.Length;
 
@@ -68,7 +67,7 @@ namespace ZCompileCore.AST
                 IL.Emit(OpCodes.Ldarg_0);
                 EmitSymbolHelper.EmitLoad(IL, this.ClassContext.NestedOutFieldSymbol);// EmitHelper.LoadField(IL, this.ClassContext.NestedOutFieldSymbol.Field);
             }
-            else if (ZMethod.IsStatic==false)
+            else if (ZMethod.GetIsStatic()==false)
             {
                 IL.Emit(OpCodes.Ldarg_0);
             }

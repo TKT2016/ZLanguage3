@@ -6,7 +6,6 @@ using System.Text;
 using ZCompileCore.AST;
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
 
 namespace ZCompileCore.AST
 {
@@ -14,8 +13,8 @@ namespace ZCompileCore.AST
     {
         public List<Exp> ArgExps { get; set; }
         public List<Exp> AdjustedArgExps { get; set; }
-        public ZNewDesc NewDesc { get; set; }
-        public ZConstructorInfo SearchedZConstructor { get; set; }
+        public ZNewCall NewDesc { get; set; }
+        public ZLConstructorInfo SearchedZConstructor { get; set; }
 
         public void AdjustArgExps()
         {

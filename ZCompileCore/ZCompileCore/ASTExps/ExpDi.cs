@@ -9,8 +9,9 @@ using ZCompileCore.Tools;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
+using Z语言系统;
 
 namespace ZCompileCore.AST
 {
@@ -32,11 +33,11 @@ namespace ZCompileCore.AST
             ArgExp = AnalySubExp(ArgExp);
             if (!this.AnalyCorrect) return this;
 
-            var propertyName = CompileConst.ZListItemPropertyName;// "Item";
+            var propertyName = ZLangUtil.ZListItemPropertyName;// "Item";
             var subjType = SubjectExp.RetType;
-            if(subjType is ZClassType)
+            if(subjType is ZLClassInfo)
             {
-                ZClassType zclass = subjType as ZClassType;
+                ZLClassInfo zclass = subjType as ZLClassInfo;
                 Property = zclass.SharpType.GetProperty(propertyName);
             }
 

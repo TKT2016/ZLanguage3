@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -17,8 +17,8 @@ namespace ZCompileCore.ASTExps
     /// 程序中定义的函数内部变量
     /// </summary>
     public class ExpTypeSingle : ExpTypeSingleBase
-    { 
-        protected ZType ClassType;
+    {
+        protected ZType SubjZType;
 
         public ExpTypeSingle(LexToken token)
         {
@@ -28,8 +28,8 @@ namespace ZCompileCore.ASTExps
         public override Exp Analy()
         {
             VarName = VarToken.GetText();
-            ClassType = SearchValue(VarName);
-            RetType = ClassType;
+            SubjZType = SearchValue(VarName);
+            RetType = SubjZType;
             return this;
         }
 

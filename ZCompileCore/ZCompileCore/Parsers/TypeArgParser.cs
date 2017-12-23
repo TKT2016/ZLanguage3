@@ -9,7 +9,7 @@ using ZCompileDesc;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZNLP;
 
 namespace ZCompileCore.Parsers

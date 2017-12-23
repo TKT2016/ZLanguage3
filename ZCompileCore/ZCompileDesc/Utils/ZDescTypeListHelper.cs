@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
 
 namespace ZCompileDesc.Utils
 {
@@ -22,11 +21,11 @@ namespace ZCompileDesc.Utils
         //    return false;
         //}
 
-        public static bool Contains(string zname, params IZDescType[] dictList)
+        public static bool Contains(string zname, params ZLType[] dictList)
         {
             foreach (var item in dictList)
             {
-                if (item.ZName==zname)//(text))
+                if (item.ZTypeName==zname)//(text))
                 {
                     return true;
                 }
@@ -34,12 +33,12 @@ namespace ZCompileDesc.Utils
             return false;
         }
 
-        public static IZDescType[] Search(string zname, params IZDescType[] dictList)
+        public static ZLType[] Search(string zname, params ZLType[] dictList)
         {
-            List<ZType> words = new List<ZType>();
-            foreach (ZType item in dictList)
+            List<ZLType> words = new List<ZLType>();
+            foreach (ZLType item in dictList)
             {
-                if (item.ZName == zname)//(text))
+                if (item.ZTypeName == zname)//(text))
                 {
                     words.Add(item);
                 }

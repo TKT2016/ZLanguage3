@@ -9,16 +9,15 @@ using ZCompileCore.Tools;
 using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
-using ZCompileDesc.ZMembers;
 
 namespace ZCompileCore.AST
 {
     public class ExpCallUse : ExpCallAnalyedBase
     {
-        ZMethodInfo SearchedMethod;
+        ZLMethodInfo SearchedMethod;
         List<Exp> newExpArgs;
 
-        public ExpCallUse(ContextExp context, ZCallDesc expProcDesc, ZMethodInfo zmethod, Exp srcExp, List<Exp> argExps)
+        public ExpCallUse(ContextExp context, ZMethodCall expProcDesc, ZLMethodInfo zmethod, Exp srcExp, List<Exp> argExps)
         {
             this.ExpContext = context;
             this.ExpProcDesc = expProcDesc;
@@ -31,7 +30,7 @@ namespace ZCompileCore.AST
         {
             if (SearchedMethod!=null)
             {
-                var defArgs = SearchedMethod.ZDesces[0].DefArgs;
+                var defArgs = SearchedMethod.ZParams;//.ZDesces[0].DefArgs;
                 newExpArgs = AnalyArgLambda(defArgs, ArgExps);
                 //AnalyArgLambda(SearchedMethod.ZDesces[0], ArgExps);
                 //ArgExps = newExpArg;

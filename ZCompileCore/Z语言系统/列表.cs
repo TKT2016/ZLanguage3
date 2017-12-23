@@ -150,10 +150,10 @@ namespace Z语言系统
         }
        
         [ZCode("插入(T:t)到第(int:index)")]
-        public void Insert( T item,int index)
+        public void Insert( T t,int index)
         {
             int i = getIndex(index);
-            list.Insert(index, item);
+            list.Insert(index, t);
         }
     }
 }

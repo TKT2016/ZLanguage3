@@ -7,23 +7,24 @@ using System.Threading.Tasks;
 using ZCompileKit.Collections;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Infoes;
-using ZCompileDesc.ZTypes;
+
+using ZCompileDesc.Collections;
 
 namespace ZCompileCore.Reports
 {
     public class ProjectCompileResult
     {
         public CompileMessageCollection MessageCollection { get; set; }
-        //public List<CompileMessage> Errors { get; set; }
-        //public List<CompileMessage> Warnings { get;set; }
 
         public string BinaryFilePath { get; set; }
-        public List<IZDescType> CompiledTypes { get; set; }
-        public ZType EntrtyZType { get; set; }
+        //public List<IZDescType> CompiledTypes { get; set; }
+        public ZLCollection CompiledTypes { get; set; }
+        public ZLType EntrtyZType { get; set; }
 
         public ProjectCompileResult() 
         {
-            CompiledTypes = new List<IZDescType>();
+            CompiledTypes = new ZLCollection();
+            //CompiledTypes = new List<IZDescType>();
         }
 
         

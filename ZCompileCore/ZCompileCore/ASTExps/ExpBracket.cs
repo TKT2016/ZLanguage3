@@ -8,7 +8,7 @@ using ZCompileCore.Lex;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 
 namespace ZCompileCore.AST
 {
@@ -105,9 +105,9 @@ namespace ZCompileCore.AST
             return list;
         }
 
-        public ZBracketCallDesc GetCallDesc()
+        public ZBracketCall GetCallDesc()
         {
-            ZBracketCallDesc zbc = new ZBracketCallDesc();
+            ZBracketCall zbc = new ZBracketCall();
             foreach (var exp in this.InneExps)
             {
                 if(exp is ExpNameValue)
@@ -115,14 +115,14 @@ namespace ZCompileCore.AST
                     ExpNameValue nvexp = (exp as ExpNameValue);
                     if(!(nvexp.ValueExp is ExpTypeBase))
                     {
-                        ZArg zargdesc = new ZArg() { IsGeneric = false, ZArgType = nvexp.ValueExp.RetType, ZArgName = nvexp.ArgName };
+                        ZArgCall zargdesc = new ZArgCall() { IsGeneric = false, ZArgType = nvexp.ValueExp.RetType, ZArgName = nvexp.ArgName };
                         zbc.Add(zargdesc);
                     }
                 }
                 else// if (!(exp is ExpType))
                 {
                     var type = exp.RetType;
-                    ZArg zargdesc = new ZArg() { ZArgType = exp.RetType };// (exp.RetType);
+                    ZArgCall zargdesc = new ZArgCall() { ZArgType = exp.RetType };// (exp.RetType);
                     //zargdesc.Data = exp;
                     //listArgs.Add(zargdesc);
                     zbc.Add(zargdesc);

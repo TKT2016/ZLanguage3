@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
 
 namespace ZCompileDesc.Descriptions
 {
-    public class ZPackageDescList : List<ZPackageDesc>, IZTypeDictionary//,IWordDictionary, 
+    public class ZPackageDescList : List<ZPackageInfo>, IZTypeDictionary
     {
         public bool Contains(string packageName)
         {
             return GetZPackage(packageName) != null;
         }
 
-        public ZPackageDesc GetZPackage(string packageName)
+        public ZPackageInfo GetZPackage(string packageName)
         {
             foreach(var zdesc in this)
             {
@@ -27,24 +26,14 @@ namespace ZCompileDesc.Descriptions
             return null;
         }
 
-        //public bool ContainsWord(string text)
-        //{
-        //    return IWordDictionaryHelper.ArrayContainsWord(text, this); 
-        //}
-
-        //public WordInfo SearchWord(string text)
-        //{
-        //    return IWordDictionaryHelper.EnumerableSearchWord(text, this); 
-        //}
-
         public bool ContainsZType(string zname)
         {
             return ZTypeListHelper.Contains(zname, this.ToArray());
         }
 
-        public ZType[] SearchZType(string zname)
+        public ZLType[] SearchZType(string zname)
         {
-            ZType[] data = ZTypeListHelper.Search(zname, this.ToArray());
+            ZLType[] data = ZTypeListHelper.Search(zname, this.ToArray());
             return data;
         }
 
@@ -58,12 +47,12 @@ namespace ZCompileDesc.Descriptions
            return false;
         }
 
-        public IZDescType[] SearchZDescType(string zname)
+        public ZLType[] SearchZDescType(string zname)
         {
-            List<IZDescType> ztypes = new List<IZDescType>();
+            List<ZLType> ztypes = new List<ZLType>();
             foreach (var item in this)
             {
-                IZDescType[] desctypes = item.SearchZDescType(zname);
+                ZLType[] desctypes = item.SearchZDescType(zname);
                 ztypes.AddRange(desctypes);
             }
             return ztypes.ToArray();

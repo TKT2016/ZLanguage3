@@ -21,9 +21,9 @@ namespace ZCompileCore.AST
 
         public override Exp Parse()
         {
-            //if (RawTokens.Count > 0 && RawTokens[0].GetText().StartsWith("X速度"))
+            //if (RawTokens.Count > 0 && RawTokens[0].GetText().StartsWith("清除出界子弹"))
             //{
-            //    Console.WriteLine(this.ToString());
+            //    Console.WriteLine("清除出界子弹");
             //}
 
             List<LexToken> tokens = Seg();
@@ -39,10 +39,6 @@ namespace ZCompileCore.AST
             List<LexToken> tokens = new List<LexToken>();
             foreach (var tok in RawTokens)
             {
-                //if (tok.ToString().IndexOf("绘图器") != -1)
-                //{
-                //    Debug.WriteLine("绘图器");
-                //}
                 if (tok.Kind == TokenKind.Ident)
                 {
                     LexToken[] newTokens = segmenter.Split(tok);
@@ -65,7 +61,7 @@ namespace ZCompileCore.AST
 
         public override void Emit()
         {
-            throw new NotImplementedException();
+            throw new CCException();
         }
 
         public override Exp[] GetSubExps()

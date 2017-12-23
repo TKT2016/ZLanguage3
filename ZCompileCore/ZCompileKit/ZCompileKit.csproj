@@ -42,13 +42,10 @@
     <Compile Include="Collections\ArrayTape.cs" />
     <Compile Include="Collections\IName.cs" />
     <Compile Include="Collections\KeyListDictionary.cs" />
-    <Content Include="Collections\NameDictionary.cs.TXT" />
-    <Content Include="Collections\StringValuesDictionary.cs.TXT" />
     <Compile Include="Infoes\ZCompileFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\ChineseHelper.cs" />
     <Compile Include="Tools\ContinuousMerger.cs" />
-    <Compile Include="Tools\EmitHelper.cs" />
     <Compile Include="Tools\ListHelper.cs" />
     <Compile Include="Tools\StringHelper.cs" />
     <Compile Include="Tools\TxtFileEncoding.cs" />

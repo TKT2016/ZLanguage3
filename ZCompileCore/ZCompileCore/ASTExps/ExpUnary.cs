@@ -6,6 +6,8 @@ using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Tools;
+using ZCompileDesc.Descriptions;
+using ZCompileDesc.Utils;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.AST
@@ -36,11 +38,15 @@ namespace ZCompileCore.AST
             if (RightExp.AnalyCorrect)
             {
                 this.RetType = RightExp.RetType;
-                Type stype = RetType.SharpType;
-                if (stype != typeof(int) && stype != typeof(float) && stype != typeof(double) && stype != typeof(decimal))
+                if(!CanUnary(RetType))
                 {
                     ErrorF(RightExp.Position, "不能进行'{0}'运算", OpToken.GetText());
                 }
+                //Type stype = RetType.SharpType;
+                //if (stype != typeof(int) && stype != typeof(float) && stype != typeof(double) && stype != typeof(decimal))
+                //{
+                //    ErrorF(RightExp.Position, "不能进行'{0}'运算", OpToken.GetText());
+                //}
             }
 
             if (OpKind == TokenKind.ADD)
@@ -53,6 +59,19 @@ namespace ZCompileCore.AST
             }
         }
 
+        private bool CanUnary(ZType ztype)
+        {
+            if (ztype is ZLType)
+            {
+                Type stype = ((ZLType)ztype).SharpType;
+                if (stype == typeof(int) || stype == typeof(float) || stype == typeof(double) || stype == typeof(decimal))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public override void Emit( )
         {
             if(OpToken.Kind== TokenKind.ADD)
@@ -61,11 +80,11 @@ namespace ZCompileCore.AST
             }
             else
             {
-                if (RetType.SharpType == typeof(float))
+                if (ZTypeUtil.IsFloat(RetType))//(RetType.SharpType == typeof(float))
                 {
                     IL.Emit(OpCodes.Ldc_R4,0.0);
                 }
-                else if (RetType.SharpType == typeof(int))
+                else if (ZTypeUtil.IsInt(RetType))//if (RetType.SharpType == typeof(int))
                 {
                     EmitHelper.LoadInt(IL, 0);
                 }

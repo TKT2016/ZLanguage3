@@ -4,10 +4,10 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workbench ActiveDocument="ZCompileCore\AST\exps\call\ExpCallThis.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Z标准包\桌面控件\键盘按键.cs">
     <Files>
-      <File FileName="ZCompileCore\AST\exps\call\ExpCallUse.cs" Line="48" Column="25" />
-      <File FileName="ZCompileCore\AST\exps\call\ExpCallThis.cs" Line="45" Column="41" />
+      <File FileName="Z标准包\绘图\绘图器.cs" Line="1" Column="1" />
+      <File FileName="Z标准包\桌面控件\键盘按键.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MultiItemStartupConfigurations />

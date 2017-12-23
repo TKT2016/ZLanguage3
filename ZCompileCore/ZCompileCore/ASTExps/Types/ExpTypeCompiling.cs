@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -19,7 +19,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpTypeCompiling : ExpTypeSingleBase
     { 
-        protected ZClassCompilingType CompilingType;
+        protected ZCClassInfo CompilingType;
 
         public ExpTypeCompiling(LexToken token)
         {
@@ -34,7 +34,7 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZClassCompilingType SearchValue(string zname)
+        private ZCClassInfo SearchValue(string zname)
         {
             return this.ClassContext.GetZCompilingType();
             //ContextFile cu = this.ClassContext.FileContext;

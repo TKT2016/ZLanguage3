@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+
 using ZNLP;
 
 namespace ZCompileCore.Contexts
@@ -35,24 +33,44 @@ namespace ZCompileCore.Contexts
             return packages.ContainsKey(packageName);
         }
 
-        public void AddImportType(IZDescType itype)
+        public void AddImportType(ZLType itype)
         {
-            ContextFileManager.Add(itype);
+            if(itype is ZLEnumInfo)
+            {
+                ContextFileManager.Import((ZLEnumInfo)itype);
+            }
+            else
+            {
+                ContextFileManager.Import((ZLClassInfo)itype);
+            }   
         }
 
-        public void AddCompiling_Name(ZClassCompilingType classCompilingType)
+        public void AddDimType(ZLDimInfo itype)
         {
-            ContextFileManager.Add(classCompilingType);
+            ContextFileManager.Import(itype);
         }
 
-        public void ImportCompiling_Body(ZClassCompilingType classCompilingType)
+        public void ImportCompilingName(ZCClassInfo classCompilingType)
         {
-            ContextFileManager.ImportCompiling_Body(classCompilingType);
+            ContextFileManager.ImportZName(classCompilingType);
         }
 
-        public IZDescType[] SearchImportIZType_WithUse(string name)
+        public void ImportCompilingBody(ZCClassInfo classCompilingType)
         {
-            return ContextFileManager.SearchIZTypes(name);
+            ContextFileManager.ImportStruct(classCompilingType);
+        }
+
+        public ZLType[] SearchImportIZType_WithUse(string name)
+        {
+            return ContextFileManager.SearchZLTypesByZClassName(name);
+        }
+
+        public object[] SearchByTypeName(string typeName)
+        {
+            List<object> list = new List<object>();
+            list.AddRange(ContextFileManager.SearchZLTypesByZClassName(typeName));
+            list.AddRange(ContextFileManager.SearchZDimsByZClassName(typeName));
+            return list.ToArray();
         }
 
         /// <summary>
@@ -60,7 +78,7 @@ namespace ZCompileCore.Contexts
         /// </summary>
         public ZType[] SearchImportType(string typeName)
         {
-            return ContextFileManager.SearchZTypesByClassNameOrDimItem(typeName);
+            return ContextFileManager.SearchByClassNameOrDimItem(typeName);
         }
        
         public void AddUseZTypeName(string ztypeName)
@@ -73,7 +91,7 @@ namespace ZCompileCore.Contexts
             return useContext.Contains(ztypeName);
         }
 
-        public void AddUseType(IZDescType iztype)
+        public void AddUseType(ZLType iztype)
         {
             useContext.Add(iztype);
         }
@@ -88,19 +106,29 @@ namespace ZCompileCore.Contexts
             return this.ContextFileManager.ArgSegementer;
         }
 
-        public ZMethodInfo[] SearchUseMethod(ZCallDesc calldesc)
+        public ZLMethodInfo[] SearchUseMethod(ZMethodCall calldesc)
         {
             return useContext.SearchUseMethod(calldesc);
         }
 
-        public ZMemberInfo SearchUseZMember(string name)
+        public ZLPropertyInfo SearchUseZProperty(string name)
         {
-            return useContext.SearchUseZMember(name);
+            return useContext.SearchUseZProperty(name);
         }
 
-        public bool IsUseProperty(string name)
+        public ZLFieldInfo SearchUseZField(string name)
         {
-            return useContext.IsUseProperty(name);
+            return useContext.SearchUseZField(name);
+        }
+
+        public bool IsUsedProperty(string name)
+        {
+            return useContext.IsUsedProperty(name);
+        }
+
+        public bool IsUsedField(string name)
+        {
+            return useContext.IsUsedField(name);
         }
 
         /// <summary>
@@ -108,17 +136,17 @@ namespace ZCompileCore.Contexts
         /// </summary>
         public ZType[] SearchZTypesByClassNameOrDimItem(string name)
         {
-            return this.ContextFileManager.SearchZTypesByClassNameOrDimItem(name);
+            return this.ContextFileManager.SearchByClassNameOrDimItem(name);
         }
 
-        public ZEnumItemInfo[] SearchUsedZEnumItems(string name)
+        public ZLEnumItemInfo[] SearchUsedZEnumItems(string name)
         {
             return ContextFileManager.SearchZEnumItems(name);
         }
 
         public bool IsUseEnumItem(string name)
         {
-            ZEnumItemInfo[] cu = this.SearchUsedZEnumItems(name);
+            ZLEnumItemInfo[] cu = this.SearchUsedZEnumItems(name);
             return cu.Length > 0;
         }
 

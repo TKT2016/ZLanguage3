@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using ZCompileCore.ASTExps;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Utils;
 using ZCompileKit;
 using ZCompileKit.Tools;
 
@@ -16,7 +15,7 @@ namespace ZCompileCore.AST
     public class ExpNewLambda : Exp
     {
         ExpLambdaBody lambdaExp;
-        List<SymbolBase> BodySymbolVars;
+        List<IIdent> BodySymbolVars;
         Exp actionExp;
         ZType fnRetType;
 
@@ -38,14 +37,14 @@ namespace ZCompileCore.AST
             {
                 throw new CCException();
             }
-            else if (fnRetType.SharpType == typeof(Func<bool>))
+            else if (ZTypeUtil.IsConditionFn(fnRetType))//if (fnRetType.SharpType == typeof(Func<bool>))
             {
-                if (actionExp.RetType.SharpType != typeof(bool))
+                if (ZTypeUtil.IsBool(actionExp.RetType))//(actionExp.RetType.SharpType != typeof(bool))
                 {
-                    ErrorF(actionExp.Position, "结果应该是" + fnRetType.ZName);
+                    ErrorF(actionExp.Position, "结果应该是" + fnRetType.ZTypeName);
                 }
             }
-            else if (fnRetType.SharpType == typeof(Action))
+            else if (ZTypeUtil.IsAction(fnRetType))// (fnRetType.SharpType == typeof(Action))
             {
                  
             }
@@ -67,29 +66,40 @@ namespace ZCompileCore.AST
             int i = 0;
             if(this.ExpContext.ClassContext.IsStatic()==false)
             {
-                ZMemberCompiling fieldSymbol = lambdaExp.FieldSymbols[0];
+                ZCFieldInfo fieldSymbol = lambdaExp.FieldSymbols[0];
                 EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
                 EmitHelper.EmitThis(IL, false);
                 EmitSymbolHelper.EmitStorm(IL,fieldSymbol);// IL.Emit(OpCodes.Stfld, fieldSymbol.Field);
                 i++;
             }
+
             for (;i<this.BodySymbolVars.Count;i++)
             {
-                SymbolBase thisSymbol = this.BodySymbolVars[i];
-                ZMemberCompiling fieldSymbol = lambdaExp.FieldSymbols[i];
+                throw new NotImplementedException();
+                //IIdent thisSymbol = this.BodySymbolVars[i];
+                //ZCFieldInfo fieldSymbol = lambdaExp.FieldSymbols[i];
 
-                EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
-                if (EmitSymbolHelper.NeedCallThis(thisSymbol))
-                {
-                    EmitHelper.Emit_LoadThis(IL,false);
-                }
-                EmitSymbolHelper.EmitLoad(IL, thisSymbol);
-                EmitSymbolHelper.EmitStorm(IL, fieldSymbol);// IL.Emit(OpCodes.Stfld, fieldSymbol.Field);
+                //EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
+                //if (EmitSymbolHelper.NeedCallThis(thisSymbol))
+                //{
+                //    EmitHelper.EmitThis(IL, false);
+                //}
+                //EmitSymbolHelper.EmitLoad(IL, thisSymbol);
+                //EmitSymbolHelper.EmitStorm(IL, fieldSymbol);
             }
 
             EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
             IL.Emit(OpCodes.Ldftn, lambdaExp.ProcBuilder);
-            ConstructorInfo[] constructorInfos = lambdaExp.FnRetType.SharpType.GetConstructors();
+            ConstructorInfo[] constructorInfos = null;// lambdaExp.FnRetType.SharpType.GetConstructors();
+            if (lambdaExp.FnRetType is ZLType)
+            {
+                constructorInfos = ((ZLType)lambdaExp.FnRetType).SharpType.GetConstructors();
+            }
+            else 
+            {
+                //constructorInfos = ((ZCClassInfo)lambdaExp.FnRetType).SharpType.GetConstructors();
+                throw new NotImplementedException();
+            }
             IL.Emit(OpCodes.Newobj, constructorInfos[0]);
             base.EmitConv();
         }
@@ -113,7 +123,7 @@ namespace ZCompileCore.AST
             return results;
         }
 
-        private List<SymbolBase> GetAllSubVars(List<ExpLocal> exps)
+        private List<IIdent> GetAllSubVars(List<ExpLocal> exps)
         {
             throw new CCException();
 

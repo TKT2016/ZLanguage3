@@ -1,12 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace ZLangRT.Utils
 {
     public static class GenericUtil
     {
+        /// <summary>
+        /// 取得泛型类型名称位置的泛型参数
+        /// </summary>
+        public static Dictionary<string, Type> GetTypeNameGenericArgTypes(Type sharpType)
+        {
+            Dictionary<string, Type> GenericArgTypes = new Dictionary<string, Type>();
+            Type[] typeArguments = sharpType.GetGenericArguments();
+            foreach (Type tParam in typeArguments)
+            {
+                GenericArgTypes.Add(tParam.Name, tParam);
+            }
+            return GenericArgTypes;
+        }
+
+        /// <summary>
+        /// 取得泛型方法的泛型参数
+        /// </summary>
+        public static Dictionary<string, Type> GetMethodGenericParameters(MethodInfo method)
+        {
+            Dictionary<string, Type> GenericArgTypes = new Dictionary<string, Type>();
+            Type[] typeArguments = method.GetGenericArguments();// sharpType.GetGenericArguments();
+            foreach (Type tParam in typeArguments)
+            {
+                GenericArgTypes.Add(tParam.Name, tParam);
+            }
+            return GenericArgTypes;
+        }
+
         public static Type GetMakeGenericType(Type type, Type baseType)
         {
             Type temp = type;

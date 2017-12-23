@@ -9,7 +9,7 @@ using ZCompileDesc;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZNLP;
 
 namespace ZCompileCore.Parsers
@@ -37,7 +37,7 @@ namespace ZCompileCore.Parsers
         private ParseResult SearchOne(LexToken token)
         {
             string ztypeName = token.GetText();
-            ZType[] ztypes = this.segManager.SearchZTypesByClassNameOrDimItem(ztypeName);
+            ZType[] ztypes = this.segManager.SearchByClassNameOrDimItem(ztypeName);
             if (ztypes.Length > 0)
             {
                 ParseResult result2 = new ParseResult() { ResultCount = ztypes.Length };

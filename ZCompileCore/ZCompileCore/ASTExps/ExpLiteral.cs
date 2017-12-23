@@ -9,7 +9,7 @@ using ZCompileCore.Tools;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 using Z语言系统;
 
@@ -30,7 +30,7 @@ namespace ZCompileCore.AST
         TokenKind LiteralKind;
         string LiteralValue;
 
-        public ZClassType AnalyLiteralZType( )
+        public ZLClassInfo AnalyLiteralZType( )
         {
             LiteralKind = LiteralToken.Kind;
             LiteralValue = LiteralToken.GetText();

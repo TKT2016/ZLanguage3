@@ -4,140 +4,97 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileKit.Collections;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+
 using ZNLP;
-using ZCompileDesc.ZMembers;
 using System.Diagnostics;
-using ZCompileDesc.Compilings;
 using ZLangRT.Utils;
 using System.Reflection;
 
 namespace ZCompileCore.Contexts
 {
-    public class ContextProc 
+    public abstract class ContextProc
     {
-        public ContextClass ClassContext { get; private set; }
-        public bool IsConstructor { get;private set; }
-        public ZMethodDesc ProcDesc { get;private set; }
-        public ZType RetZType { get; set; }
-        public string ProcName { get; set; }
-
+        public ContextClass ClassContext { get; protected set; }
+        private string _KeyContext;
         private static int ProcIndex = 0;
-        string _KeyContext;
-        static int ContextProcIndex = 0;
-        public ContextProc(ContextClass classContext,bool isConstructor)
-        {
-            this.ClassContext = classContext;
-            ProcIndex++;
-            EmitContext = new ProcEmitContext();
-            ContextProcIndex++;
-            _KeyContext = ContextProcIndex.ToString();
-            IsConstructor = isConstructor;
-        }
 
-        Dictionary<string, string> _Argtext = new Dictionary<string, string>();
-        public bool ContainArgtext(string text)
+        public abstract bool HasParameter(string name);
+        public abstract ZCParamInfo GetParameter(string name);
+        public abstract ZCParamInfo GetParameter(int i);
+        public abstract int GetParametersCount();
+        public abstract ILGenerator GetILGenerator();
+        //public abstract ParameterBuilder DefineParameter(int position, string strParamName);
+        public virtual void DefineParameter(ZCParamInfo zcparam)
         {
-            return _Argtext.ContainsKey(text);
+            zcparam.DefineParameter();
         }
-
-        public void AddArgtext(string text)
-        {
-            _Argtext.Add(text, text);
-        }
-
-        //Dictionary<string, string> _Argnames = new Dictionary<string, string>();
-        Dictionary<string, SymbolArg> _argDefDict = new Dictionary<string, SymbolArg>();
-
-        public bool ContainArg(string name)
-        {
-            return _argDefDict.ContainsKey(name);
-        }
-
-        public void AddArg(SymbolArg argSymbol)
-        {
-            _argDefDict.Add(argSymbol.Name, argSymbol);
-        }
-
-        public SymbolArg GetDefArg(string name)
-        {
-            return _argDefDict[name];
-        }
+        public abstract string CreateNestedClassName();
+        public abstract ZCParamInfo AddParameterName(string paramName);
 
         public bool ContainsVarName(string name)
         {
-            if (this.ContainArg(name)) return true;
+            if (this.HasParameter(name)) return true;
             if (this.IsDefLocal(name)) return true;
-            if (this.IsPropertyDef(name)) return true;
-            if (this.IsPropertyBase(name)) return true;
-            if (this.IsUseProperty(name)) return true;
-            if (this.IsUseEnumItem(name)) return true;
+            if (this.IsThisField(name)) return true;
+            if (this.IsThisProperty(name)) return true;
+            if (this.IsSuperField(name)) return true;
+            if (this.IsSuperProperty(name)) return true;
+            if (this.IsUsedProperty(name)) return true;
+            if (this.IsUsedEnumItem(name)) return true;
             return false;
         }
 
-        private UserWordsSegementer _ProcComplexSegmenter;
-        public UserWordsSegementer ProcSegmenter
+        public bool IsThisProperty(string name)
         {
-            get
+            ZCClassInfo zct = this.ClassContext.GetZCompilingType();//.ThisCompilingType;
+            foreach (ZCPropertyInfo member in zct.ZPropertys)
             {
-                if (_ProcComplexSegmenter == null)
-                {
-                    _ProcComplexSegmenter = this.ClassContext.FileContext.ImportUseContext.GetFileSegementer().Clone();
-                }
-                return _ProcComplexSegmenter;
-            }
-        }
-
-        Dictionary<string, SymbolLocalVar> localDefDict = new Dictionary<string, SymbolLocalVar>();
-
-        
-
-        public bool IsDefLocal(string name)
-        {
-            return localDefDict.ContainsKey(name);
-        }
-
-        public SymbolLocalVar GetDefLocal(string name)
-        {
-            return localDefDict[name];
-        }
-
-        public bool IsPropertyDef(string name)
-        {
-            //if (name.IndexOf("X速度") != -1)
-            //{
-            //    Debug.WriteLine("X速度");
-            //}
-            ZClassCompilingType zct = this.ClassContext.GetZCompilingType();//.ThisCompilingType;
-            foreach (var member in zct.ZMembers)
-            {
-                if (member.ContainsWord(name))
+                if (member.HasZName(name))
                     return true;
             }
             return false;
         }
 
-        public bool IsPropertyBase(string name)
+        public bool IsThisField(string name)
         {
-            ZClassType zbase = this.ClassContext.GetSuperZType();
+            return false;
+        }
+
+        public bool IsSuperProperty(string name)
+        {
+            ZLClassInfo zbase = this.ClassContext.GetSuperZType();
             if (zbase == null) return false;
-            ZMemberInfo zmember = zbase.SearchZMember(name);
+            ZLPropertyInfo zmember = zbase.SearchProperty(name);
             return zmember != null;
         }
 
-        public bool IsUseEnumItem(string name)
+        public bool IsSuperField(string name)
+        {
+            ZLClassInfo zbase = this.ClassContext.GetSuperZType();
+            if (zbase == null) return false;
+            var zmember = zbase.SearchField(name);
+            return zmember != null;
+        }
+
+        public bool IsUsedEnumItem(string name)
         {
             ContextImportUse contextiu = this.ClassContext.FileContext.ImportUseContext;
             return contextiu.IsUseEnumItem(name);
         }
 
-        public bool IsUseProperty(string name)
+        public bool IsUsedField(string name)
         {
             ContextImportUse importUseContext = this.ClassContext.FileContext.ImportUseContext;
-            return importUseContext.IsUseProperty(name);
+            return importUseContext.IsUsedField(name);
+        }
+
+        public bool IsUsedProperty(string name)
+        {
+            ContextImportUse importUseContext = this.ClassContext.FileContext.ImportUseContext;
+            return importUseContext.IsUsedProperty(name);
         }
 
         public bool IsCompilingClassName(string name)
@@ -150,12 +107,11 @@ namespace ZCompileCore.Contexts
         {
             ContextImportUse importUseContext = this.ClassContext.FileContext.ImportUseContext;
             return importUseContext.IsImportClassName(name);
-            
         }
 
         public bool IsThisMethodSingle(string name)
         {
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
             //ZClassCompilingType zcc = this.ClassContext.ThisCompilingType;
             var methods = this.ClassContext.SearchThisProc(calldesc);
@@ -165,7 +121,7 @@ namespace ZCompileCore.Contexts
         public bool IsSuperMethodSingle(string name)
         {
             if (this.IsStatic()) return false;
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
             var methods = this.ClassContext.SearchSuperProc(calldesc);
             return methods.Length > 0;
@@ -175,23 +131,31 @@ namespace ZCompileCore.Contexts
         {
             ContextImportUse importUseContext = this.ClassContext.FileContext.ImportUseContext;
             //ContextUse cu = this.ClassContext.FileContext.UseContext;
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
             var methods = importUseContext.SearchUseMethod(calldesc);
-            return methods != null && methods.Length>0;
+            return methods != null && methods.Length > 0;
         }
 
-        public void AddDefSymobl(SymbolArg argSymbol)
+        public ContextProc(ContextClass classContext)
         {
-            this.ProcSegmenter.AddWord(argSymbol.Name);
-            _argDefDict.Add(argSymbol.Name, argSymbol);
+            this.ClassContext = classContext;
+            ProcIndex++;
+            _KeyContext = ProcIndex.ToString();
         }
 
-        public void AddDefSymbol(SymbolLocalVar localSymbol)
+        protected Dictionary<string, ZCLocalVar> localDefDict = new Dictionary<string, ZCLocalVar>();
+
+        public bool IsDefLocal(string name)
         {
-            this.ProcSegmenter.AddWord(localSymbol.Name);
-            localDefDict.Add(localSymbol.Name, localSymbol);
+            return localDefDict.ContainsKey(name);
         }
+
+        public ZCLocalVar GetDefLocal(string name)
+        {
+            return localDefDict[name];
+        }
+
 
         #region create index :localvar ,arg, each
         int LoacalVarIndex = -1;
@@ -209,7 +173,7 @@ namespace ZCompileCore.Contexts
         {
             if (ArgIndex == -1)
             {
-                if(IsStatic())
+                if (IsStatic())
                 {
                     ArgIndex = 0;
                 }
@@ -227,11 +191,18 @@ namespace ZCompileCore.Contexts
             return ArgIndex;
         }
 
+        private int TempIndex = -1;
+        public int CreateTempIndex()
+        {
+            TempIndex++;
+            return TempIndex;
+        }
+
         int EachIndex = -1;
         //public List<string> ArgList = new List<string>();
-        public int CreateEachIndex( )
+        public int CreateEachIndex()
         {
-            EachIndex ++;
+            EachIndex++;
             //ArgList.Add(name);
             return EachIndex;
         }
@@ -245,102 +216,28 @@ namespace ZCompileCore.Contexts
 
         #endregion
 
-        private ProcEmitContext EmitContext { get; set; }
         public bool IsStatic()
         {
             return this.ClassContext.IsStatic();
         }
 
-        private int NestedIndex = 0;
-        public string CreateNestedClassName()
+        private UserWordsSegementer _ProcComplexSegmenter;
+        public UserWordsSegementer ProcSegmenter
         {
-            NestedIndex++;
-            return (ProcName ?? "") + "Nested" + NestedIndex;
-        }
-
-        #region Compiling
-
-        ZMethodCompiling methodCompiling;
-
-        public void SetMethodCompiling(ZMethodCompiling methodCompiling)
-        {
-            this.methodCompiling = methodCompiling;
-            this.ClassContext.AddMethod(methodCompiling);
-            this.ProcDesc = methodCompiling.ZDesces[0];
-        }
-
-        #endregion
-
-        #region Builder Emit
-
-        public void SetBuilder(MethodBuilder methodBuilder)
-        {
-            bool isStatic = this.IsStatic();
-            this.EmitContext.SetBuilder(methodBuilder);
-            if (!IsConstructor)
+            get
             {
-                this.methodCompiling.SetBuilder(methodBuilder);
-                this.ProcDesc.ZMethod =
-                    new ZMethodInfo(methodBuilder, isStatic, new ZMethodDesc[] { ProcDesc },
-                        AccessAttributeEnum.Public);
-                //ZClassCompilingType zct = this.ClassContext.GetZCompilingType();
-                //zct.SetMemberBuilder();
+                if (_ProcComplexSegmenter == null)
+                {
+                    _ProcComplexSegmenter = this.ClassContext.FileContext.ImportUseContext.GetFileSegementer().Clone();
+                }
+                return _ProcComplexSegmenter;
             }
         }
 
-        public void SetBuilder(ConstructorBuilder constructorBuilder)
+        public void AddLocalVar(ZCLocalVar localSymbol)
         {
-            bool isStatic = this.IsStatic();
-            this.EmitContext.SetBuilder(constructorBuilder);
+            this.ProcSegmenter.AddWord(localSymbol.ZName);
+            localDefDict.Add(localSymbol.ZName, localSymbol);
         }
-
-        public ParameterBuilder DefineParameter(int position, string strParamName)
-        {
-            if(this.EmitContext.CurrentMethodBuilder!=null)
-            {
-                ParameterBuilder pb = this.EmitContext.CurrentMethodBuilder.DefineParameter(position, ParameterAttributes.None, strParamName);
-                return pb;
-            }
-            else
-            {
-                ParameterBuilder pb = this.EmitContext.CurrentConstructorBuilder.DefineParameter(position, ParameterAttributes.None, strParamName);
-                return pb;
-            }
-        }
-
-        public ILGenerator GetILGenerator()
-        {
-            return this.EmitContext.ILout;
-        }
-
-        #endregion
-
-        public class ProcEmitContext
-        {
-            public MethodBuilder CurrentMethodBuilder { get; private set; }
-            public ConstructorBuilder CurrentConstructorBuilder { get; private set; }
-            //public string ContextKey { get; private set; }
-
-            public ProcEmitContext( )
-            {
-
-            }
-
-            public void SetBuilder(MethodBuilder methodBuilder)
-            {
-                CurrentMethodBuilder = methodBuilder;
-                ILout = methodBuilder.GetILGenerator();
-            }
-
-            public void SetBuilder(ConstructorBuilder constructorBuilder)
-            {
-                CurrentConstructorBuilder = constructorBuilder;
-                ILout = constructorBuilder.GetILGenerator();
-            }
-
-            public ILGenerator ILout { get;private set; }
-        }
-
-        
     }
 }

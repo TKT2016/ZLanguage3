@@ -17,75 +17,96 @@ namespace ZCompileCore.Parsers
     {
         ArrayTape<object> Tape;
         ContextExp Context;
-        ChainItemParser ItemParser;
-        Stack<object> chains = new Stack<object>();
+        Stack<ChainItemFeaturer> chains = new Stack<ChainItemFeaturer>();
 
-        WordCompilePart _CurrCompPart ; 
-
-        public Exp Parse(IEnumerable<object> elements, ContextExp context)
+        private void InitFields(IEnumerable<object> elements, ContextExp context)
         {
             Tape = new ArrayTape<object>(elements.ToArray());
             Context = context;
-            
-            ItemParser = new ChainItemParser(context);
+
+            //ItemParser = new ChainItemParser(context);
             chains.Clear();
             isParsedCurrCompPart = false;
-            while(!Tape.IsEnd)
+        }
+
+        private ChainItemFeaturer[] parseItems()
+        {
+            while (!Tape.IsEnd)
             {
-                object obj = ParseItem();
+                var obj = ParseItem();
                 chains.Push(obj);
             }
-            List<object> objs = chains.ToList();
+            var objs = chains.ToList();
             objs.Reverse();
-           
-            if(objs.Count==0)
+            return objs.ToArray();
+        }
+
+        public Exp Parse(IEnumerable<object> elements, ContextExp context)
+        {
+            InitFields(elements,context);
+
+            ChainItemFeaturer[] objs = parseItems();
+
+            int objSize = objs.Length;
+            if (objSize  == 0)
             {
                 return null;
             }
-            else if (objs.Count == 1)
+            else if (objSize == 1)
             {
-                if(objs[0] is ExpProcNamePart)
-                {
-                    LexToken tok = (objs[0] as ExpProcNamePart).PartNameToken;
-                    string text = tok.GetText();
-                    var ProcContext = this.Context.ProcContext;
-                    if (ProcContext.IsThisMethodSingle(text))
-                    {
-                        ExpCallSingleThis pptExp = new ExpCallSingleThis(tok);
-                        pptExp.SetContext(this.Context);
-                        return pptExp.Analy();
-                    }
-                    else if (ProcContext.IsSuperMethodSingle(text))
-                    {
-                        ExpCallSingleSuper pptExp = new ExpCallSingleSuper(tok);
-                        pptExp.SetContext(this.Context);
-                        return pptExp.Analy();
-                    }
-                    else if (ProcContext.IsUseMethodSingle(text))
-                    {
-                        ExpCallSingleUse pptExp = new ExpCallSingleUse(tok);
-                        pptExp.SetContext(this.Context);
-                        return pptExp.Analy();
-                    }
-                    else
-                    {
-                        return new ExpErrorToken(tok, (objs[0] as ExpProcNamePart).ExpContext);
-                    }
-                }
-                else
-                {
-                    return (Exp)objs[0];
-                }
+                return Parse1(objs[0]);
             }
-            else if (objs.Count == 2 && (objs[0] is ExpTypeBase) && IsArg(objs[1]))
+            else if (objSize == 2 && (objs[0].Data is ExpTypeBase) && IsArg(objs[1]))
             {
-                return ParseToExpNew((ExpTypeBase)objs[0], (Exp)objs[1]);
+                return ParseToExpNew((ExpTypeBase)objs[0].Data, (Exp)objs[1].Data);
             }
             else
             {
-                ExpCall callExp = new ExpCall(objs.Select(p => (Exp)p));
+                ExpCall callExp = new ExpCall(objs.Select(p => (Exp)p.Data));
                 callExp.SetContext(this.Context);
                 return callExp.Analy();
+            }
+        }
+
+        private Exp Parse1(ChainItemFeaturer cif)
+        {
+            var data = cif.Data;
+            if (data is ExpProcNamePart)
+            {
+                ExpProcNamePart dataExp = (ExpProcNamePart)data;
+                LexToken tok = dataExp.PartNameToken;
+                string text = tok.GetText();
+                var ProcContext = this.Context.ProcContext;
+                if (ProcContext.IsThisMethodSingle(text))
+                {
+                    ExpCallSingleThis pptExp = new ExpCallSingleThis(tok);
+                    pptExp.SetContext(this.Context);
+                    return pptExp.Analy();
+                }
+                else if (ProcContext.IsSuperMethodSingle(text))
+                {
+                    ExpCallSingleSuper pptExp = new ExpCallSingleSuper(tok);
+                    pptExp.SetContext(this.Context);
+                    return pptExp.Analy();
+                }
+                else if (ProcContext.IsUseMethodSingle(text))
+                {
+                    ExpCallSingleUse pptExp = new ExpCallSingleUse(tok);
+                    pptExp.SetContext(this.Context);
+                    return pptExp.Analy();
+                }
+                else
+                {
+                    return new ExpErrorToken(tok, dataExp.ExpContext);
+                }
+            }
+            else if(cif.IsExp)
+            {
+                return (Exp)data;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -98,78 +119,71 @@ namespace ZCompileCore.Parsers
             return exp3;
         }
 
-        private bool IsArg(object obj)
+        private bool IsArg(ChainItemFeaturer obj)
         {
-            if (!(obj is Exp)) return false;
-            if ((obj is ExpError)) return false;
-            if ((obj is ExpProcNamePart)) return false;
+            if (!(obj.Data is Exp)) return false;
+            if ((obj.Data is ExpError)) return false;
+            if ((obj.Data is ExpProcNamePart)) return false;
             return true;
         }
 
-        private object ParseItem()
+        private ChainItemFeaturer ParseItem()
         {
-            object obj = null;
-            //if (Tape.Current.ToString().IndexOf("速度") != -1)
+            ChainItemFeaturer cf = CurrentItem;// new ChainItemFeaturer(this.Context, Tape.Current);
+            //if (CurrentItem.Data.ToString().IndexOf("W")!=-1)
             //{
-            //    Console.WriteLine("速度");
+            //    Console.WriteLine("W");
             //}
+            object obj = null;
             //WordCompilePart curcp = ItemParser.ParseCompilePart(Tape.Current);
-            if (CurrCompPart == WordCompilePart.de)
+            if (cf.IsDe)//(CurrCompPart == WordCompilePart.de)
             {
                 obj=ParseDe();
                 //chains.Push(obj);
             }
-            else if (CurrCompPart == WordCompilePart.di)
+            else if (cf.IsDi)//(CurrCompPart == WordCompilePart.di)
             {
                 obj = ParseDi();
                 //chains.Push(obj);
             }
-            else if (CurrCompPart == WordCompilePart.exp)
+            else if (cf.IsExp)//(CurrCompPart == WordCompilePart.exp)
             {
                 obj = ParseItemExp();
                 //chains.Push(obj);
             }
-            else if (CurrCompPart == WordCompilePart.localvar
-                || CurrCompPart == WordCompilePart.literal
-                || CurrCompPart == WordCompilePart.property_this
-                || CurrCompPart == WordCompilePart.property_base
-                || CurrCompPart == WordCompilePart.enumitem_use
-                || CurrCompPart == WordCompilePart.property_use
-                 || CurrCompPart == WordCompilePart.arg
-                )
+            else if(cf.IsLocalVar || cf.IsLiteral || cf.IsThisProperty || cf.IsSuperProperty
+                || cf.IsUsedEnumItem|| cf.IsUsedProperty||cf.IsParameter|| cf.IsUsedField|| cf.IsThisField)
             {
                 obj = ParseExpect_Var();
-                //chains.Push(obj);
             }
-            else if (CurrCompPart == WordCompilePart.tname_this
-                || CurrCompPart == WordCompilePart.tname_import)
+            else if (cf.IsThisClassName || cf.IsImportTypeName)
             {
                 Exp exp = ParseTypes();
                 obj = exp;
                 if (exp is ExpTypeUnsure)
                 {
                     ExpTypeUnsure expType = (ExpTypeUnsure)exp;
-                    if (CurrCompPart != WordCompilePart.de && CurrCompPart != WordCompilePart.di
-                        && CurrCompPart!= WordCompilePart.none)
+                    if (!CurrentItem.IsNone && !CurrentItem.IsDe && !CurrentItem.IsDi  )
                     {
-                        object nextObj = ParseItem();
-                        if ((nextObj is ExpBracket)
-                            || (nextObj is ExpLiteral)
-                            || (nextObj is ExpVarBase)
+                        var nextObj = ParseItem();
+                        if ((nextObj.Data is ExpBracket)
+                            || (nextObj.Data is ExpLiteral)
+                            || (nextObj.Data is ExpVarBase)
                             )
                         {
-                            Exp newexp = ParseToExpNew(expType,(Exp)nextObj);
+                            Exp newexp = ParseToExpNew(expType,(Exp)nextObj.Data);
                             obj = newexp;
                         }
                         else 
                         {
-                            chains.Push(exp);
+                            var obj2 = NewFeaturer(exp);
+                            chains.Push(obj2);
                             obj = nextObj;
                         }
                     }
                 }
             }
-            else if (CurrCompPart == WordCompilePart.str)
+            else if (CurrentItem.IsText)
             {
                 Exp exp = ParseStr();
                 obj = exp;
@@ -178,7 +192,14 @@ namespace ZCompileCore.Parsers
             {
                 throw new CCException();
             }
-            return obj;
+            return NewFeaturer(obj);
+        }
+
+        private ChainItemFeaturer NewFeaturer(object obj)
+        {
+            if (obj == null) return new ChainItemFeaturer();
+            else if (obj is ChainItemFeaturer) return (ChainItemFeaturer)obj;
+            else return new ChainItemFeaturer(this.Context,obj);
         }
 
         private ExpBracket WarpExp(Exp exp)
@@ -201,8 +222,7 @@ namespace ZCompileCore.Parsers
         private Exp ParseTypes()
         {
             List<LexToken> tokens = new List<LexToken> ();
-                while(Tape.IsEnd ==false && (CurrCompPart == WordCompilePart.tname_this
-                || CurrCompPart == WordCompilePart.tname_import))
+                while(Tape.IsEnd ==false && (CurrentItem.IsThisClassName || CurrentItem.IsImportTypeName) )
                 {
                     LexToken tok = (LexToken)Tape.Current;
                     tokens.Add(tok);
@@ -219,6 +239,7 @@ namespace ZCompileCore.Parsers
             
             deexp.KeyToken = (LexToken)Tape.Current;
             deexp.LeftExp = PopChainsExp();
+            
             MoveNext();
             if(Tape.Current is LexToken)
             {
@@ -247,7 +268,7 @@ namespace ZCompileCore.Parsers
         private Exp ParseExpect_Exp_Var()
         {
             Exp exp = null;
-            if (CurrCompPart == WordCompilePart.exp)
+            if (CurrentItem.IsExp)// == WordCompilePart.exp)
             {
                 exp = ParseItemExp();
             }
@@ -260,35 +281,65 @@ namespace ZCompileCore.Parsers
 
         private Exp ParseExpect_Var()
         {
-            if (CurrCompPart == WordCompilePart.localvar)
+            if (CurrentItem.IsLocalVar)// == WordCompilePart.localvar)
             {
                 return ParseLocalVar();
             }
-            else if (CurrCompPart == WordCompilePart.literal)
+            else if (CurrentItem.IsLiteral)// == WordCompilePart.literal)
             {
                 return ParseLiteral();
             }
-            else if (CurrCompPart == WordCompilePart.arg)
+            else if (CurrentItem.IsParameter)// == WordCompilePart.arg)
             {
                 return ParseArg();
             }
-            else if (CurrCompPart == WordCompilePart.property_this)
+            else if (CurrentItem.IsThisProperty)// == WordCompilePart.property_this)
             {
                 return ParsePropertyThis();
             }
-            else if (CurrCompPart == WordCompilePart.property_base)
+            else if (CurrentItem.IsSuperProperty)// == WordCompilePart.property_base)
             {
-                return ParsePropertyBase();
+                return ParsePropertySuper();
             }
-            else if (CurrCompPart == WordCompilePart.enumitem_use)
+            else if (CurrentItem.IsSuperField)
+            {
+                return ParseFieldSuper();
+            }
+            else if (CurrentItem.IsUsedEnumItem)// == WordCompilePart.enumitem_use)
             {
                 return ParseEnumItemUse();
             }
-            else if (CurrCompPart == WordCompilePart.property_use)
+            else if (CurrentItem.IsUsedProperty)// == WordCompilePart.property_use)
             {
                 return ParsePropertyUse();
             }
+            else if (CurrentItem.IsThisField)
+            {
+                return ParseFieldThis();
+            }
+            else if (CurrentItem.IsUsedField)
+            {
+                return ParseFieldUse();
+            }
             return null;
+        }
+
+        private Exp ParseFieldThis()
+        {
+            LexToken tok = (LexToken)Tape.Current;
+            MoveNext();
+            ExpDefField exp2 = new ExpDefField(tok);
+            exp2.SetContext(this.Context);
+            return exp2.Analy();
+        }
+
+        private Exp ParseFieldUse()
+        {
+            LexToken tok = (LexToken)Tape.Current;
+            MoveNext();
+            ExpUseField exp2 = new ExpUseField(tok);
+            exp2.SetContext(this.Context);
+            return exp2.Analy();
         }
 
         private Exp ParseEnumItemUse()
@@ -309,11 +360,20 @@ namespace ZCompileCore.Parsers
             return exp2.Analy();
         }
 
-        private Exp ParsePropertyBase()
+        private Exp ParsePropertySuper()
         {
             LexToken tok = (LexToken)Tape.Current;
             MoveNext();
             ExpSuperProperty exp2 = new ExpSuperProperty(tok);
+            exp2.SetContext(this.Context);
+            return exp2.Analy();
+        }
+
+        private Exp ParseFieldSuper()
+        {
+            LexToken tok = (LexToken)Tape.Current;
+            MoveNext();
+            ExpSuperField exp2 = new ExpSuperField(tok);
             exp2.SetContext(this.Context);
             return exp2.Analy();
         }
@@ -379,25 +439,42 @@ namespace ZCompileCore.Parsers
             isParsedCurrCompPart = false;
         }
 
-        private WordCompilePart CurrCompPart
+        ChainItemFeaturer _CurItem;
+        private ChainItemFeaturer CurrentItem
         {
             get
             {
                 if (!isParsedCurrCompPart)
-                { 
-                    if (Tape.Current == null) return WordCompilePart.none;
-                    //if (Tape.Current.ToString().IndexOf("敌人子弹") != -1)
-                    //{
-                    //    Console.WriteLine("敌人子弹");
-                    //}
-                    _CurrCompPart = ItemParser.ParseCompilePart(Tape.Current);
-                    isParsedCurrCompPart = true;
+                {
+                    if (Tape.Current == null)
+                    {
+                        _CurItem = new ChainItemFeaturer();
+                    }
+                    else
+                    {
+                        _CurItem = new ChainItemFeaturer(this.Context, Tape.Current);
+                    }
+                   isParsedCurrCompPart = true;
                 }
-                return _CurrCompPart;
+                return _CurItem;
             }
         }
 
-        private object PopChains()
+        //private WordCompilePart CurrCompPart
+        //{
+        //    get
+        //    {
+        //        if (!isParsedCurrCompPart)
+        //        { 
+        //            if (Tape.Current == null) return WordCompilePart.none;
+        //            _CurrCompPart = ItemParser.ParseCompilePart(Tape.Current);
+        //            isParsedCurrCompPart = true;
+        //        }
+        //        return _CurrCompPart;
+        //    }
+        //}
+
+        private ChainItemFeaturer PopChains()
         {
             if (this.chains.Count > 0)
             {
@@ -406,7 +483,7 @@ namespace ZCompileCore.Parsers
             return null;
         }
 
-        private object PeekChains()
+        private ChainItemFeaturer PeekChains()
         {
             if (this.chains.Count > 0)
             {
@@ -417,11 +494,11 @@ namespace ZCompileCore.Parsers
 
         private Exp PopChainsExp()
         {
-            object obj = PeekChains();
+            var obj = PeekChains();
             if (obj == null) return null;
-            if (!(obj is Exp)) return null;
+            if (!(obj.IsExp)) return null;
             PopChains();
-            return (Exp)obj;
+            return (Exp)obj.Data;
         }
 
     }

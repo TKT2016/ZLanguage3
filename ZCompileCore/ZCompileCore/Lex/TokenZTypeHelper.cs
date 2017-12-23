@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZCompileDesc;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 
 namespace ZCompileCore.Lex
 {
     public static class TokenZTypeHelper
     {
-        public static ZClassType GetLiteralZType(LexToken LiteralToken)
+        public static ZLClassInfo GetLiteralZType(LexToken LiteralToken)
         {
-            ZClassType RetType = null; ;
+            ZLClassInfo RetType = null; ;
             var LiteralKind = LiteralToken.Kind;
             var LiteralValue = LiteralToken.GetText();
 

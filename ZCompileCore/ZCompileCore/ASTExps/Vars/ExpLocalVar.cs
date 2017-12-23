@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -18,7 +17,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpLocalVar : ExpLocal
     {
-        public SymbolLocalVar LocalVarSymbol { get; protected set; }
+        public ZCLocalVar LocalVarSymbol { get; protected set; }
 
         public ExpLocalVar(LexToken token)
         {
@@ -30,7 +29,7 @@ namespace ZCompileCore.ASTExps
         {
             if (this.ExpContext == null) throw new CCException();
             LocalVarSymbol = this.ProcContext.GetDefLocal(VarName);
-            RetType = LocalVarSymbol.SymbolZType;
+            RetType = LocalVarSymbol.GetZType();
             return this;
         }
 
@@ -58,11 +57,16 @@ namespace ZCompileCore.ASTExps
             base.EmitConv();
         }
 
+        public void EmitLoadLocala()
+        {
+            EmitHelper.LoadVara(IL, LocalVarSymbol.VarBuilder);
+        }
+
         private void EmitGetNested()
         {
             if (this.NestedFieldSymbol != null)
             {
-                EmitHelper.Emit_LoadThis(IL,false);
+                EmitHelper.EmitThis(IL, false);
                 EmitSymbolHelper.EmitLoad(IL, this.NestedFieldSymbol);
                 base.EmitConv();
             }
@@ -84,8 +88,8 @@ namespace ZCompileCore.ASTExps
             }
         }
 
-        ZMemberCompiling NestedFieldSymbol;
-        public void SetAsLambdaFiled(ZMemberCompiling fieldSymbol)
+        ZCFieldInfo NestedFieldSymbol;
+        public override void SetAsLambdaFiled(ZCFieldInfo fieldSymbol)
         {
             NestedFieldSymbol = fieldSymbol;
         }
@@ -94,7 +98,7 @@ namespace ZCompileCore.ASTExps
         {
             if (this.NestedFieldSymbol != null)
             {
-                EmitHelper.Emit_LoadThis(IL,false);
+                EmitHelper.EmitThis(IL, false);
                 EmitValueExp(valueExp);
                 EmitSymbolHelper.EmitStorm(IL, this.NestedFieldSymbol);
             }
@@ -119,7 +123,7 @@ namespace ZCompileCore.ASTExps
         {
             get
             {
-                return LocalVarSymbol.CanWrite;
+                return LocalVarSymbol.GetCanWrite();
             }
         }
         #endregion

@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
-using ZCompileCore.Symbols;
-using ZCompileDesc.Compilings;
+
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
 using ZCompileKit;
 using ZCompileKit.Tools;
 
@@ -11,10 +9,214 @@ namespace ZCompileCore.Tools
 {
     public static class EmitSymbolHelper
     {
-        public static bool NeedCallThis(SymbolBase symbol)
+        //public static bool EmitLoad(ILGenerator il, IIdent iident)
+        //{
+        //    if (iident is ZLParamInfo)
+        //    {
+        //        EmitLoad(il, (ZLParamInfo)iident); 
+        //        return true;
+        //    }
+        //    else if (iident is ZCParamInfo)
+        //    {
+        //        EmitLoad(il, (ZCParamInfo)iident);
+        //        return true;
+        //    }
+        //    else if (iident is ZCLocalVar)
+        //    {
+        //        EmitLoad(il, (ZCLocalVar)iident);
+        //        return true;
+        //    }
+        //    else if (iident is ZCFieldInfo)
+        //    {
+        //        EmitLoad(il, (ZCFieldInfo)iident);
+        //        return true;
+        //    }
+        //    else if (iident is ZLFieldInfo)
+        //    {
+        //        EmitLoad(il, (ZLFieldInfo)iident);
+        //        return true;
+        //    }
+        //    else if (iident is ZLPropertyInfo)
+        //    {
+        //        EmitLoad(il, (ZLPropertyInfo)iident);
+        //        return true;
+        //    }
+        //    else if (iident is ZCPropertyInfo)
+        //    {
+        //        EmitLoad(il, (ZCPropertyInfo)iident);
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //    //EmitHelper.LoadArg(il, zcparam.EmitIndex);
+        //}
+
+        public static bool EmitLoada(ILGenerator il, IIdent iident)
         {
-            if (symbol is SymbolLocalVar) return false;
-            else if (symbol is SymbolArg) return false;
+            if (iident is ZAParamInfo)
+            {
+                ZAParamInfo zlp = (ZAParamInfo)iident;
+                EmitHelper.LoadArga(il, zlp.GetEmitIndex());
+                return true;
+            }
+            else if (iident is ZCLocalVar)
+            {
+                ZCLocalVar zlp = (ZCLocalVar)iident;
+                EmitHelper.LoadVara(il, zlp.VarBuilder);
+                return true;
+            }
+            else if (iident is ZCFieldInfo)
+            {
+                ZCFieldInfo zlp = (ZCFieldInfo)iident;
+                EmitHelper.LoadFielda(il, zlp.FieldBuilder);
+                return true;
+            }
+            else if (iident is ZLFieldInfo)
+            {
+                ZLFieldInfo zlp = (ZLFieldInfo)iident;
+                EmitHelper.LoadFielda(il, zlp.SharpField);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            //EmitHelper.LoadArg(il, zcparam.EmitIndex);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZAPropertyInfo memberCompiling)
+        {
+            if(memberCompiling is ZLPropertyInfo)
+            {
+                EmitLoad(il, (ZLPropertyInfo)memberCompiling);
+            }
+            else if (memberCompiling is ZCPropertyInfo)
+            {
+                EmitLoad(il, (ZCPropertyInfo)memberCompiling);
+            }
+            else
+            {
+                throw new CCException();
+            }
+        }
+
+        public static void EmitLoad(ILGenerator il, ZLFieldInfo zfield)
+        {
+            EmitHelper.LoadField(il, zfield.SharpField);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZCPropertyInfo memberCompiling)
+        {
+            PropertyBuilder propertyBuilder = memberCompiling.PropertyBuilder;
+            MethodInfo getMethod = propertyBuilder.GetGetMethod();
+            EmitHelper.CallDynamic(il, getMethod);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZLPropertyInfo property)
+        {
+            var ppi = property.SharpProperty;
+            MethodInfo getMethod = ppi.GetGetMethod();
+            EmitHelper.CallDynamic(il, getMethod);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZCLocalVar symbolVar)
+        {
+            EmitHelper.LoadVar(il, symbolVar.VarBuilder);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZCParamInfo zcparam)
+        {
+            EmitHelper.LoadArg(il,zcparam.EmitIndex);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZLParamInfo zcparam)
+        {
+            EmitHelper.LoadArg(il, zcparam.EmitIndex);
+        }
+
+        public static void EmitLoad(ILGenerator il, ZCFieldInfo memberCompiling)
+        {
+             EmitHelper.LoadField(il, memberCompiling.FieldBuilder);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZCFieldInfo memberCompiling)
+        {
+            EmitHelper.StormField(il, memberCompiling.FieldBuilder);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZLFieldInfo memberCompiling)
+        {
+            EmitHelper.StormField(il, memberCompiling.SharpField);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZCPropertyInfo memberCompiling)
+        {
+            PropertyBuilder propertyBuilder = memberCompiling.PropertyBuilder;
+            MethodInfo setMethod = propertyBuilder.GetSetMethod();
+            EmitHelper.CallDynamic(il, setMethod);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZLPropertyInfo memberCompiling)
+        {
+            var property = memberCompiling.SharpProperty;
+            MethodInfo setMethod = property.GetSetMethod();
+            EmitHelper.CallDynamic(il, setMethod);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZCLocalVar symbolVar)
+        {
+            EmitHelper.StormVar(il, symbolVar.VarBuilder);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZCParamInfo argsymbol)
+        {
+            EmitHelper.StormArg(il, argsymbol.EmitIndex);
+        }
+
+        public static void EmitStorm(ILGenerator il, ZLParamInfo zp)
+        {
+            EmitHelper.StormArg(il, zp.EmitIndex);
+        }
+
+        //public static void EmitStorm(ILGenerator il, IIdent symbol)
+        //{
+        //    if (symbol is ZCLocalVar)
+        //    {
+        //        var symbolVar = symbol as ZCLocalVar;
+        //        EmitHelper.StormVar(il, symbolVar.VarBuilder);
+        //    }
+        //    //else if (symbol is SymbolArg)
+        //    //{
+        //    //    SymbolArg argsymbol = (symbol as SymbolArg);
+        //    //    EmitHelper.StormArg(il, argsymbol.ArgIndex);
+        //    //}
+        //    //else if (symbol is SymbolDefProperty)
+        //    //{
+        //    //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
+        //    //    MethodInfo setMethod = symbol2.Property.GetSetMethod();
+        //    //    EmitHelper.CallDynamic(il, setMethod);
+        //    //}
+        //    //else if (symbol is SymbolDefField)
+        //    //{
+        //    //    SymbolDefField symbol2 = (symbol as SymbolDefField);
+        //    //    EmitHelper.StormField(il, symbol2.Field);
+        //    //}
+        //    //else if (symbol is SymbolRefStaticMember)
+        //    //{
+        //    //    EmitStorm(il, symbol as SymbolRefStaticMember);
+        //    //}
+        //    else
+        //    {
+        //        throw new CCException();
+        //    }
+        //}
+
+        public static bool NeedCallThis(IIdent symbol)
+        {
+            if (symbol is ZCLocalVar) return false;
+            else if (symbol is ZCParamInfo) return false;
             //else if (symbol is SymbolDefProperty) 
             //{
             //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
@@ -34,163 +236,5 @@ namespace ZCompileCore.Tools
                 throw new CCException();
             }
         }
-
-        public static void EmitLoad(ILGenerator il, SymbolLocalVar symbolVar)
-        {
-            EmitHelper.LoadVar(il, symbolVar.VarBuilder);
-        }
-
-        public static void EmitLoad(ILGenerator il, SymbolArg argsymbol)
-        {
-            EmitHelper.LoadArg(il, argsymbol.ArgIndex);
-        }
-
-        public static void EmitLoad(ILGenerator il, SymbolBase symbol)
-        {
-            if (symbol is SymbolLocalVar)
-            {
-                var symbolVar = symbol as SymbolLocalVar;
-                EmitHelper.LoadVar(il, symbolVar.VarBuilder);
-            }
-            else if (symbol is SymbolArg)
-            {
-                SymbolArg argsymbol = (symbol as SymbolArg);
-                EmitHelper.LoadArg(il, argsymbol.ArgIndex);
-            }
-            //else if (symbol is SymbolDefProperty)
-            //{
-            //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
-            //    MethodInfo getMethod = symbol2.Property.GetGetMethod();
-            //    EmitHelper.CallDynamic(il, getMethod);
-            //}
-            //else if (symbol is SymbolDefField)
-            //{
-            //    SymbolDefField symbol2 = (symbol as SymbolDefField);
-            //    EmitHelper.LoadField(il, symbol2.Field);
-            //}
-            //else if (symbol is SymbolRefStaticMember)
-            //{
-            //    EmitLoad(il, symbol as SymbolRefStaticMember);
-            //}
-            else
-            {
-                throw new CCException();
-            }
-        }
-
-        //public static void EmitLoad(ILGenerator il, SymbolRefStaticMember symbol)
-        //{
-        //    if (symbol.ZMember is ZPropertyInfo)
-        //    {
-        //        MethodInfo getMethod = (symbol.ZMember as ZPropertyInfo).SharpProperty.GetGetMethod();
-        //        EmitHelper.CallDynamic(il, getMethod);
-        //    }
-        //    else if (symbol.ZMember is ZFieldInfo)
-        //    {
-        //        EmitHelper.LoadField(il, (symbol.ZMember as ZFieldInfo).SharpField);
-        //    }
-        //    else if (symbol.ZMember is ZEnumItemInfo)
-        //    {
-        //        int enumValue = (int)((symbol.ZMember as ZEnumItemInfo).Value);
-        //        EmitHelper.LoadInt(il, enumValue);
-        //    }
-        //    else
-        //    {
-        //        throw new CCException();
-        //    }
-        //}
-
-        public static void EmitLoad(ILGenerator il, ZMemberCompiling memberCompiling)
-        {
-            if (memberCompiling.IsField())
-            {
-                EmitHelper.LoadField(il, (FieldBuilder)(memberCompiling.GetBuilder()));
-            }
-            else
-            {
-                PropertyBuilder propertyBuilder = (PropertyBuilder)(memberCompiling.GetBuilder());
-                MethodInfo getMethod = propertyBuilder.GetGetMethod();
-                EmitHelper.CallDynamic(il, getMethod);
-            }
-        }
-
-        public static void EmitStorm(ILGenerator il, ZMemberCompiling memberCompiling)
-        {
-            if (memberCompiling.IsField())
-            {
-                EmitHelper.StormField(il, (FieldBuilder)(memberCompiling.GetBuilder()));
-            }
-            else
-            {
-                PropertyBuilder propertyBuilder = (PropertyBuilder)(memberCompiling.GetBuilder());
-                MethodInfo setMethod = propertyBuilder.GetSetMethod();
-                EmitHelper.CallDynamic(il, setMethod);
-            }
-        }
-
-        public static void EmitStorm(ILGenerator il, SymbolLocalVar symbolVar)
-        {
-            EmitHelper.StormVar(il, symbolVar.VarBuilder);
-        }
-
-        public static void EmitStorm(ILGenerator il, SymbolArg argsymbol)
-        {
-            EmitHelper.StormArg(il, argsymbol.ArgIndex);
-        }
-
-        public static void EmitStorm(ILGenerator il, SymbolBase symbol)
-        {
-            if (symbol is SymbolLocalVar)
-            {
-                var symbolVar = symbol as SymbolLocalVar;
-                EmitHelper.StormVar(il, symbolVar.VarBuilder);
-            }
-            else if (symbol is SymbolArg)
-            {
-                SymbolArg argsymbol = (symbol as SymbolArg);
-                EmitHelper.StormArg(il, argsymbol.ArgIndex);
-            }
-            //else if (symbol is SymbolDefProperty)
-            //{
-            //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
-            //    MethodInfo setMethod = symbol2.Property.GetSetMethod();
-            //    EmitHelper.CallDynamic(il, setMethod);
-            //}
-            //else if (symbol is SymbolDefField)
-            //{
-            //    SymbolDefField symbol2 = (symbol as SymbolDefField);
-            //    EmitHelper.StormField(il, symbol2.Field);
-            //}
-            //else if (symbol is SymbolRefStaticMember)
-            //{
-            //    EmitStorm(il, symbol as SymbolRefStaticMember);
-            //}
-            else
-            {
-                throw new CCException();
-            }
-        }
-
-        //public static void EmitStorm(ILGenerator il, SymbolRefStaticMember symbol)
-        //{
-        //    if (symbol.ZMember is ZPropertyInfo)
-        //    {
-        //        MethodInfo setMethod = (symbol.ZMember as ZPropertyInfo).SharpProperty.GetSetMethod();
-        //        EmitHelper.CallDynamic(il, setMethod);
-        //    }
-        //    else if (symbol.ZMember is ZFieldInfo)
-        //    {
-        //        EmitHelper.StormField(il, (symbol.ZMember as ZFieldInfo).SharpField);
-        //    }
-        //    else if (symbol.ZMember is ZEnumItemInfo)
-        //    {
-        //        int enumValue = (int)((symbol.ZMember as ZEnumItemInfo).Value);
-        //        EmitHelper.LoadInt(il, enumValue);
-        //    }
-        //    else
-        //    {
-        //        throw new CCException();
-        //    }
-        //}
     }
 }

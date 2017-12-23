@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
 using ZCompileDesc;
 
 namespace ZCompileCore.Contexts
@@ -14,15 +12,15 @@ namespace ZCompileCore.Contexts
     public class ContextUse
     {
         //public ContextFile FileContext { get; private set; }
-        public List<ZClassType> UseZClassList { get; private set; }
-        public List<ZEnumType> UseZEnumList { get; private set; }
-        public List<ZDimType> UseZDimList { get; private set; }
+        public List<ZLClassInfo> UseZClassList { get; private set; }
+        public List<ZLEnumInfo> UseZEnumList { get; private set; }
+        public List<ZLDimInfo> UseZDimList { get; private set; }
         //public UseSymbolTable SymbolTable { get; private set; }
         public ContextUse()
         {
-            UseZClassList = new List<ZClassType>();
-            UseZEnumList = new List<ZEnumType>();
-            UseZDimList = new List<ZDimType>();
+            UseZClassList = new List<ZLClassInfo>();
+            UseZEnumList = new List<ZLEnumInfo>();
+            UseZDimList = new List<ZLDimInfo>();
             //SymbolTable = new UseSymbolTable("Use", null, UseZClassList, UseZEnumList);
         }
 
@@ -38,26 +36,26 @@ namespace ZCompileCore.Contexts
             return useTypes.ContainsKey(ztypeName);
         }
 
-        public void AddUseType(IZDescType iztype)
+        public void AddUseType(ZLType iztype)
         {
-            string key = iztype.ZName;
+            string key = iztype.ZTypeName;
             useTypes.Remove(key);
-            useTypes.Add(iztype.ZName, iztype);
+            useTypes.Add(iztype.ZTypeName, iztype);
         }
 
-        public void Add(IZDescType iztype)
+        public void Add(ZLType iztype)
         {
-            if(iztype is ZEnumType)
+            if(iztype is ZLEnumInfo)
             {
-                UseZEnumList.Add(iztype as ZEnumType);
+                UseZEnumList.Add(iztype as ZLEnumInfo);
             }
-            else if (iztype is ZDimType)
+            else if (iztype is ZLDimInfo)
             {
-                UseZDimList.Add(iztype as ZDimType);
+                UseZDimList.Add(iztype as ZLDimInfo);
             }
-            else if (iztype is ZClassType)
+            else if (iztype is ZLClassInfo)
             {
-                UseZClassList.Add(iztype as ZClassType);
+                UseZClassList.Add(iztype as ZLClassInfo);
             }
             else
             {
@@ -65,10 +63,10 @@ namespace ZCompileCore.Contexts
             }
         }
 
-        public ZMethodInfo[] SearchUseMethod(ZCallDesc calldesc)
+        public ZLMethodInfo[] SearchUseMethod(ZMethodCall calldesc)
         {
-            List<ZMethodInfo> list = new List<ZMethodInfo>();
-            foreach (ZClassType zclass in UseZClassList)
+            List<ZLMethodInfo> list = new List<ZLMethodInfo>();
+            foreach (ZLClassInfo zclass in UseZClassList)
             {
                 //if (zclass.IsStatic)
                 {
@@ -82,13 +80,13 @@ namespace ZCompileCore.Contexts
             return list.ToArray();
         }
 
-        public ZMemberInfo SearchUseZMember(string name)
+        public ZLPropertyInfo SearchUseZProperty(string name)
         {
-            foreach (ZClassType zclass in this.UseZClassList)
+            foreach (ZLClassInfo zclass in this.UseZClassList)
             {
                 //if (zclass.IsStatic)
                 {
-                    var zitem = zclass.SearchZMember(name);
+                    var zitem = zclass.SearchProperty(name);
                     if (zitem != null)
                     {
                         return zitem;
@@ -98,13 +96,44 @@ namespace ZCompileCore.Contexts
             return null;
         }
 
-        public bool IsUseProperty(string name)
+        public ZLFieldInfo SearchUseZField(string name)
         {
-            foreach (ZClassType zclass in UseZClassList)
+            foreach (ZLClassInfo zclass in this.UseZClassList)
             {
                 //if (zclass.IsStatic)
                 {
-                    if (zclass.SearchZMember(name) != null)
+                    var zitem = zclass.SearchField(name);
+                    if (zitem != null)
+                    {
+                        return zitem;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public bool IsUsedProperty(string name)
+        {
+            foreach (ZLClassInfo zclass in UseZClassList)
+            {
+                //if (zclass.IsStatic)
+                {
+                    if (zclass.SearchProperty(name) != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool IsUsedField(string name)
+        {
+            foreach (ZLClassInfo zclass in UseZClassList)
+            {
+                //if (zclass.IsStatic)
+                {
+                    if (zclass.SearchField(name) != null)
                     {
                         return true;
                     }

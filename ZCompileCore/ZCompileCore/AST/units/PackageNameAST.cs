@@ -7,7 +7,7 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+
 
 namespace ZCompileCore.AST
 {
@@ -15,7 +15,7 @@ namespace ZCompileCore.AST
     {
         public List<LexToken> Tokens { get; protected set; }
         public string PackageFullName { get; protected set; }
-        public ZPackageDesc ZPackage { get; protected set; }
+        public ZPackageInfo ZPackage { get; protected set; }
        
         public PackageNameAST()
         {
@@ -49,7 +49,7 @@ namespace ZCompileCore.AST
         private bool LoadPackageTypes( )
         {
             var fileContext = this.FileContext;
-            ZPackageDesc packageDesc = fileContext.ProjectContext.SearchZPackageDesc(this.PackageFullName);
+            ZPackageInfo packageDesc = fileContext.ProjectContext.SearchZPackageDesc(this.PackageFullName);
             if (packageDesc == null)
             {
                 ErrorF(this.Position, "不存在'{0}'开发包", PackageFullName);
@@ -62,7 +62,7 @@ namespace ZCompileCore.AST
             return true;
         }
 
-        private void AddPackage(ZPackageDesc zdesc)
+        private void AddPackage(ZPackageInfo zdesc)
         {
             ContextImportUse contextiu = this.FileContext.ImportUseContext;
             foreach (var item in zdesc.EnumTypes)
@@ -70,9 +70,9 @@ namespace ZCompileCore.AST
                 contextiu.AddImportType(item);
             }
 
-            foreach (ZDimType item in zdesc.DimTypes)
+            foreach (ZLDimInfo item in zdesc.DimTypes)
             {
-                contextiu.AddImportType(item);
+                contextiu.AddDimType(item);
             }
 
             foreach (var item in zdesc.ClassTypes)
@@ -84,17 +84,17 @@ namespace ZCompileCore.AST
 
         public override void AnalyBody()
         {
-            
+            return;
         }
 
         public override void EmitName()
         {
-            
+            return;
         }
 
         public override void EmitBody()
         {
-            
+            return;
         }
 
         public void SetContext(ContextFile fileContext)

@@ -2,13 +2,11 @@
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
 using ZCompileKit.Tools;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
 using ZLangRT;
 using System;
 using ZCompileDesc;
@@ -40,12 +38,24 @@ namespace ZCompileCore.AST
 
         public override void Emit( )
         {
-            caseMethod = caseMethod.MakeGenericMethod(new Type[] { TypeExp.RetType.SharpType });
+            caseMethod = MakeCastMethod(TypeExp.RetType);// caseMethod.MakeGenericMethod(new Type[] { TypeExp.RetType.SharpType });
             ArgExp.RequireType= ZLangBasicTypes.ZOBJECT;// (typeof(object);
             ArgExp.Emit();
             EmitHelper.CallDynamic(IL, caseMethod);
             //IL.Emit(OpCodes.Unbox_Any);
             base.EmitConv();
+        }
+
+        private MethodInfo MakeCastMethod(ZType ztype)
+        {
+            if(ztype is ZLType)
+            {
+                return caseMethod.MakeGenericMethod(new Type[] { ((ZLType)ztype).SharpType });
+            }
+            else
+            {
+                return caseMethod.MakeGenericMethod(new Type[] { ((ZCClassInfo)ztype).ClassBuilder });
+            }
         }
 
 

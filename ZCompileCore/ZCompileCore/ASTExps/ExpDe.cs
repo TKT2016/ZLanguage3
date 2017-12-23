@@ -2,16 +2,14 @@
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
 using ZCompileKit.Tools;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
 using ZCompileCore.ASTExps;
 using System;
 using ZCompileCore.Tools;
+using ZCompileDesc.Utils;
 
 namespace ZCompileCore.AST
 {
@@ -20,110 +18,102 @@ namespace ZCompileCore.AST
         public LexToken KeyToken { get; set; }
         public Exp LeftExp { get; set; }
         public LexToken RightToken { get; set; }
-
-        string propertyName;
-        ZMemberInfo ZMember;
+        private string propertyName;
+        private IIdent memberSymbol;
+        private ZCLocalVar tempLocal;
 
         public override Exp Analy()
         {
             if (this.ExpContext == null) throw new CCException();
             LeftExp = AnalyLeft();
-            if (RightToken != null)
-            {
-                if (RightToken.Kind == TokenKind.Ident && RightToken.GetText() == ZKeywords.Each)
-                {
-                    var eachItemExp = AnalyEach();
-                    Exp newExp = eachItemExp.Analy();
-                    return newExp;
-                }
-                else
-                {
-                    ParseRightPropertyName();
-                }
-                if (LeftExp.RetType is ZEnumType)
-                {
-                    ErrorF(LeftExp.Position, "约定没有属性");
-                }
-                else if (LeftExp.RetType is ZClassType)
-                {
-                    ZClassType zclass = LeftExp.RetType as ZClassType;
-                    ZMember = zclass.SearchZMember(propertyName);
-                    if (ZMember == null)
-                    {
-                        ErrorF(LeftExp.Position, "不存在'{0}'属性", propertyName);
-                    }
-                    else
-                    {
-                        RetType = ZMember.MemberZType;
-                    }
-                }
-                else
-                {
-                    throw new CCException();
-                }
-            }
-            else
+            if (RightToken == null)
             {
                 ErrorF(LeftExp.Position, "'{0}'的后面缺少属性", LeftExp.ToString());
                 return LeftExp;
             }
+
+
+            if (RightToken.Kind == TokenKind.Ident && RightToken.GetText() == ZKeywords.Each)
+            {
+                var eachItemExp = AnalyEach();
+                Exp newExp = eachItemExp.Analy();
+                return newExp;
+            }
+
+            AnalyRight();
             return this;
         }
 
-        SymbolDefBase leftStructSymbol;
-        bool isNeedEmitLeft=false;
-        private Exp AnalyLeft()
-        {
-            //if (LeftExp.ToString() == "鼠标位置")
-            //{
-            //    Console.WriteLine("鼠标位置");
-            //}
-            LeftExp =  AnalySubExp(LeftExp);
-            if (LeftExp is ExpTypeBase)
-            {
-                var leftTypeExp = (LeftExp as ExpTypeBase);
-                ZType ltype = leftTypeExp.RetType;
-                if(ltype is ZEnumType)
-                {
-                    ErrorF(LeftExp.Position, "约定类型'{0}'取值不能用'的'", LeftExp.ToString());
-                }
-                else if (ltype is ZClassType)
-                {
-                    ExpStaticClassName escn = new ExpStaticClassName(leftTypeExp.GetMainToken(),(ltype as ZClassType));
-                    escn.SetContext(this.ExpContext);
-                    LeftExp = escn.Analy();
-                }
-            }
-
-            if (ReflectionUtil.IsStruct(LeftExp.RetType.SharpType))
-            {
-                if (LeftExp is ExpLocalVar)
-                {
-                    leftStructSymbol = (LeftExp as ExpLocalVar).LocalVarSymbol;
-                }
-                else if (LeftExp is ExpArg)
-                {
-                    leftStructSymbol = (LeftExp as ExpArg).ArgSymbol;
-                }
-                else
-                {
-                    isNeedEmitLeft = true;
-                    var VarName="LocalDStructIndex_" + LocalDStructIndex;
-                    SymbolLocalVar localVarSymbol = new SymbolLocalVar(VarName, LeftExp.RetType);
-                    localVarSymbol.LoacalVarIndex = this.ExpContext.ProcContext.CreateLocalVarIndex(VarName);
-                    this.ProcContext.AddDefSymbol(localVarSymbol);
-                    leftStructSymbol = localVarSymbol;
-                    LocalDStructIndex++;
-                }
-                //throw new CCException();
-            }
-            return LeftExp;
-        }
-
-        private bool ParseRightPropertyName()
+        private void AnalyRight()
         {
             propertyName = RightToken.GetText();
-            return true;
+            
+            if (LeftExp.RetType is ZLEnumInfo)
+            {
+                ErrorF(LeftExp.Position, "约定没有属性");
+                return;
+            }
+            else if (LeftExp.RetType is ZLClassInfo)
+            {
+                AnalyMember(LeftExp.RetType as ZLClassInfo);
+            }
+            else if (LeftExp.RetType is ZCClassInfo)
+            {
+                AnalyMember(LeftExp.RetType as ZCClassInfo);
+            }
+
+            if (memberSymbol == null)
+            {
+                ErrorF(LeftExp.Position, "{0}不存在成员'{1}'", LeftExp.ToString(), propertyName);
+            }
+            else if (IsNeedTempLocal())
+            {
+                AnalyPropertyTempLocal();
+            }
+        }
+
+        private bool IsNeedTempLocal()
+        {
+            if (!LeftExp.RetType.IsStruct) return false;
+            if(LeftExp is ExpDefProperty ||LeftExp is ExpUseProperty ||LeftExp is ExpSuperProperty)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void AnalyPropertyTempLocal()
+        {
+            int tempIndex = this.ExpContext.ProcContext.CreateTempIndex();
+            var tempName = "@property_temp" + tempIndex;
+            tempLocal = new ZCLocalVar(tempName, LeftExp.RetType);
+            tempLocal.LoacalVarIndex = this.ExpContext.ProcContext.CreateLocalVarIndex(tempLocal.ZName);
+            this.ProcContext.AddLocalVar(tempLocal);
+        }
+
+        private void AnalyMember(ZCClassInfo zclass)
+        {
+            memberSymbol = zclass.SearchProperty(propertyName);
+            if (memberSymbol != null)
+            {
+                RetType = ((ZAPropertyInfo)memberSymbol).GetZPropertyType();
+            }
+        }
+
+        private void AnalyMember(ZLClassInfo zclass)
+        {
+            memberSymbol = zclass.SearchProperty(propertyName);
+            if (memberSymbol != null)
+            {
+                RetType = ((ZLPropertyInfo)memberSymbol).GetZPropertyType();
+                return;
+            }
+
+            memberSymbol = zclass.SearchField(propertyName);
+            if (memberSymbol != null)
+            {
+                RetType = ((ZLFieldInfo)memberSymbol).GetZFieldType();
+            }
         }
 
         private ExpEachItem AnalyEach()
@@ -137,126 +127,169 @@ namespace ZCompileCore.AST
             return itemExp;
         }
 
+        private Exp AnalyLeft()
+        {
+            var newExp = AnalySubExp(LeftExp);
+            if (newExp is ExpTypeBase)
+            {
+                var leftTypeExp = (LeftExp as ExpTypeBase);
+                ZType ltype = leftTypeExp.RetType;
+                if (ltype is ZLEnumInfo)
+                {
+                    ErrorF(LeftExp.Position, "约定类型'{0}'取值不能用'的'", LeftExp.ToString());
+                }
+                else if (ltype is ZLClassInfo)
+                {
+                    ExpStaticClassName escn = new ExpStaticClassName(leftTypeExp.GetMainToken(), (ltype as ZLClassInfo));
+                    escn.SetContext(this.ExpContext);
+                    newExp = escn.Analy();
+                }
+            }
+            return newExp;
+            //else if (LeftExp is ExpLocalVar)
+            //{
+            //    memberSymbol = (LeftExp as ExpLocalVar).LocalVarSymbol;
+            //}
+            //else if (LeftExp is ExpArg)
+            //{
+            //    memberSymbol = (LeftExp as ExpArg).ArgSymbol;
+            //}
+            //else
+            //{
+            //    //isNeedEmitLeft = true;
+            //    //var VarName = "LocalDStructIndex_" + LocalDStructIndex;
+            //    //ZCLocalVar localVarSymbol = new ZCLocalVar(VarName, LeftExp.RetType);
+            //    //localVarSymbol.LoacalVarIndex = this.ExpContext.ProcContext.CreateLocalVarIndex(VarName);
+            //    //this.ProcContext.AddLocalVar(localVarSymbol);
+            //    //memberSymbol = localVarSymbol;
+            //    //LocalDStructIndex++;
+            //}
+        }
+
         public override void Emit( )
         {
             EmitGet();
             base.EmitConv();
         }
 
-        public void EmitGet( )
-        {
-            if (ZMember is ZPropertyInfo)
-            {
-                MethodInfo getMethod = (ZMember as ZPropertyInfo).SharpProperty.GetGetMethod();
-                EmitSubject();
-                EmitHelper.CallDynamic(IL, getMethod);
-            }
-            else
-            {
-                EmitSubject();
-                EmitHelper.LoadField(IL, (ZMember as ZFieldInfo).SharpField);
-            }
-        }
-        
         public void EmitSet(Exp valueExp)
         {
-            if (ZMember is ZPropertyInfo)
-            {
-                MethodInfo setMethod = (ZMember as ZPropertyInfo).SharpProperty.GetSetMethod();
-                EmitSubject();
-                valueExp.Emit();
-                EmitHelper.CallDynamic(IL, setMethod);
-            }
+            EmitLeft();
+            valueExp.Emit();
+            EmitSetMember();
+        }
+
+        public void EmitGet( )
+        {
+            EmitLeft();
+            EmitGetMember();
+        }
+
+        private void EmitGetMember()
+        {
+            if(memberSymbol is ZLFieldInfo)
+                {
+                    EmitSymbolHelper.EmitLoad(IL,(ZLFieldInfo)memberSymbol);
+                }
+                else if(memberSymbol is ZCFieldInfo)
+                {
+                   EmitSymbolHelper.EmitLoad(IL,(ZCFieldInfo)memberSymbol);
+                }
+                else if(memberSymbol is ZLPropertyInfo)
+                {
+                     EmitSymbolHelper.EmitLoad(IL,(ZLPropertyInfo)memberSymbol);
+                }
+                else if(memberSymbol is ZCPropertyInfo)
+                {
+                     EmitSymbolHelper.EmitLoad(IL,(ZCPropertyInfo)memberSymbol);
+                }
             else
             {
-                EmitSubject();
-                valueExp.Emit();
-                EmitHelper.StormField(IL, (ZMember as ZFieldInfo).SharpField);
+                throw new CCException();
             }
         }
 
-        private void EmitSubject( )
+        private void EmitSetMember()
         {
-            //if (LeftExp.ToString() == "鼠标位置")
-            //{
-            //    Console.WriteLine("鼠标位置");
-            //}
-            if (SubjectIsStruct())
+            if(memberSymbol is ZLFieldInfo)
+                {
+                    EmitSymbolHelper.EmitStorm(IL,(ZLFieldInfo)memberSymbol);
+                }
+                else if(memberSymbol is ZCFieldInfo)
+                {
+                   EmitSymbolHelper.EmitStorm(IL,(ZCFieldInfo)memberSymbol);
+                }
+                else if(memberSymbol is ZLPropertyInfo)
+                {
+                     EmitSymbolHelper.EmitStorm(IL,(ZLPropertyInfo)memberSymbol);
+                }
+                else if(memberSymbol is ZCPropertyInfo)
+                {
+                     EmitSymbolHelper.EmitStorm(IL,(ZCPropertyInfo)memberSymbol);
+                }
+            else
             {
-                EmitLoadStruct();
+                throw new CCException();
+            }
+        }
+
+        private void EmitLeft()
+        {
+            if(LeftExp.RetType.IsStruct)
+            {
+                if(IsNeedTempLocal())
+                {
+                    LeftExp.Emit();
+                    EmitSymbolHelper.EmitStorm(IL, this.tempLocal);
+                    EmitSymbolHelper.EmitLoada(IL, this.tempLocal);
+                }
+                else
+                {
+                    if(LeftExp is ExpLocalVar)
+                    {
+                        ((ExpLocalVar)LeftExp).EmitLoadLocala();
+                    }
+                    else if(LeftExp is ExpArg)
+                    {
+                        ((ExpArg)LeftExp).EmitLoadArga();
+                    }
+                    else if(LeftExp is ExpDefField)
+                    {
+                        ((ExpDefField)LeftExp).EmitLoadFielda();
+                    }
+                    else if(LeftExp is ExpSuperField)
+                    {
+                        ((ExpSuperField)LeftExp).EmitLoadFielda();
+                    }
+                    else if(LeftExp is ExpUseField)
+                    {
+                        ((ExpUseField)LeftExp).EmitLoadFielda();
+                    }
+                    else
+                    {
+                        LeftExp.Emit();
+                    }
+                }
             }
             else
             {
                 LeftExp.Emit();
             }
         }
-
-        private bool SubjectIsStruct()
-        {
-            if (!(LeftExp is ExpVarBase)) return false;
-            ExpVarBase varexp = LeftExp as ExpVarBase;
-            return (ReflectionUtil.IsStruct(varexp.RetType.SharpType));
-        }
-
-        private bool EmitLoadStruct()
-        {
-            ExpVarBase varexp = LeftExp as ExpVarBase;
-            if (ReflectionUtil.IsStruct(varexp.RetType.SharpType))
-            {
-                if (isNeedEmitLeft)
-                {
-                    LeftExp.Emit();
-                    if (leftStructSymbol is SymbolLocalVar)
-                    {
-                        EmitHelper.StormVar(IL, (leftStructSymbol as SymbolLocalVar).VarBuilder);
-                        return true;
-                    }
-                    else if (leftStructSymbol is SymbolArg)
-                    {
-                        EmitHelper.StormArg(IL , (leftStructSymbol as SymbolArg).ArgIndex);
-                        return true;
-                    }
-                }
-                if (leftStructSymbol is SymbolLocalVar)
-                {
-                    IL.Emit(OpCodes.Ldloca, (leftStructSymbol as SymbolLocalVar).VarBuilder);
-                    return true;
-                }
-                else if (leftStructSymbol is SymbolArg)
-                {
-                    IL.Emit(OpCodes.Ldarga, (leftStructSymbol as SymbolArg).ArgIndex);
-                    return true;
-                }
-                //else if (varexp is ExpSuperProperty)
-                //{
-                //    SymbolLocalVar syslocal = new SymbolLocalVar("LocalDStructIndex_" + LocalDStructIndex, varexp.RetType);
-                //    varexp.Emit();
-                //    //EmitSymbolHelper.EmitLoad(IL, syslocal);
-                //    //EmitSymbolHelper.EmitLoad(IL, syslocal);
-                //    EmitHelper.StormVar(IL, syslocal.VarBuilder);
-                //    IL.Emit(OpCodes.Ldloca, syslocal.VarBuilder);
-                //    return true;
-                //}
-                throw new CCException();
-            }
-            return false;
-        }
-
-        static int LocalDStructIndex = 1;
-
+            
         #region 次要方法属性
 
         public bool CanWrite
         {
             get
             {
-                return ZMember.CanWrite;
+                return this.memberSymbol.GetCanWrite();
             }
         }
 
         public override Exp[] GetSubExps()
         {
-            return new Exp[] { LeftExp };//return new Exp[] { LeftExp, RightExp };
+            return new Exp[] { LeftExp };
         }
 
         public override string ToString()
@@ -278,3 +311,4 @@ namespace ZCompileCore.AST
         #endregion
     }
 }
+

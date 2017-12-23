@@ -45,7 +45,9 @@
   <ItemGroup>
     <Compile Include="FormWorderManager.cs" />
     <Compile Include="ISegementer.cs" />
-    <Compile Include="WordCompilePart.cs" />
+    <Content Include="Resources\dict - 复制.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="WordSpeechPart.cs" />
     <Compile Include="UserWordsSegementer.cs" />
     <Compile Include="SimpleSegementer.cs" />

@@ -13,7 +13,7 @@ using ZCompileKit.Tools;
 using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
-using ZCompileDesc.ZTypes;
+
 
 namespace ZCompileCore.Engines
 {
@@ -52,7 +52,7 @@ namespace ZCompileCore.Engines
             }
 
             result.CompiledTypes.Clear();
-            result.CompiledTypes.AddRange(this.ProjectContext.CompiledTypes.ToList() );
+            result.CompiledTypes.Add(this.ProjectContext.CompiledTypes );
 
             return result;
         }
@@ -65,30 +65,25 @@ namespace ZCompileCore.Engines
                 FileSource fileType = parser.Parse(item);
                 if (fileType != null)
                 {
-                    IZDescType genType = null;
                     if (fileType is FileEnum)
                     {
-                        ZType zenum = (fileType as FileEnum).Compile();
-                        genType = zenum;
+                        ZLEnumInfo zenum = (fileType as FileEnum).Compile();
+                        this.ProjectContext.CompiledTypes.Add(zenum);
                     }
                     else if (fileType is FileDim)
                     {
-                        ZDimType zdim = (fileType as FileDim).Compile();
-                        genType = zdim;
+                        ZLDimInfo zdim = (fileType as FileDim).Compile();
+                        this.ProjectContext.CompiledTypes.Add(zdim);
                     }
                     else if (fileType is FileClass)
                     {
-                        ZClassType zdim = (fileType as FileClass).Compile();
-                        genType = zdim;
+                        ZLClassInfo zclass = (fileType as FileClass).Compile();
+                        this.ProjectContext.CompiledTypes.Add(zclass);
                     }
                     else
                     {
                         throw new CCException();
-                    }
-                    if (genType != null)
-                    {
-                        this.ProjectContext.CompiledTypes.Add(genType);
-                    }
+                    }      
                 }
                 else
                 {
@@ -115,7 +110,7 @@ namespace ZCompileCore.Engines
             if (ProjectContext.ProjectModel.BinaryFileKind != PEFileKinds.Dll && !string.IsNullOrEmpty(ProjectContext.ProjectModel.EntryClassName))
             {
                 var entryClassName = ProjectContext.ProjectModel.EntryClassName;
-                result.EntrtyZType = ProjectContext.CompiledTypes.Get(entryClassName) as ZType;
+                result.EntrtyZType = ProjectContext.CompiledTypes.Get(entryClassName);
                 if (result.EntrtyZType == null)
                 {
                     this.ProjectContext.Errorf(0, 0, "入口类型'{0}'不存在或编译失败", entryClassName);

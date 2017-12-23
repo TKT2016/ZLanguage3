@@ -3,14 +3,14 @@ using System.Reflection;
 using System.Reflection.Emit;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using Z语言系统;
 using ZCompileKit.Tools;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZLangRT;
 using ZCompileDesc;
 
@@ -19,9 +19,9 @@ namespace ZCompileCore.AST
     public class ExpEach : Exp
     {
         public Exp SubjectExp;
-        SymbolLocalVar ListSymbol;
-        SymbolLocalVar IndexSymbol;
-        SymbolLocalVar CountSymbol;
+        ZCLocalVar ListSymbol;
+        ZCLocalVar IndexSymbol;
+        ZCLocalVar CountSymbol;
        
         ExpEachItem ItemExp;
         public Exp BodyExp { get; set; }
@@ -46,9 +46,10 @@ namespace ZCompileCore.AST
             SubjectExp = SubjectExp.Analy();
             if(SubjectExp.RetType==null)
             {
-                Type newType =typeof(列表<>).MakeGenericType(typeof(object));
-                ZType newZtype = ZTypeManager.RegNewGenericType(newType);
-                SubjectExp.RetType = newZtype;
+                //Type newType =typeof(列表<>).MakeGenericType(typeof(object));
+                //ZType newZtype = ZTypeManager.RegNewGenericType(newType);
+                ZLClassInfo newZClass = ZTypeManager.MakeGenericType(ZLangBasicTypes.ZLIST, ZLangBasicTypes.ZOBJECT);
+                SubjectExp.RetType = newZClass;
             }
             CreateEachSymbols();
             AnalyCountMethod();
@@ -60,8 +61,8 @@ namespace ZCompileCore.AST
         private void AnalyCountMethod()
         {
             ZType subjectZType = SubjectExp.RetType;
-            Type mainType = subjectZType.SharpType;
-            PropertyInfo countProperty = mainType.GetProperty(CompileConst.ZListCountPropertyName);//"Count");
+            Type mainType = ZTypeUtil.GetTypeOrBuilder(subjectZType);// subjectZType.SharpType;
+            PropertyInfo countProperty = mainType.GetProperty(ZLangUtil.ZListCountPropertyName);//"Count");
             getCountMethod = countProperty.GetGetMethod();
         }
 
@@ -79,20 +80,21 @@ namespace ZCompileCore.AST
             var elementName = "@each" + foreachIndex + "_item";
             var countName = "@each" + foreachIndex+"_count";
 
-            ListSymbol = new SymbolLocalVar(listSymbolName, SubjectExp.RetType);
-            ListSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(ListSymbol.SymbolName);
-            this.ProcContext.AddDefSymbol(ListSymbol);
+            ListSymbol = new ZCLocalVar(listSymbolName, SubjectExp.RetType);
+            ListSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(ListSymbol.ZName);
+            this.ProcContext.AddLocalVar(ListSymbol);
 
-            Type[] genericTypes = GenericUtil.GetInstanceGenriceType(SubjectExp.RetType.SharpType, typeof(列表<>));
+            Type[] genericTypes = GenericUtil.GetInstanceGenriceType(ZTypeUtil.GetTypeOrBuilder(SubjectExp.RetType), typeof(列表<>));
+            //Type[] genericTypes = GenericUtil.GetInstanceGenriceType(SubjectExp.RetType.SharpType, typeof(列表<>));
             Type ElementType = genericTypes[0];
 
-            IndexSymbol = new SymbolLocalVar(indexName, ZLangBasicTypes.ZINT);
+            IndexSymbol = new ZCLocalVar(indexName, ZLangBasicTypes.ZINT);
             IndexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
-            this.ProcContext.AddDefSymbol(IndexSymbol);
+            this.ProcContext.AddLocalVar(IndexSymbol);
 
-            CountSymbol = new SymbolLocalVar(countName, ZLangBasicTypes.ZINT);
+            CountSymbol = new ZCLocalVar(countName, ZLangBasicTypes.ZINT);
             CountSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(countName);
-            this.ProcContext.AddDefSymbol(CountSymbol);
+            this.ProcContext.AddLocalVar(CountSymbol);
         }
 
         int START_INDEX = 1;
@@ -116,7 +118,7 @@ namespace ZCompileCore.AST
             //定义一个标签，表示从下面开始进入循环体
             IL.MarkLabel(True_Label);
             BodyExp.Emit();
-            if (BodyExp.RetType.SharpType != typeof(void))
+            if (ZTypeUtil.IsBool(BodyExp.RetType))//(BodyExp.RetType.SharpType != typeof(void))
             {
                 IL.Emit(OpCodes.Pop);
             }

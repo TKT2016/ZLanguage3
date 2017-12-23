@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.AST;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using Z语言系统;

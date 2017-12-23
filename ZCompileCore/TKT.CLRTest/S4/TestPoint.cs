@@ -19,14 +19,19 @@ namespace TKT.CLRTest.S4
         {
             鼠标位置 = new Point(e.X, e.Y);
             响应鼠标移动();
-            
         }
+
+
+        //public void SetSBX(int v)
+        //{
+        //    this.鼠标位置.X = v;/* C# struct陷阱  */
+        //}
 
         [ZCode("响应鼠标移动")]
         public virtual void 响应鼠标移动()
         {
             this.玩家.X坐标 = this.鼠标位置.X;
-            this.玩家.Y坐标 = this.鼠标位置.Y;
+            //this.玩家.Y坐标 = this.鼠标位置.Y;
         }
 
         private FJ 玩家 { get; set; }
@@ -35,6 +40,18 @@ namespace TKT.CLRTest.S4
         {
             public int X坐标 { get; set; }
             public int Y坐标 { get; set; }
+        }
+
+        
+
+        public static void SetX(Point p ,int v)
+        {
+            p.X = v;
+        }
+
+        public static int GetX(Point p)
+        {
+            return p.X;
         }
     }
 

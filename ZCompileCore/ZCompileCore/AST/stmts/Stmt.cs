@@ -15,6 +15,7 @@ namespace ZCompileCore.AST
     {
         #region Context
         public ContextProc ProcContext { get; set; }
+        //public ContextMethod ProcContext { get; set; }
         public ContextClass ClassContext { get { return this.ProcContext.ClassContext; } }
         public override ContextFile FileContext { get { return this.ProcContext.ClassContext.FileContext; } }
         public ContextProject ProjectContext { get { return this.ProcContext.ClassContext.FileContext.ProjectContext; } }
@@ -24,7 +25,7 @@ namespace ZCompileCore.AST
         public int Deep { get; set; }
 
         public virtual void Analy() { }
-        public virtual void Emit() { throw new NotImplementedException(); }
+        public virtual void Emit() { throw new CCException(); }
 
         protected virtual Exp ParseExp(Exp exp)
         {

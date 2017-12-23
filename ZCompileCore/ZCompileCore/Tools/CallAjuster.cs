@@ -52,7 +52,36 @@ namespace ZCompileCore.Tools
             return AdjustedArgExps;
         }
 
-        public static List<Exp> AdjustExps(ZParam[] paramArr, List<Exp> exps)
+        public static List<Exp> AdjustExps(ZLParamInfo[] paramArr, List<Exp> exps)
+        {
+            if (!IsNeedAdjust(exps))
+            {
+                return exps;
+            }
+            var AdjustedArgExps = new List<Exp>();
+            Dictionary<string, ExpNameValue> argsDict = new Dictionary<string, ExpNameValue>();
+            foreach (var arg in exps)
+            {
+                if (arg is ExpNameValue)
+                {
+                    ExpNameValue env = arg as ExpNameValue;
+                    argsDict.Add(env.ArgName, env);
+                }
+                else
+                {
+                    throw new CCException();
+                }
+            }
+            foreach (var pi in paramArr)
+            {
+                string paramName = pi.ZParamName;
+                ExpNameValue exp = argsDict[paramName];
+                AdjustedArgExps.Add(exp);
+            }
+            return AdjustedArgExps;
+        }
+
+        public static List<Exp> AdjustExps(ZCParamInfo[] paramArr, List<Exp> exps)
         {
             if (!IsNeedAdjust(exps))
             {

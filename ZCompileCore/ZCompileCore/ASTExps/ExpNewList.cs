@@ -10,7 +10,6 @@ using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using Z语言系统;
 using ZCompileKit.Tools;
-using ZCompileDesc.ZMembers;
 using ZCompileCore.ASTExps;
 
 namespace ZCompileCore.AST
@@ -48,20 +47,20 @@ namespace ZCompileCore.AST
 
         public override void Emit()
         {
-            var zlistType = TypeExp.RetType.SharpType;
+            var zlistType = ((ZLType)TypeExp.RetType).SharpType;
             var Constructor = zlistType.GetConstructor(new Type[]{});// ConstructorDesc.Constructor;
             LocalBuilder varLocal = IL.DeclareLocal(zlistType);
             EmitHelper.NewObj(IL, Constructor);
             IL.Emit(OpCodes.Stloc, varLocal);
 
-            MethodInfo addMethod = zlistType.GetMethod(CompileConst.ZListAddMethodName);//"Add");
-            ZMethodInfo exAddMethodInfo = new ZMethodInfo(addMethod);
+            MethodInfo addMethod = zlistType.GetMethod(ZLangUtil.ZListAddMethodName);//"Add");
+            //ZLMethodInfo exAddMethodInfo = new ZLMethodInfo(addMethod);
 
             foreach (var exp in ArgExp.InneExps)
             {
                 EmitHelper.LoadVar(IL, varLocal);//il.Emit(OpCodes.Ldloc, varLocal);
                 exp.Emit();
-                EmitHelper.CallDynamic(IL, exAddMethodInfo.SharpMethod);
+                EmitHelper.CallDynamic(IL, addMethod); //EmitHelper.CallDynamic(IL, exAddMethodInfo.SharpMethod);
             }
             EmitHelper.LoadVar(IL, varLocal);//il.Emit(OpCodes.Ldloc, varLocal);
             base.EmitConv();

@@ -5,12 +5,11 @@ using System.Text;
 using ZCompileCore.Engines;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
-using ZCompileCore.Symbols;
+
 using ZLangRT;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
-using ZCompileDesc.ZMembers;
+
 using ZCompileDesc.Collections;
 using ZNLP;
 
@@ -21,8 +20,8 @@ namespace ZCompileCore.Contexts
         public ContextProject ProjectContext { get; set; }
         public ContextImportUse ImportUseContext { get; private set; }
         public ContextClass ClassContext { get; set; }
-        public ZFileModel FileModel { get; private set; }  
-        public IZDescType EmitedIZDescType { get; set; }
+        public ZFileModel FileModel { get; private set; }
+        public ZLClassInfo EmitedIZDescType { get; set; }
 
         string _KeyContext;
 

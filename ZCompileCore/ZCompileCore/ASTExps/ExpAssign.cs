@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.Contexts;
-using ZCompileCore.Symbols;
+
 using ZLangRT;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
@@ -20,7 +20,7 @@ namespace ZCompileCore.AST
         public Exp ValueExp { get; set; }
         public bool IsAssignTo { get; set; }
 
-        Exp NewValueExp;
+        private Exp NewValueExp;
 
         public override Exp[] GetSubExps()
         {
@@ -29,10 +29,6 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
-            //if (ValueExp.ToString().IndexOf("图片") != -1)
-            //{
-            //    Console.WriteLine("图片");
-            //}
             ValueExp = AnalySubExp(ValueExp);
             ToExp = AnalyToExp();
             if (ToExp is ExpDe || ToExp is ExpDi)
@@ -90,9 +86,9 @@ namespace ZCompileCore.AST
         private Exp AnalyDim(ExpLocalVar varExp)
         {
             var VarName=varExp.VarName;
-            SymbolLocalVar localVarSymbol = new SymbolLocalVar(VarName, ValueExp.RetType);
+            ZCLocalVar localVarSymbol = new ZCLocalVar(VarName, ValueExp.RetType);
             localVarSymbol.LoacalVarIndex = this.ExpContext.ProcContext.CreateLocalVarIndex(VarName);
-            this.ProcContext.AddDefSymbol(localVarSymbol);
+            this.ProcContext.AddLocalVar(localVarSymbol);
             Exp varExp2 = varExp.Analy();
             return varExp2;
         }
@@ -107,7 +103,7 @@ namespace ZCompileCore.AST
         {
             if (!ToExp.AnalyCorrect) return;
             if (ToExp.RetType==null) return;
-            if (ZLambda.IsFn(ToExp.RetType.SharpType))
+            if (ZTypeUtil.IsFn(ToExp.RetType))//(ZLambda.IsFn(ToExp.RetType.SharpType))
             {
                 ExpNewLambda newLambdaExp = new ExpNewLambda(ValueExp, ToExp.RetType);
                 newLambdaExp.SetContext(this.ExpContext);
@@ -122,6 +118,10 @@ namespace ZCompileCore.AST
 
         public override void Emit()
         {
+            //if (ToExp.ToString().IndexOf("X坐标")!=-1)
+            //{
+            //    Console.WriteLine("X坐标");
+            //}
             (ToExp as ISetter).EmitSet(NewValueExp);
         }
 

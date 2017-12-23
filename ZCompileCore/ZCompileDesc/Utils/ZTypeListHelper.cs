@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
 
 namespace ZCompileDesc.Utils
 {
@@ -26,7 +25,7 @@ namespace ZCompileDesc.Utils
         {
             foreach (var item in dictList)
             {
-                if (item.ZName==zname)//(text))
+                if (item.ZTypeName==zname)//(text))
                 {
                     return true;
                 }
@@ -39,7 +38,7 @@ namespace ZCompileDesc.Utils
             List<ZType> words = new List<ZType>();
             foreach (ZType item in dictList)
             {
-                if (item.ZName == zname)//(text))
+                if (item.ZTypeName == zname)//(text))
                 {
                     words.Add(item);
                 }
@@ -47,9 +46,9 @@ namespace ZCompileDesc.Utils
             return words.ToArray();
         }
 
-        public static ZType[] Search(string zname, params IZTypeDictionary[] dictList)
+        public static ZLType[] Search(string zname, params IZTypeDictionary[] dictList)
         {
-            List<ZType> words = new List<ZType>();
+            List<ZLType> words = new List<ZLType>();
             foreach (IZTypeDictionary item in dictList)
             {
                 words.AddRange(item.SearchZType(zname));

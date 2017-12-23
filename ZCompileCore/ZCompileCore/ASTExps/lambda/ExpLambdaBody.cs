@@ -7,27 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZLangRT;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileDesc;
 using ZCompileCore.ASTExps;
-using ZCompileDesc.Compilings;
 
 namespace ZCompileCore.AST
 {
     public class ExpLambdaBody : Exp
     {
-        List<SymbolBase> BodyVars;
-        public List<ZMemberCompiling> FieldSymbols { get; private set; }
+        List<IIdent> BodyVars;
+        public List<ZCFieldInfo> FieldSymbols { get; private set; }
         public List<ExpLocal> FieldExpVars { get; private set; }
 
-        public ExpLambdaBody(Exp exp, ZType fnRetType, List<SymbolBase> bodyVars, List<ExpLocal> fieldExpVars, ContextExp outExpContext)
+        public ExpLambdaBody(Exp exp, ZType fnRetType, List<IIdent> bodyVars, List<ExpLocal> fieldExpVars, ContextExp outExpContext)
         {
             BodyExp = exp;
             FnRetType = fnRetType;
@@ -44,7 +43,7 @@ namespace ZCompileCore.AST
             return BodyExp.GetSubExps();
         }
 
-        SymbolLocalVar retSymbol;
+        ZCLocalVar retSymbol;
         Type NestedType { get; set; }
         public ConstructorBuilder NewBuilder { get; private set; }
 
@@ -56,13 +55,13 @@ namespace ZCompileCore.AST
             BodyExp.SetIsNested(true);
             if (FnRetType == ZLangBasicTypes.ZBOOL)
             {
-                retSymbol = new SymbolLocalVar("$RetResult", FnRetType);
+                retSymbol = new ZCLocalVar("$RetResult", FnRetType);
             }
             return this;
         }
 
         internal ContextClass NestedClassContext;
-        private ContextProc NestedProcContext;
+        private ContextMethod NestedProcContext;
         private StmtCall NestedStmt;
         private ContextExp NestedExpContext;
 
@@ -71,7 +70,7 @@ namespace ZCompileCore.AST
             NestedClassContext = new ContextClass(this.ExpContext.FileContext);
             NestedClassContext.ClassName = this.ExpContext.ProcContext.CreateNestedClassName();
 
-            NestedProcContext = new ContextProc(NestedClassContext,false);
+            NestedProcContext = new ContextMethod(NestedClassContext);
             NestedProcContext.ProcName = NestedClassContext.ClassName + "$CALL";
             //NestedProcContext.ProcManagerContext = NestedClassContext.ProcManagerContext;
             //NestedProcContext.ProcManagerContext.AddContext(NestedProcContext);
@@ -106,7 +105,7 @@ namespace ZCompileCore.AST
             BodyExp.Emit();
             if (retSymbol == null)
             {
-                if (BodyExp.RetType.SharpType != typeof(void))
+                if (!ZTypeUtil.IsVoid(BodyExp.RetType))//(BodyExp.RetType.SharpType != typeof(void))
                 {
                     il.Emit(OpCodes.Pop);
                 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Utils;
 using ZLangRT.Attributes;
 using ZLangRT.Utils;
 using Z语言系统;
@@ -16,62 +16,69 @@ namespace ZCompileDesc
 
         static ZTypeManager()
         {
-            ZLangBasicTypes.ZOBJECT = CreateZTypeImp(typeof(事物)) as ZClassType;
+            ZLangBasicTypes.ZOBJECT = (ZLClassInfo)(CreateZTypeImp(typeof(事物))) ;
             Cache.AddCache(ZLangBasicTypes.ZOBJECT);
             Cache.AddCache(ZLangBasicTypes.ZOBJECT, "object");
 
-            ZLangBasicTypes.ZVOID = CreateZTypeImp(typeof(VOID)) as ZClassType;
+            ZLangBasicTypes.ZVOID = (ZLClassInfo)(CreateZTypeImp(typeof(VOID)));// CreateZTypeImp(typeof(VOID)) as ZLClass;
             Cache.AddCache(ZLangBasicTypes.ZVOID);
             Cache.AddCache(ZLangBasicTypes.ZVOID, "void");
 
-            ZLangBasicTypes.ZBOOL = CreateZTypeImp(typeof(判断符)) as ZClassType;
+            ZLangBasicTypes.ZBOOL = (ZLClassInfo)(CreateZTypeImp(typeof(判断符)));//CreateZTypeImp(typeof(判断符)) as ZLClass;
             Cache.AddCache(ZLangBasicTypes.ZBOOL);
             Cache.AddCache(ZLangBasicTypes.ZBOOL, "bool");
 
-            ZLangBasicTypes.ZINT = CreateZTypeImp(typeof(整数)) as ZClassType;
+            ZLangBasicTypes.ZINT = (ZLClassInfo)(CreateZTypeImp(typeof(整数)));//CreateZTypeImp(typeof(整数)) as ZLClass;
             Cache.AddCache(ZLangBasicTypes.ZINT);
             Cache.AddCache(ZLangBasicTypes.ZINT, "int");
 
-            ZLangBasicTypes.ZFLOAT = CreateZTypeImp(typeof(浮点数)) as ZClassType;
+            ZLangBasicTypes.ZFLOAT = (ZLClassInfo)(CreateZTypeImp(typeof(浮点数)));// CreateZTypeImp(typeof(浮点数)) as ZLClass;
             Cache.AddCache(ZLangBasicTypes.ZFLOAT);
             Cache.AddCache(ZLangBasicTypes.ZFLOAT, "float");
 
-            ZLangBasicTypes.ZSTRING = CreateZTypeImp(typeof(文本)) as ZClassType;
+            ZLangBasicTypes.ZSTRING = (ZLClassInfo)(CreateZTypeImp(typeof(文本)));//CreateZTypeImp(typeof(文本)) as ZLClass;
             Cache.AddCache(ZLangBasicTypes.ZSTRING);
             Cache.AddCache(ZLangBasicTypes.ZSTRING, "string");
 
-            ZLangBasicTypes.ZACTION = CreateZTypeImp(typeof(可运行语句)) as ZClassType;
+            ZLangBasicTypes.ZACTION = (ZLClassInfo)(CreateZTypeImp(typeof(可运行语句)));// CreateZTypeImp(typeof(可运行语句)) as ZLClass;
             Cache.AddCache(ZLangBasicTypes.ZACTION);
 
-            ZLangBasicTypes.ZCONDITION = CreateZTypeImp(typeof(可运行条件)) as ZClassType;
+            ZLangBasicTypes.ZCONDITION = (ZLClassInfo)(CreateZTypeImp(typeof(可运行条件)));// CreateZTypeImp(typeof(可运行条件)) as ZClassType;
             Cache.AddCache(ZLangBasicTypes.ZCONDITION);
 
-            ZLangBasicTypes.ZDATETIME = CreateZTypeImp(typeof(时间日期)) as ZClassType;
+            ZLangBasicTypes.ZDATETIME = (ZLClassInfo)(CreateZTypeImp(typeof(时间日期)));//CreateZTypeImp(typeof(时间日期)) as ZClassType;
             Cache.AddCache(ZLangBasicTypes.ZDATETIME);
 
-            ZLangBasicTypes.ZLIST = CreateZTypeImp(typeof(列表<>)) as ZClassType;
+            ZLangBasicTypes.ZLIST = (ZLClassInfo)(CreateZTypeImp(typeof(列表<>)));//CreateZTypeImp(typeof(列表<>)) as ZClassType;
             Cache.AddCache(ZLangBasicTypes.ZLIST);
         }
-      
-        public static ZType RegNewGenericType(Type newType)
+
+        public static ZLClassInfo MakeGenericType(ZLClassInfo genericType, params ZType[] argZTypes)
         {
-            ZType ztype = CreateZTypeImp(newType) as ZType;
-            return ztype;
+            ZLClassInfo newzclass = genericType.MakeGenericType(argZTypes);
+            Cache.AddCache(newzclass);
+            return newzclass;
         }
 
-        public static IZDescType[] GetBySharpName(string sharpName)
+        //public static ZType RegNewGenericType(Type newType)
+        //{
+        //    ZType ztype = CreateZTypeImp(newType) as ZType;
+        //    return ztype;
+        //}
+
+        public static ZLType[] GetBySharpName(string sharpName)
         {
-            if (Cache.SNameCache.ContainsKey(sharpName)) return new IZDescType[] { Cache.SNameCache[sharpName] };
-            else return new IZDescType[] { };
+            if (Cache.SNameCache.ContainsKey(sharpName)) return new ZLType[] { Cache.SNameCache[sharpName] };
+            else return new ZLType[] { };
         }
 
-        public static IZDescType[] GetByMarkName(string zname)
+        public static ZLType[] GetByMarkName(string zname)
         {
-            if (Cache.ZNameCache.ContainsKey(zname)) return new IZDescType[] { Cache.ZNameCache[zname] };
-            else return new IZDescType[] { };
+            if (Cache.ZNameCache.ContainsKey(zname)) return new ZLType[] { Cache.ZNameCache[zname] };
+            else return new ZLType[] { };
         }
 
-        public static IZDescType GetBySharpType(Type type)
+        public static ZLType GetBySharpType(Type type)
         {
             if (type == null) return null;
             else if (Cache.SharpCache.ContainsKey(type))
@@ -99,18 +106,18 @@ namespace ZCompileDesc
                         return null;
                     }
                 }
-                ZType newZtype = ZTypeManager.RegNewGenericType(type);
-                return newZtype;
+                //ZType newZtype = ZTypeManager.RegNewGenericType(type);
+                //return newZtype;
             }
 
             return null;
         }
 
-        public static IZDescType GetByMarkType(Type type)
+        public static ZLType GetByMarkType(Type type)
         {
             if (type == null) return null;
             if (Cache.MarkCache.ContainsKey(type)) return Cache.MarkCache[type];
-            IZDescType descType = CreateZTypeImp(type);
+            ZLType descType = CreateZTypeImp(type);
             if(descType!=null)
             {
                 Cache.AddCache(descType);
@@ -118,30 +125,35 @@ namespace ZCompileDesc
             return descType;
         }
 
-        private static IZDescType CreateZTypeImp(Type type)
+        public static ZLDimInfo CreateZLDimImp(Type type)
+        {
+            if(AttributeUtil.HasAttribute<ZDimAttribute>(type))
+            {
+                ZLDimInfo zdim = new ZLDimInfo(type);
+                return zdim;
+            }
+            return null;
+        }
+
+        private static ZLType CreateZTypeImp(Type type)
         {
             if (AttributeUtil.HasAttribute<ZInstanceAttribute>(type))
             {
                 ZInstanceAttribute zAttr = AttributeUtil.GetAttribute<ZInstanceAttribute>(type);
                 Type sharpType = (zAttr.SharpType == null ? type : zAttr.SharpType);
-                ZClassLibType zclass = new ZClassLibType(type, sharpType, false);
+                ZLClassInfo zclass = new ZLClassInfo(type, sharpType, false);
                 return zclass;
-            }
-            else if(AttributeUtil.HasAttribute<ZDimAttribute>(type))
-            {
-                ZDimType zdim = new ZDimType(type);
-                return zdim;
             }
             else if (AttributeUtil.HasAttribute<ZEnumAttribute>(type))
             {
-                ZEnumType zenum = new ZEnumType(type);
+                ZLEnumInfo zenum = new ZLEnumInfo(type);
                 return zenum;
             }
             else if (AttributeUtil.HasAttribute<ZStaticAttribute>(type))
             {
                 ZStaticAttribute zAttr = AttributeUtil.GetAttribute<ZStaticAttribute>(type);
                 Type sharpType = (zAttr.SharpType == null ? type : zAttr.SharpType);
-                ZClassLibType zclass = new ZClassLibType(type, sharpType, true);
+                ZLClassInfo zclass = new ZLClassInfo(type, sharpType, true);
                 return zclass;
             }
            
@@ -150,31 +162,32 @@ namespace ZCompileDesc
 
         private class ZTypeCache
         {
-            public Dictionary<Type, IZDescType> MarkCache = new Dictionary<Type, IZDescType>();
-            public Dictionary<Type, IZDescType> SharpCache = new Dictionary<Type, IZDescType>();
-            public Dictionary<string, IZDescType> ZNameCache = new Dictionary<string, IZDescType>();
-            public Dictionary<string, IZDescType> SNameCache = new Dictionary<string, IZDescType>();
+            public Dictionary<Type, ZLType> MarkCache = new Dictionary<Type, ZLType>();
+            public Dictionary<Type, ZLType> SharpCache = new Dictionary<Type, ZLType>();
+            public Dictionary<string, ZLType> ZNameCache = new Dictionary<string, ZLType>();
+            public Dictionary<string, ZLType> SNameCache = new Dictionary<string, ZLType>();
 
-            public void AddCache(IZDescType descType)
+            public void AddCache(ZLType descType)
             {
+                if (descType == null) return;
                 try
                 {
                     if (!MarkCache.ContainsKey(descType.MarkType))
                         MarkCache.Add(descType.MarkType, descType);
                     if (!SharpCache.ContainsKey(descType.SharpType))
                         SharpCache.Add(descType.SharpType, descType);
-                    if (!ZNameCache.ContainsKey(descType.ZName))
-                        ZNameCache.Add(descType.ZName, descType);
+                    if (!ZNameCache.ContainsKey(descType.ZTypeName))
+                        ZNameCache.Add(descType.ZTypeName, descType);
                     if (!SNameCache.ContainsKey(descType.SharpType.Name))
                         SNameCache.Add(descType.SharpType.Name, descType);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("ZTypeManager.Cache.AddCache(IZDescType):" + descType +":"+ ex.Message);
+                    Console.WriteLine("ZTypeManager.Cache.AddCache(IBLibType):" + descType +":"+ ex.Message);
                 }
             }
 
-            public void AddCache(IZDescType descType,string sname)
+            public void AddCache(ZLType descType,string sname)
             {
                 try
                 {
@@ -182,14 +195,14 @@ namespace ZCompileDesc
                         MarkCache.Add(descType.MarkType, descType);
                     if (!SharpCache.ContainsKey(descType.SharpType))
                         SharpCache.Add(descType.SharpType, descType);
-                    if (!ZNameCache.ContainsKey(descType.ZName))
-                        ZNameCache.Add(descType.ZName, descType);
+                    if (!ZNameCache.ContainsKey(descType.ZTypeName))
+                        ZNameCache.Add(descType.ZTypeName, descType);
                     if (!SNameCache.ContainsKey(sname))
                         SNameCache.Add(sname, descType);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("ZTypeManager.Cache.AddCache(IZDescType):" + sname + ":" + ex.Message);
+                    Console.WriteLine("ZTypeManager.Cache.AddCache(IBLibType):" + sname + ":" + ex.Message);
                 }
             }
 
@@ -203,7 +216,7 @@ namespace ZCompileDesc
                 return ZNameCache.ContainsKey(typeName) || SNameCache.ContainsKey(typeName);
             }
 
-            public IZDescType Get(Type type)
+            public ZLType Get(Type type)
             {
                 if (MarkCache.ContainsKey(type))
                     return MarkCache[type];
@@ -213,7 +226,7 @@ namespace ZCompileDesc
                     return null;
             }
 
-            public IZDescType Get(string typeName)
+            public ZLType Get(string typeName)
             {
                 if (ZNameCache.ContainsKey(typeName))
                     return ZNameCache[typeName];

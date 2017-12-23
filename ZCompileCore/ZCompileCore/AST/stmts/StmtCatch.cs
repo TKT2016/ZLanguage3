@@ -5,11 +5,11 @@ using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.AST
@@ -22,8 +22,8 @@ namespace ZCompileCore.AST
 
        string exTypeName;
        string exName;
-       ZType exType;
-       SymbolLocalVar exSymbol;
+       ZLType exType;
+       ZCLocalVar exSymbol;
 
        public override void Analy( )
        {
@@ -37,31 +37,22 @@ namespace ZCompileCore.AST
                //NameTypeParser parser = new NameTypeParser(segMan.TypeNameDict, segMan.ArgSegementer);
                //NameTypeParser.ParseResult result = parser.ParseVar(ExceptionTypeVarToken);
 
-               exTypeName = result.ArgZTypes[0].ZName;
-               exType = result.ArgZTypes[0];
+               exTypeName = result.ArgZTypes[0].ZTypeName;
+               exType = (ZLType)result.ArgZTypes[0];
                exName = result.ArgName;
            }
-           //var symbols = this.ProcContext.Symbols;
-           //exTypeName = ExceptionTypeToken.GetText();
-           //exType = ZTypeCache.GetByZName(exTypeName)[0];
-           //if (exType == null)
-           //{
-           //    errorf(ExceptionTypeToken.Postion, "类型'{0}'不存在", exTypeName);
-           //}
-           //exName = ExceptionVarToken.GetText();
-           //var exSymbol2 = symbols.Get(exName);
            if (this.ProcContext.ContainsVarName(exName)==false)// exSymbol2 == null)
            {
-               exSymbol = new SymbolLocalVar(exName, exType);
+               exSymbol = new ZCLocalVar(exName, exType);
                exSymbol.LoacalVarIndex =this.ProcContext.CreateLocalVarIndex(exName);
-               this.ProcContext.AddDefSymbol(exSymbol);
+               this.ProcContext.AddLocalVar(exSymbol);
            }
            else
            {
                if (this.ProcContext.IsDefLocal(exName))//if (exSymbol2 is SymbolLocalVar)
                {
                    exSymbol = this.ProcContext.GetDefLocal(exName);// exSymbol2 as SymbolLocalVar;
-                   if (exSymbol.SymbolZType != exType)
+                   if (exSymbol.GetZType() != exType)
                    {
                        ErrorF(ExceptionTypeVarToken.Position, "变量'{0}'的类型与异常的类型不一致", exName);
                    }
@@ -85,14 +76,6 @@ namespace ZCompileCore.AST
            CatchBody.Emit();
            IL.EndExceptionBlock();
        }
-
-       //private IWordDictionary GetTypeWords()
-       //{
-       //    WordDictionary dict = this.ProcContext.ClassContext.FileContext.ImportContext.TypeNameDict;
-       //    //WordDictionaryList collect = new WordDictionaryList();
-       //    //collect.Add(dict);
-       //    return dict;
-       //}
 
        #region 覆盖 
        public override string ToString()

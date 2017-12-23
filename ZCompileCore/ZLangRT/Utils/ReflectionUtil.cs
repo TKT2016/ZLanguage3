@@ -34,59 +34,59 @@ namespace ZLangRT.Utils
         //    return list.ToArray();
         //}
 
-        public static AccessAttributeEnum GetAccessAttributeEnum(Type type)
+        public static AccessAttrEnum GetAccessAttributeEnum(Type type)
         {
-            if (type.IsPublic) return AccessAttributeEnum.Public;
-            if (type.IsNotPublic) return AccessAttributeEnum.Private;
-            return AccessAttributeEnum.Private;
+            if (type.IsPublic) return AccessAttrEnum.Public;
+            if (type.IsNotPublic) return AccessAttrEnum.Private;
+            return AccessAttrEnum.Private;
         }
 
-        public static AccessAttributeEnum GetAccessAttributeEnum(FieldInfo SharpField)
+        public static AccessAttrEnum GetAccessAttributeEnum(FieldInfo SharpField)
         {
-            AccessAttributeEnum AccessAttribute = AccessAttributeEnum.Private;
+            AccessAttrEnum AccessAttribute = AccessAttrEnum.Private;
             if (SharpField.IsPublic)
             {
-                AccessAttribute = AccessAttributeEnum.Public;
+                AccessAttribute = AccessAttrEnum.Public;
             }
             else if (SharpField.IsPrivate)
             {
-                AccessAttribute = AccessAttributeEnum.Private;
+                AccessAttribute = AccessAttrEnum.Private;
             }
             else if (SharpField.IsFamily)
             {
-                AccessAttribute = AccessAttributeEnum.Internal;
+                AccessAttribute = AccessAttrEnum.Internal;
             }
             else if (SharpField.IsFamilyOrAssembly)
             {
-                AccessAttribute = AccessAttributeEnum.Protected;
+                AccessAttribute = AccessAttrEnum.Protected;
             }
             else
             {
-                AccessAttribute = AccessAttributeEnum.Private;
+                AccessAttribute = AccessAttrEnum.Private;
             }
             return AccessAttribute;
         }
 
-        public static AccessAttributeEnum GetAccessAttributeEnum(PropertyInfo SharpProperty)
+        public static AccessAttrEnum GetAccessAttributeEnum(PropertyInfo SharpProperty)
         {
-            AccessAttributeEnum getAae = ReflectionUtil.GetAccessAttributeEnum(SharpProperty.GetGetMethod());
-            AccessAttributeEnum setAae = ReflectionUtil.GetAccessAttributeEnum(SharpProperty.GetSetMethod());
-            var AccessAttribute = AccessAttributeEnum.Private;
-            if (getAae == AccessAttributeEnum.Public || setAae == AccessAttributeEnum.Public)
+            AccessAttrEnum getAae = ReflectionUtil.GetAccessAttributeEnum(SharpProperty.GetGetMethod());
+            AccessAttrEnum setAae = ReflectionUtil.GetAccessAttributeEnum(SharpProperty.GetSetMethod());
+            var AccessAttribute = AccessAttrEnum.Private;
+            if (getAae == AccessAttrEnum.Public || setAae == AccessAttrEnum.Public)
             {
-                AccessAttribute = AccessAttributeEnum.Public;
+                AccessAttribute = AccessAttrEnum.Public;
             }
-            else if (getAae == AccessAttributeEnum.Private && setAae == AccessAttributeEnum.Private)
+            else if (getAae == AccessAttrEnum.Private && setAae == AccessAttrEnum.Private)
             {
-                AccessAttribute = AccessAttributeEnum.Private;
+                AccessAttribute = AccessAttrEnum.Private;
             }
-            else if (getAae == AccessAttributeEnum.Internal && setAae == AccessAttributeEnum.Internal)
+            else if (getAae == AccessAttrEnum.Internal && setAae == AccessAttrEnum.Internal)
             {
-                AccessAttribute = AccessAttributeEnum.Internal;
+                AccessAttribute = AccessAttrEnum.Internal;
             }
-            else if (getAae == AccessAttributeEnum.Protected && setAae == AccessAttributeEnum.Protected)
+            else if (getAae == AccessAttrEnum.Protected && setAae == AccessAttrEnum.Protected)
             {
-                AccessAttribute = AccessAttributeEnum.Protected;
+                AccessAttribute = AccessAttrEnum.Protected;
             }
             //else
             //{
@@ -95,28 +95,28 @@ namespace ZLangRT.Utils
             return AccessAttribute;
         }
 
-        public static AccessAttributeEnum GetAccessAttributeEnum(MethodInfo method)
+        public static AccessAttrEnum GetAccessAttributeEnum(MethodInfo method)
         {
-            if (method == null) return AccessAttributeEnum.Private;
+            if (method == null) return AccessAttrEnum.Private;
             if (method.IsPublic)
             {
-                return AccessAttributeEnum.Public;
+                return AccessAttrEnum.Public;
             }
             else if (method.IsPrivate)
             {
-                return AccessAttributeEnum.Private;
+                return AccessAttrEnum.Private;
             }
             else if (method.IsFamily)
             {
-                return AccessAttributeEnum.Internal;
+                return AccessAttrEnum.Internal;
             }
             else if (method.IsFamilyOrAssembly)
             {
-                return AccessAttributeEnum.Protected;
+                return AccessAttrEnum.Protected;
             }
             else
             {
-                return AccessAttributeEnum.Private;
+                return AccessAttrEnum.Private;
             }
         }
 

@@ -8,7 +8,7 @@ using ZCompileCore.Lex;
 using ZLangRT.Attributes;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileDesc;
 using ZCompileCore.Contexts;
 
@@ -29,14 +29,14 @@ namespace ZCompileCore.AST
             Values.Add(token);
         }
 
-        public ZEnumType Compile(ModuleBuilder moduleBuilder, string packageName, string fileName)
+        public ZLEnumInfo Compile(ModuleBuilder moduleBuilder, string packageName, string fileName)
         {
             AnalyText();
             EmitName();
             AnalyBody();
             EmitBody();
             var EmitedType = Builder.CreateType();
-            ZEnumType ztype = ZTypeManager.GetByMarkType(EmitedType) as ZEnumType;
+            ZLEnumInfo ztype = ZTypeManager.GetByMarkType(EmitedType) as ZLEnumInfo;
             return ztype;
         }
 

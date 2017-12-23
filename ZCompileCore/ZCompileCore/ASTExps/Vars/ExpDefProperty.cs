@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -19,7 +18,7 @@ namespace ZCompileCore.ASTExps
     public class ExpDefProperty : ExpVarBase
     {
         //protected SymbolDefProperty PropertySymbol;
-        ZMemberCompiling PropertyCompiling;
+        ZCPropertyInfo PropertyCompiling;
 
         public ExpDefProperty(LexToken token)
         {
@@ -29,17 +28,13 @@ namespace ZCompileCore.ASTExps
         public override Exp Analy()
         {
             VarName = VarToken.GetText();
-            //if (VarName.ToString() == "子弹群")
-            //{
-            //    Console.WriteLine("子弹群");
-            //}
             PropertyCompiling = this.ProcContext.ClassContext.SeachZProperty(VarName);
-            RetType = PropertyCompiling.GetMemberType();// PropertySymbol.SymbolZType;
+            RetType = PropertyCompiling.ZPropertyType;//.GetMemberType();// PropertySymbol.SymbolZType;
             return this;
         }
 
-        ZMemberCompiling NestedFieldSymbol;
-        public void SetAsLambdaFiled(ZMemberCompiling fieldSymbol)
+        ZCFieldInfo NestedFieldSymbol;
+        public void SetAsLambdaFiled(ZCFieldInfo fieldSymbol)
         {
             NestedFieldSymbol = fieldSymbol;
         }
@@ -69,7 +64,7 @@ namespace ZCompileCore.ASTExps
             //    Console.WriteLine("子弹群");
             //}
             bool isstatic = this.PropertyCompiling.IsStatic;
-            EmitHelper.Emit_LoadThis(IL, isstatic);
+            EmitHelper.EmitThis(IL, isstatic);
             EmitSymbolHelper.EmitLoad(IL, PropertyCompiling);
             base.EmitConv();
         }
@@ -79,7 +74,7 @@ namespace ZCompileCore.ASTExps
             bool isstatic = this.PropertyCompiling.IsStatic;
             if (this.NestedFieldSymbol != null)
             {
-                EmitHelper.Emit_LoadThis(IL,isstatic);
+                EmitHelper.EmitThis(IL, isstatic);
                 EmitSymbolHelper.EmitLoad(IL, this.NestedFieldSymbol);
                 base.EmitConv();
             }
@@ -87,7 +82,7 @@ namespace ZCompileCore.ASTExps
             {
                 if (this.ClassContext.IsStatic() == false)
                 {
-                    EmitHelper.Emit_LoadThis(IL, isstatic);
+                    EmitHelper.EmitThis(IL, isstatic);
                     EmitSymbolHelper.EmitLoad(IL, this.ClassContext.NestedOutFieldSymbol);
                 }
                 EmitSymbolHelper.EmitLoad(IL, PropertyCompiling);
@@ -112,7 +107,7 @@ namespace ZCompileCore.ASTExps
             bool isstatic = false;// this.PropertyCompiling.IsStatic;
             if (this.NestedFieldSymbol != null)
             {
-                EmitHelper.Emit_LoadThis(IL, isstatic);
+                EmitHelper.EmitThis(IL, isstatic);
                 EmitValueExp(valueExp);
                 EmitSymbolHelper.EmitStorm(IL, this.NestedFieldSymbol);
             }
@@ -120,7 +115,7 @@ namespace ZCompileCore.ASTExps
             {
                 if (this.ClassContext.IsStatic() == false)
                 {
-                    EmitHelper.Emit_LoadThis(IL, isstatic);
+                    EmitHelper.EmitThis(IL, isstatic);
                     EmitSymbolHelper.EmitLoad(IL, this.ClassContext.NestedOutFieldSymbol);//EmitHelper.LoadField(IL, this.ClassContext.NestedOutFieldSymbol.Field);
                 }
                 EmitValueExp(valueExp);
@@ -131,7 +126,7 @@ namespace ZCompileCore.ASTExps
         private void EmitSetProperty(Exp valueExp)
         {
             bool isstatic = this.PropertyCompiling.IsStatic;
-            EmitHelper.Emit_LoadThis(IL, isstatic);
+            EmitHelper.EmitThis(IL, isstatic);
             EmitValueExp(valueExp);
             EmitSymbolHelper.EmitStorm(IL, PropertyCompiling);
             base.EmitConv();
@@ -145,7 +140,7 @@ namespace ZCompileCore.ASTExps
         {
             get
             {
-                return PropertyCompiling.CanWrite;
+                return PropertyCompiling.GetCanWrite();//.CanWrite;
             }
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.Contexts;
+using ZCompileDesc.Utils;
 
 namespace ZCompileCore.AST
 {
@@ -39,12 +40,8 @@ namespace ZCompileCore.AST
 
         public override void Emit()
         {
-            //if (this.ToString().StartsWith("子弹群添加Z"))
-            //{
-            //    Console.WriteLine("子弹群添加Z");
-            //}
             CallExp.Emit();
-            if (CallExp.RetType.SharpType != typeof(void))
+            if (!ZTypeUtil.IsVoid(CallExp.RetType))
             {
                 IL.Emit(OpCodes.Pop);
             }

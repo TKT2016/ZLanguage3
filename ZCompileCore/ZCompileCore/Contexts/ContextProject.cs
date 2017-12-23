@@ -12,7 +12,8 @@ using ZLangRT;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using System.IO;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Collections;
+
 
 namespace ZCompileCore.Contexts
 {
@@ -20,8 +21,8 @@ namespace ZCompileCore.Contexts
     {
         public string PackageName { get; set; }
         public ZProjectModel ProjectModel { get;private set; }
-        public Dictionary<Assembly, ZAssemblyDesc> AssemblyDescDictionary { get; private set; }
-        public CompiledTypeCollection CompiledTypes { get; private set; }
+        public Dictionary<Assembly, ZAssemblyInfo> AssemblyDescDictionary { get; private set; }
+        public ZLCollection CompiledTypes { get; private set; }
         public CompileMessageCollection MessageCollection { get; private set; }
 
         public ContextProject(ZProjectModel projectModel, CompileMessageCollection messageCollection)
@@ -30,24 +31,24 @@ namespace ZCompileCore.Contexts
             PackageName = ProjectModel.ProjectPackageName;
             MessageCollection = messageCollection;
 
-            AssemblyDescDictionary = new Dictionary<Assembly, ZAssemblyDesc>();
-            CompiledTypes = new CompiledTypeCollection();
+            AssemblyDescDictionary = new Dictionary<Assembly, ZAssemblyInfo>();
+            CompiledTypes = new ZLCollection();
         }
 
         public bool AddAssembly(Assembly assembly)
         {
             if (this.AssemblyDescDictionary.ContainsKey(assembly)) return false;
-            ZAssemblyDesc assemblyDesc = new ZAssemblyDesc(assembly.FullName,assembly);
+            ZAssemblyInfo assemblyDesc = new ZAssemblyInfo(assembly.FullName,assembly);
             this.AssemblyDescDictionary.Add(assembly, assemblyDesc);
             return true;
         }
 
-        public ZPackageDesc SearchZPackageDesc(string packageName)
+        public ZPackageInfo SearchZPackageDesc(string packageName)
         {
             var dict = this.AssemblyDescDictionary;
-            foreach (ZAssemblyDesc assemblyDesc in dict.Values)
+            foreach (ZAssemblyInfo assemblyDesc in dict.Values)
             {
-                ZPackageDesc packageDesc = assemblyDesc.SearhcZPackageDesc(packageName);
+                ZPackageInfo packageDesc = assemblyDesc.SearhcZPackageDesc(packageName);
                 if (packageDesc != null)
                     return packageDesc;
             }

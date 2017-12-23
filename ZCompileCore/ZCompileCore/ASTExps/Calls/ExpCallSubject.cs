@@ -9,19 +9,18 @@ using ZCompileCore.Tools;
 using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
-using ZCompileDesc.ZTypes;
-using ZCompileDesc.ZMembers;
+
 
 namespace ZCompileCore.AST
 {
     public class ExpCallSubject : ExpCallAnalyedBase
     {
         Exp SubjectExp;
-        ZMethodInfo SearchedMethod;
-        ZClassType SubjectZType;
+        ZLMethodInfo SearchedMethod;
+        ZLClassInfo SubjectZType;
         List<Exp> newExpArgs;
 
-        public ExpCallSubject(ContextExp context, Exp SubjectExp, ZCallDesc expProcDesc, Exp srcExp, List<Exp> argExps)
+        public ExpCallSubject(ContextExp context, Exp SubjectExp, ZMethodCall expProcDesc, Exp srcExp, List<Exp> argExps)
         {
             this.ExpContext = context;
             this.SubjectExp = SubjectExp;
@@ -37,13 +36,13 @@ namespace ZCompileCore.AST
             //    Console.WriteLine("子弹群添加Z");
             //}
             if (this.ExpContext == null) throw new CCException();
-            if (SubjectExp.RetType is ZEnumType)
+            if (SubjectExp.RetType is ZLEnumInfo)
             {
                 ErrorF(this.Position, "约定类型没有过程");
             }
             else
             {
-                SubjectZType =  (SubjectExp.RetType as ZClassType);
+                SubjectZType =  (SubjectExp.RetType as ZLClassInfo);
                 var zmethods = SubjectZType.SearchZMethod(ExpProcDesc);
                 if (zmethods.Length == 0)
                 {
@@ -52,7 +51,7 @@ namespace ZCompileCore.AST
                 else
                 {
                     SearchedMethod = zmethods[0];
-                    var defArgs = SearchedMethod.ZDesces[0].DefArgs;
+                    var defArgs = SearchedMethod.ZParams;//.ZDesces[0].DefArgs;
                     newExpArgs = AnalyArgLambda(defArgs, ArgExps);
 
                     this.RetType = SearchedMethod.RetZType;
@@ -71,7 +70,7 @@ namespace ZCompileCore.AST
 
         private void EmitSubject()
         {
-            if (!SearchedMethod.IsStatic)
+            if (!SearchedMethod.GetIsStatic())
             {
                 SubjectExp.Emit();
             }

@@ -8,8 +8,6 @@ using ZCompileCore.Contexts;
 using ZCompileCore.ASTExps;
 using ZCompileCore.Lex;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
 using ZCompileCore.Parsers;
 
 namespace ZCompileCore.ASTExps
@@ -73,7 +71,7 @@ namespace ZCompileCore.ASTExps
 
         public override void Emit()
         {
-            throw new NotImplementedException();
+            throw new CCException();
         }
 
         public override Exp[] GetSubExps()

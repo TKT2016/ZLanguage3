@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.Contexts;
 using ZCompileDesc;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
+
 
 namespace ZCompileCore.Parsers
 {
@@ -18,7 +19,7 @@ namespace ZCompileCore.Parsers
             this.segManager = segManager;
         }
 
-		public ZType[] Find(string text)
+        public ZType[] Find(string text)
         {
             ZType[] result = null;
             result = SearchOne(text);
@@ -27,7 +28,7 @@ namespace ZCompileCore.Parsers
 
         private ZType[] SearchOne(string ztypeName)
         {
-            ZType[] ztypes = this.segManager.SearchZTypesByClassNameOrDimItem(ztypeName);
+            ZType[] ztypes = this.segManager.SearchByClassNameOrDimItem(ztypeName);
             if (ztypes.Length > 0)
             {
                 return ztypes;

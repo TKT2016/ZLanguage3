@@ -18,7 +18,7 @@ namespace ZCompileCore.AST
     /// </summary>
     public class ExpCallNone : ExpCallAnalyedBase
     {
-        public ExpCallNone(ContextExp context, ZCallDesc expProcDesc, Exp srcExp)
+        public ExpCallNone(ContextExp context, ZMethodCall expProcDesc, Exp srcExp)
         {
             this.ExpContext = context;
             this.ExpProcDesc = expProcDesc;

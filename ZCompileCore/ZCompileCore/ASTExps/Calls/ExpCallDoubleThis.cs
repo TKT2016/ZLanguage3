@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -22,7 +21,9 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpCallDoubleThis : ExpCallDouble
     {
-        public ExpCallDoubleThis(ZMethodInfo[] methods, Exp argExp,Exp srcExp)
+        ZCMethodInfo ZMethod;
+        protected ZCMethodInfo[] Methods;
+        public ExpCallDoubleThis(ZCMethodInfo[] methods, Exp argExp,Exp srcExp)
         {
             this.Methods = methods;
             this.ArgExp = argExp;
@@ -31,14 +32,14 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
-            Method = SearchZMethod();
-            RetType = Method.RetZType;
+            ZMethod = SearchZMethod();
+            RetType = ZMethod.RetZType;
             return this;
         }
 
-        private ZMethodInfo SearchZMethod( )
+        private ZCMethodInfo SearchZMethod()
         {
-            return Methods[0];
+            return (ZCMethodInfo)(Methods[0]);
         }
 
         #region Emit
@@ -46,18 +47,18 @@ namespace ZCompileCore.ASTExps
         {
             EmitSubject();
             EmitArgs();
-            EmitHelper.CallDynamic(IL, Method.SharpMethod);
+            EmitHelper.CallDynamic(IL, ZMethod.MethodBuilder);//.SharpMethod);
             EmitConv(); 
         }
 
         protected void EmitArgs()
         {
-            EmitArgExp(Method.ZDesces[0].DefArgs[0], ArgExp);
+            EmitArgExp(ZMethod.ZParams[0],ArgExp);//.ZDesces[0].DefArgs[0], ArgExp);
         }
 
         private void EmitSubject()
         {
-            if (Method.IsStatic == false)
+            if (ZMethod.GetIsStatic() == false)
             {
                 IL.Emit(OpCodes.Ldarg_0);
             }

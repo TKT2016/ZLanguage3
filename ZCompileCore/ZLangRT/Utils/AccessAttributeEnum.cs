@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZLangRT.Utils
 {
-    public enum AccessAttributeEnum
+    public enum AccessAttrEnum
     {
         Public,
         Protected,

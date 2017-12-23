@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -23,6 +21,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpCallSingleSuper : ExpCallSingle
     {
+        protected ZLMethodInfo Method;
         public ExpCallSingleSuper(LexToken token)
         {
             VarToken = token;
@@ -36,9 +35,9 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZMethodInfo SearchZMethod(string name)
+        private ZLMethodInfo SearchZMethod(string name)
         {
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
             var methods = this.ClassContext.SearchSuperProc(calldesc);
             return methods[0];
@@ -54,7 +53,7 @@ namespace ZCompileCore.ASTExps
 
         private void EmitSubject()
         {
-            if (Method.IsStatic == false)
+            if (Method.GetIsStatic() == false)
             {
                 IL.Emit(OpCodes.Ldarg_0);
             }

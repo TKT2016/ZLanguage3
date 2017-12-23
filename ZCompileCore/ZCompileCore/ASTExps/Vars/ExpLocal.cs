@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -18,30 +17,12 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public abstract class ExpLocal : ExpVarBase
     {
-        public ZMemberCompiling MemberCompiling { get;private set; }
+        public ZCFieldInfo MemberCompiling { get; private set; }
 
-        public void SetAsLambdaFiled(ZMemberCompiling memberCompiling)
+        public virtual void SetAsLambdaFiled(ZCFieldInfo memberCompiling)
         {
             MemberCompiling = memberCompiling;
         }
 
-        //public SymbolDefField NestedFieldSymbol { get; protected set; }
-        //public void SetAsLambdaFiled(SymbolDefField fieldSymbol)
-        //{
-        //    NestedFieldSymbol = fieldSymbol;
-        //}
-
-        //public SymbolBase GetSymbol()
-        //{
-        //    if(this is ExpArg)
-        //    {
-        //        return (this as ExpArg).ArgSymbol;
-        //    }
-        //    else if (this is ExpLocalVar)
-        //    {
-        //        return (this as ExpLocalVar).LocalVarSymbol;
-        //    }
-        //    throw new CCException();
-        //}
     }
 }

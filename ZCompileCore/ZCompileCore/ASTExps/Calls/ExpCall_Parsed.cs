@@ -9,7 +9,6 @@ using ZCompileCore.Tools;
 using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
-using ZCompileDesc.ZMembers;
 using ZCompileKit.Tools;
 using ZCompileCore.Parsers;
 
@@ -17,7 +16,7 @@ namespace ZCompileCore.AST
 {
     public class ExpCall_Parsed : ExpCallAnalyedBase
     {
-        ZCallDesc CallDesc;
+        ZMethodCall CallDesc;
         List<Exp> Elements;
 
         public ExpCall_Parsed( List<Exp> elements, ContextExp context,Exp srcExp)
@@ -78,7 +77,7 @@ namespace ZCompileCore.AST
         {
             if (this.ExpContext.ClassContext.GetSuperZType() == null)
                 return null;
-            ZMethodInfo[] descArray = this.ExpContext.ClassContext.GetSuperZType().FindDeclaredZMethod(CallDesc);
+            ZLMethodInfo[] descArray = this.ExpContext.ClassContext.GetSuperZType().SearchDeclaredZMethod(CallDesc);
             if (descArray.Length == 0)
             {
                 return null;
@@ -90,8 +89,8 @@ namespace ZCompileCore.AST
             }
             else
             {
-                ZMethodInfo methodDesc = descArray[0];
-                ExpCallThis expCallThis = new ExpCallThis(this.ExpContext, CallDesc, methodDesc, this, ArgExps);
+                ZLMethodInfo methodDesc = descArray[0];
+                ExpCallSuper expCallThis = new ExpCallSuper(this.ExpContext, CallDesc, methodDesc, this, ArgExps);
                 return expCallThis;
             }
         }
@@ -121,7 +120,7 @@ namespace ZCompileCore.AST
                         throw new CCException();
                     }
                 }
-                ZCallDesc tailDesc = CallDesc.CreateTail();
+                ZMethodCall tailDesc = CallDesc.CreateTail();
                 List<Exp> argExps = ListHelper.GetSubs<Exp>(ArgExps,1);
                 ExpCallSubject expCallSubject = new ExpCallSubject(this.ExpContext, SubjectExp, tailDesc, this.SrcExp, argExps);
                 return expCallSubject;
@@ -132,7 +131,7 @@ namespace ZCompileCore.AST
         {
             //try
             //{
-                ZMethodInfo[] zmethods = this.ExpContext.ClassContext.FileContext.ImportUseContext.SearchUseMethod(CallDesc);
+                ZLMethodInfo[] zmethods = this.ExpContext.ClassContext.FileContext.ImportUseContext.SearchUseMethod(CallDesc);
                 if (zmethods.Length == 0)
                 {
                     return null;
@@ -157,7 +156,7 @@ namespace ZCompileCore.AST
         private Exp SearchThis( )
         {
             //ZMethodDesc[] descArray = this.ExpContext.ClassContext.SearchThisProc(CallDesc);
-            ZMethodInfo[] descArray = this.ExpContext.ClassContext.SearchThisProc(CallDesc);
+            ZCMethodInfo[] descArray = this.ExpContext.ClassContext.SearchThisProc(CallDesc);
             if (descArray.Length == 0)
             {
                 return null;
@@ -169,7 +168,7 @@ namespace ZCompileCore.AST
             }
             else
             {
-                ZMethodInfo method = descArray[0];
+                ZCMethodInfo method = descArray[0];
                 ExpCallThis expCallThis = new ExpCallThis(this.ExpContext, CallDesc, method, this, ArgExps);
                 return expCallThis;
             }
@@ -177,7 +176,7 @@ namespace ZCompileCore.AST
 
         private void AnalyProcDesc()
         {
-           CallDesc= new ZCallDesc();
+           CallDesc= new ZMethodCall();
            ArgExps = new List<Exp>();
             foreach(var item in this.Elements)
             {
@@ -193,7 +192,7 @@ namespace ZCompileCore.AST
                 else if (item is ExpBracket)
                 {
                     ExpBracket bracketExp = item as ExpBracket;
-                    ZBracketCallDesc zbracketDesc = bracketExp.GetCallDesc();
+                    ZBracketCall zbracketDesc = bracketExp.GetCallDesc();
                     CallDesc.Add(zbracketDesc);
                     ArgExps.AddRange(bracketExp.GetSubExps());
                 }

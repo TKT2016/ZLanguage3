@@ -9,7 +9,6 @@ using ZCompileCore.Tools;
 using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
-using ZCompileDesc.ZMembers;
 using ZCompileKit.Tools;
 using ZCompileCore.Parsers;
 

@@ -3,19 +3,19 @@ using System.Linq;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+
 
 namespace ZCompileCore.AST
 {
     public class ProcBracket : SectionPartProc
     {
-        public List<ProcArg> Args { get; private set; }
+        public List<ProcParameter> Args { get; private set; }
 
         public ProcBracket()
         {
-            Args = new List<ProcArg>();
+            Args = new List<ProcParameter>();
         }
 
         public override void AnalyText()
@@ -69,9 +69,20 @@ namespace ZCompileCore.AST
             }
         }
 
+        //public void SetContext(ContextMethod procContext)
+        //{
+        //    this.ProcContext = procContext;
+        //    this.ClassContext = this.ProcContext.ClassContext;
+        //    this.FileContext = this.ClassContext.FileContext;
+        //    foreach (var item in Args)
+        //    {
+        //        item.SetContext(procContext);
+        //    }
+        //}
+
         //public ContextProc ProcContext;
 
-        public void Add(ProcArg arg)
+        public void Add(ProcParameter arg)
         {
             Args.Add(arg);
         }
@@ -85,13 +96,13 @@ namespace ZCompileCore.AST
         //    }
         //}
 
-        private ZBracketDefDesc _ZBracketDefDesc;
-        public ZBracketDefDesc GetZDesc()
+        private ZCBracketDesc _ZBracketDefDesc;
+        public ZCBracketDesc GetZDesc()
         {
             if (_ZBracketDefDesc==null)
             {
-                _ZBracketDefDesc = new ZBracketDefDesc();
-                foreach(ProcArg item in Args)
+                _ZBracketDefDesc = new ZCBracketDesc();
+                foreach(ProcParameter item in Args)
                 {
                     var zarg = item.GetZParam();
                     _ZBracketDefDesc.Add(zarg);

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -19,7 +18,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpUseEnumItem : ExpVarBase
     {
-        protected ZEnumItemInfo ZEnumItem;
+        protected ZLEnumItemInfo ZEnumItem;
 
         public ExpUseEnumItem(LexToken token)
         {
@@ -34,10 +33,10 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZEnumItemInfo SearchValue(string zname)
+        private ZLEnumItemInfo SearchValue(string zname)
         {
             ContextImportUse contextiu = this.FileContext.ImportUseContext;
-            ZEnumItemInfo[] cu = contextiu.SearchUsedZEnumItems(zname);
+            ZLEnumItemInfo[] cu = contextiu.SearchUsedZEnumItems(zname);
             return cu[0];
             //ContextUse cu = this.ClassContext.FileContext.UseContext;
             //foreach (var zenum in cu.UseZEnumList)

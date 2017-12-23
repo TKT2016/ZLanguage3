@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
+
 
 namespace ZCompileCore.ASTExps
 {

@@ -109,3 +109,4 @@ E:\ProgProj\Z\Z4\ZCompileCore\ZCompileCore\bin\Debug\Resources\prob_trans.json
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompileCore\bin\Debug\ZNLP.dll
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompileCore\bin\Debug\Newtonsoft.Json.dll
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompileCore\bin\Debug\ZNLP.pdb
+E:\MySource\Zyy\Z4\ZCompileCore\ZCompileCore\bin\Debug\Resources\dict - 复制.txt

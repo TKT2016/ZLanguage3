@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -18,7 +18,8 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpArg : ExpLocal
     {
-        public SymbolArg ArgSymbol { get; protected set; }
+        //public SymbolArg ArgSymbol { get; protected set; }
+        public ZCParamInfo ArgSymbol { get; protected set; }
 
         public ExpArg(LexToken token)
         {
@@ -29,12 +30,12 @@ namespace ZCompileCore.ASTExps
         {
             VarName = VarToken.GetText();
             //var symbols = this.ProcContext.Symbols;
-            ArgSymbol = this.ProcContext.GetDefArg(VarName);// symbols.Get(VarName) as SymbolArg;
-            RetType = ArgSymbol.SymbolZType;
+            ArgSymbol = this.ProcContext.GetParameter(VarName);// symbols.Get(VarName) as SymbolArg;
+            RetType = ArgSymbol.ZParamType;//.SymbolZType;
             return this;
         }
 
-        ZMemberCompiling NestedFieldSymbol;
+        ZCFieldInfo NestedFieldSymbol;
         //public void SetAsLambdaFiled(ZMemberCompiling fieldSymbol)
         //{
         //    NestedFieldSymbol = fieldSymbol;
@@ -68,7 +69,7 @@ namespace ZCompileCore.ASTExps
         {
             if (this.NestedFieldSymbol != null)
             {
-                EmitHelper.Emit_LoadThis(IL,false);
+                EmitHelper.EmitThis(IL, false);
                 EmitSymbolHelper.EmitLoad(IL, this.NestedFieldSymbol);
                 base.EmitConv();
             }
@@ -94,7 +95,7 @@ namespace ZCompileCore.ASTExps
         {
             if (this.NestedFieldSymbol != null)
             {
-                EmitHelper.Emit_LoadThis(IL,true);
+                EmitHelper.EmitThis(IL, true);
                 EmitValueExp(valueExp);
                 EmitSymbolHelper.EmitStorm(IL, this.NestedFieldSymbol);
             }
@@ -111,6 +112,11 @@ namespace ZCompileCore.ASTExps
             base.EmitConv();
         }
 
+        public void EmitLoadArga()
+        {
+            EmitHelper.LoadArga(IL, ArgSymbol.EmitIndex);
+        }
+
         #endregion
 
         #region 覆盖
@@ -119,7 +125,7 @@ namespace ZCompileCore.ASTExps
         {
             get
             {
-                return ArgSymbol.CanWrite;
+                return ArgSymbol.GetCanWrite();
             }
         }
 

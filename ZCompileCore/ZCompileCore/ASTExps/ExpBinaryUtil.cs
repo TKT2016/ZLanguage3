@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZCompileCore.Lex;
+using ZCompileDesc.Descriptions;
 using ZLangRT;
 using ZLangRT.Utils;
 
@@ -79,6 +80,15 @@ namespace ZCompileCore.AST
             CalculaterMethodTypeEnum calculaterMethodType = GetCalculaterMethodType(opKind, ltype, rtype);
             if (calculaterMethodType == CalculaterMethodTypeEnum.None) return null;
             return GetCalcMethod(calculaterMethodType, opKind, ltype, rtype);
+        }
+
+        public static MethodInfo GetCalcMethod(TokenKind opKind, ZType ltype, ZType rtype)
+        {
+            if(ltype is ZLType  && rtype is ZLType)
+            {
+                return GetCalcMethod(opKind, (ltype as ZLType).SharpType, (rtype as ZLType).SharpType);
+            }
+            return null;
         }
 
         private static MethodInfo GetCalcMethod(CalculaterMethodTypeEnum calculaterMethodType, TokenKind opKind, Type ltype, Type rtype)

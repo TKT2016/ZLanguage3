@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc.Descriptions;
 using ZLangRT.Utils;
 

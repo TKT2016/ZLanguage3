@@ -58,10 +58,12 @@ namespace 小飞机游戏
 		[ZCode("响应鼠标移动")]
 		public override void 响应鼠标移动()
 		{
-			Point point=this.鼠标位置;
-			this.玩家.X坐标 = point.X;
-            Point point2 = this.鼠标位置;
-			this.玩家.Y坐标 = point2.Y;
+			//Point point=this.鼠标位置;
+			//this.玩家.X坐标 = point.X;
+            //Point point2 = this.鼠标位置;
+			//this.玩家.Y坐标 = point2.Y;
+            this.玩家.X坐标 = 鼠标位置.X;
+            this.玩家.Y坐标 = 鼠标位置.Y;
 		}
 
 		[ZCode("用(绘图器:HTQ)绘图")]

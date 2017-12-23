@@ -7,7 +7,7 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
+
 
 namespace ZCompileCore.AST
 {

@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -23,6 +20,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpCallSingleThis : ExpCallSingle
     {
+        private ZCMethodInfo Method;
         public ExpCallSingleThis(LexToken token)
         {
             VarToken = token;
@@ -36,13 +34,13 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZMethodInfo SearchZMethod(string name)
+        private ZCMethodInfo SearchZMethod(string name)
         {
             //if (this.ToString().StartsWith("清除出界子弹"))
             //{
             //    Console.WriteLine("清除出界子弹");
             //}
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
             var methods = this.ClassContext.SearchThisProc(calldesc);
             return methods[0];
@@ -52,13 +50,13 @@ namespace ZCompileCore.ASTExps
         public override void Emit()
         {
             EmitSubject();
-            EmitHelper.CallDynamic(IL, Method.SharpMethod);
+            EmitHelper.CallDynamic(IL, Method.MethodBuilder);
             EmitConv(); 
         }
 
         private void EmitSubject()
         {
-            if (Method.IsStatic == false)
+            if (Method.GetIsStatic() == false)
             {
                 IL.Emit(OpCodes.Ldarg_0);
             }

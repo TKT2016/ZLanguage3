@@ -5,7 +5,6 @@ using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Reports;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
 
 namespace ZCompileCore.AST
 {
@@ -35,15 +34,15 @@ namespace ZCompileCore.AST
             DimSection.FileContext = this.FileContext;
             DimSection.AnalyText();
             DimSection.AnalyType();
-            typeName = DimSection.GetName();//this.FileContext.FileModel.GetFileNameNoEx());
+            typeName = DimSection.GetName();
         }
 
         public void EmitTypeName()
         {
-            DimSection.EmitName();//this.ProjectContext.EmitContext.ModuleBuilder, this.ProjectContext.ProjectModel.ProjectPackageName);
+            DimSection.EmitName();
         }
 
-        public ZDimType Compile()
+        public ZLDimInfo Compile()
         {
             SetPartContext();
             AnalyImport();

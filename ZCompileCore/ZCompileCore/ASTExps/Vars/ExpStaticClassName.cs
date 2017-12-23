@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -20,8 +20,8 @@ namespace ZCompileCore.ASTExps
     {
         //ExpTypeBase srcTypeExp;
         //LexToken VarToken;
-        ZClassType classType;
-        public ExpStaticClassName(LexToken nameToken,ZClassType classType)
+        ZLClassInfo classType;
+        public ExpStaticClassName(LexToken nameToken, ZLClassInfo classType)
         {
             this.VarToken = nameToken;
             this.classType = classType;

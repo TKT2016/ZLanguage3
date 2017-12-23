@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
-using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZTypes;
 using ZCompileKit;
 using ZLangRT;
 using ZNLP;
@@ -16,8 +15,10 @@ namespace ZCompileCore.AST
     public class ProcName : SectionPartProc
     {
         public List<object> NameTerms = new List<object>();
-        ZMethodDesc _ProcDesc;
-        List<ProcArg> ProcArgs = new List<ProcArg>();
+        ZCMethodDesc _ProcDesc;
+
+        public ContextMethod MethodContext { get { return (ContextMethod)ProcContext; } }
+
         public void AddNamePart(LexToken token)
         {
             NameTerms.Add(token);
@@ -58,7 +59,7 @@ namespace ZCompileCore.AST
                 {
                     var pbrackets = term as ProcBracket;
                     pbrackets.AnalyType();
-                    ProcArgs.AddRange(pbrackets.Args);
+                    //ProcArgs.AddRange(pbrackets.Args);
                 }
                 else if (term is LexToken)
                 {
@@ -69,13 +70,19 @@ namespace ZCompileCore.AST
                     throw new CCException();
                 }
             }
-            bool isStatic = this.ClassContext.IsStatic();
-            int start_i = isStatic ? 0 : 1;
-            for (var i = 0; i < ProcArgs.Count; i++)
+            //bool isStatic = this.ClassContext.IsStatic();
+            //int start_i = 0;// isStatic ? 0 : 1;
+            //if(isStatic)
+            //{
+            //    Console.WriteLine(" isStatic ");
+            //}
+            var size = this.ProcContext.GetParametersCount();//
+            for (var i = 0; i < size; i++)
             {
-                ProcArg procArg = ProcArgs[i];
-                int argIndex = start_i + i;
-                procArg.SetArgIndex(argIndex);
+                var procArg = this.ProcContext.GetParameter(i);// ProcArgs[i];
+                int argIndex = i; // start_i + i;
+                procArg.ParamIndex = argIndex;//.SetParameterIndex(argIndex);
+               
             }
         }
 
@@ -86,22 +93,23 @@ namespace ZCompileCore.AST
 
         public override void EmitName()
         {
-            //bool isStatic = this.ClassContext.IsStatic();
-            //var methodBuilder = this.ProcContext.EmitContext.CurrentMethodBuilder;
-            //int start_i = isStatic ? 0 : 1;
-            //int k = start_i;
-            for (var i = 0; i < ProcArgs.Count; i++)
+            for (int i = 0; i < NameTerms.Count; i++)
             {
-                ProcArg procArg = ProcArgs[i];
-                procArg.EmitName();
-                //ZParam zparam = procArg.GetZParam();
-                //if (!zparam.IsGeneric)
-                //{
-                //    ParameterBuilder pb = methodBuilder.DefineParameter(k, ParameterAttributes.None, zparam.ZParamName);
-                //    //zparam.ParameterInfo = pb;
-                //    //k++;
-                //}
+                var term = NameTerms[i];
+                if (term is ProcBracket)
+                {
+                    var pbracket = term as ProcBracket;
+                    pbracket.EmitName();
+                }
             }
+            //var size = this.ProcContext.GetParametersCount();// ProcArgs.Count;
+            //for (var i = 0; i < size; i++)
+            //{
+            //    var procArg = this.ProcContext.GetParameter(i);
+            //    this.ProcContext.DefineParameter(procArg);
+            //    //ProcParameter procArg = this.ProcContext.GetParameter(i);// ProcArgs[i];//MethodContext.ZMethodInfo.ZParams[i];
+            //    //procArg.EmitName();
+            //}
         }
 
         public override void EmitBody()
@@ -111,8 +119,7 @@ namespace ZCompileCore.AST
 
         public string GetMethodName()
         {
-            //ContextClass context = this.ProcContext.ClassContext;
-            ZClassType baseZType = this.ClassContext.GetSuperZType();// context.GetSuperZType();
+            ZLClassInfo baseZType = this.ClassContext.GetSuperZType();
             var procDesc = GetZDesc();
             if (baseZType != null)
             {
@@ -126,29 +133,29 @@ namespace ZCompileCore.AST
             return mname;
         }
 
-        private string CreateMethodName(ZMethodDesc zdesc)
+        private string CreateMethodName(ZCMethodDesc zdesc)
         {
             List<string> list = new List<string>();
-            for (int i = 0; i < zdesc.Parts.Count; i++)
+            for (int i = 0; i < zdesc.Parts.Length; i++)
             {
                 object item = zdesc.Parts[i];
                 if (item is string)
                 {
                     list.Add(item as string);
                 }
-                else if (item is ZBracketDefDesc)
+                else if (item is ZCBracketDesc)
                 {
-                    ZBracketDefDesc zbracket = item as ZBracketDefDesc;
+                    ZCBracketDesc zbracket = item as ZCBracketDesc;
                     for (var j = 0; j < zbracket.ParamsCount; j++)
                     {
-                        var zparam = zbracket.GetParam(j);
-                        if (zparam.IsGenericArg)
+                        var zparam = zbracket.ZParams[j];
+                        if (zparam.GetIsGenericParam())
                         {
                             list.Add("类型");
                         }
                         else
                         {
-                            list.Add(zparam.ZParamType.ZName);
+                            list.Add(zparam.ZParamType.ZTypeName);
                         }
                     }
                 }
@@ -160,11 +167,11 @@ namespace ZCompileCore.AST
             return string.Join("", list);
         }
 
-        public ZMethodDesc GetZDesc()
+        public ZCMethodDesc GetZDesc()
         {
             if (_ProcDesc == null)
             {
-                _ProcDesc = new ZMethodDesc();
+                _ProcDesc = ((ContextMethod)this.ProcContext).ZMethodInfo.ZMethodDesc;// new ZCMethodDesc();
                 for (int i = 0; i < NameTerms.Count; i++)
                 {
                     var term = NameTerms[i];
@@ -177,7 +184,7 @@ namespace ZCompileCore.AST
                     else if (term is ProcBracket)
                     {
                         ProcBracket pbrackets = term as ProcBracket;
-                        ZBracketDefDesc bracketDesc = pbrackets.GetZDesc();
+                        var bracketDesc = pbrackets.GetZDesc();
                         _ProcDesc.Add(bracketDesc);
                     }
                     else
@@ -190,7 +197,7 @@ namespace ZCompileCore.AST
             return _ProcDesc;
         }
 
-        public void SetContext(ContextProc procContext)
+        public void SetContext(ContextMethod procContext)
         {
             this.ProcContext = procContext;
             this.ClassContext = this.ProcContext.ClassContext;

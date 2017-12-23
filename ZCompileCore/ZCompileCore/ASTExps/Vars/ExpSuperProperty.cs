@@ -6,11 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -20,7 +19,7 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpSuperProperty : ExpVarBase
     {
-        ZMemberInfo ZMember;
+        ZLPropertyInfo ZMember;
         public ExpSuperProperty(LexToken token)
         {
             VarToken = token;
@@ -30,15 +29,15 @@ namespace ZCompileCore.ASTExps
         {
             if (this.ExpContext == null) throw new CCException();
             VarName = VarToken.GetText();
-            ZClassType zbase = this.ClassContext.GetSuperZType();
-            ZMember = zbase.SearchZMember(VarName);
+            ZLClassInfo zbase = this.ClassContext.GetSuperZType();
+            ZMember = zbase.SearchProperty(VarName);
             if (ZMember == null) throw new CCException();
-            RetType = ZMember.MemberZType;
+            RetType = ZMember.ZPropertyType;//.MemberZType;
             return this;
         }
 
-        ZMemberCompiling NestedFieldSymbol;
-        public void SetAsLambdaFiled(ZMemberCompiling fieldSymbol)
+        ZCFieldInfo NestedFieldSymbol;
+        public void SetAsLambdaFiled(ZCFieldInfo fieldSymbol)
         {
             NestedFieldSymbol = fieldSymbol;
         }
@@ -56,8 +55,8 @@ namespace ZCompileCore.ASTExps
 
         private void EmitGetProperty()
         {
-            EmitHelper.Emit_LoadThis(IL,false);
-            MethodInfo getMethod = (this.ZMember as ZPropertyInfo).SharpProperty.GetGetMethod();
+            EmitHelper.EmitThis(IL, false);
+            MethodInfo getMethod = (this.ZMember as ZLPropertyInfo).SharpProperty.GetGetMethod();
             EmitHelper.CallDynamic(IL, getMethod);
             base.EmitConv();
         }
@@ -69,9 +68,9 @@ namespace ZCompileCore.ASTExps
 
         private void EmitSetProperty(Exp valueExp)
         {
-            EmitHelper.Emit_LoadThis(IL,false);
+            EmitHelper.EmitThis(IL, false);
             EmitValueExp(valueExp);
-            MethodInfo setMethod = (this.ZMember as ZPropertyInfo).SharpProperty.GetSetMethod();
+            MethodInfo setMethod = (this.ZMember as ZLPropertyInfo).SharpProperty.GetSetMethod();
             EmitHelper.CallDynamic(IL, setMethod);
             base.EmitConv();
         }
@@ -84,7 +83,7 @@ namespace ZCompileCore.ASTExps
         {
             get
             {
-                return ZMember.CanWrite;
+                return ZMember.GetCanWrite();
             }
         }
 

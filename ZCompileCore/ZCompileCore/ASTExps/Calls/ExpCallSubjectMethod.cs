@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -24,8 +23,9 @@ namespace ZCompileCore.ASTExps
     {
         Exp SubjectAnalyedExp;
         LexToken MethodToken;
-        ZCallDesc CallDesc;
+        ZMethodCall CallDesc;
         string MethodName;
+        ZLMethodInfo Method;
 
         public ExpCallSubjectMethod(Exp subjectAnalyedExp,LexToken token)
         {
@@ -36,7 +36,7 @@ namespace ZCompileCore.ASTExps
         public override Exp Analy()
         {
             MethodName = MethodToken.GetText();
-            CallDesc = new ZCallDesc();
+            CallDesc = new ZMethodCall();
             CallDesc.Add(MethodName);
 
             Method = SearchZMethod(MethodName);
@@ -44,14 +44,14 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZMethodInfo SearchZMethod(string name)
+        private ZLMethodInfo SearchZMethod(string name)
         {
             ZType mainType = SubjectAnalyedExp.RetType;
-            ZCallDesc calldesc = new ZCallDesc();
+            ZMethodCall calldesc = new ZMethodCall();
             calldesc.Add(name);
-            if (mainType is ZClassType)
+            if (mainType is ZLClassInfo)
             {
-                var methods = (mainType as ZClassType).SearchZMethod(calldesc);
+                var methods = (mainType as ZLClassInfo).SearchZMethod(calldesc);
                 return methods[0];
             }
             return null;

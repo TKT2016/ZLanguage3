@@ -9,7 +9,7 @@ using ZCompileCore.Tools;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.AST
@@ -42,13 +42,12 @@ namespace ZCompileCore.AST
                 ErrorF(this.OpToken.Position, "运算符'{0}'两边缺少表达式", OpToken.GetText());
                 //AnalyResult = false;
             }
-            //if (LeftExp.ToString() == "长度")
+            //if (LeftExp.ToString() == "J的按键")
             //{
-            //    Console.WriteLine("长度");
+            //    Console.WriteLine("J的按键");
             //}
             OpKind = OpToken.Kind;
             LeftExp = AnalySubExp(LeftExp);
-            
             RightExp = AnalySubExp(RightExp);
 
             if (RightExp == null)
@@ -62,13 +61,13 @@ namespace ZCompileCore.AST
                 {
                     ZType ltype = LeftExp.RetType;
                     ZType rtype = RightExp.RetType;
-                    if (ltype.SharpType == typeof(void) || rtype.SharpType == typeof(void))
+                    if (ZTypeUtil.IsVoid(ltype) || ZTypeUtil.IsVoid(rtype))// (ltype.SharpType == typeof(void) || rtype.SharpType == typeof(void))
                     {
                         ErrorF(OpToken.Position, "没有结果的表达式无法进行'{0}'运算", OpToken.ToCode());
                     }
                     else
                     {
-                        OpMethod = ExpBinaryUtil.GetCalcMethod(OpKind, ltype.SharpType, rtype.SharpType);
+                        OpMethod = ExpBinaryUtil.GetCalcMethod(OpKind, ltype, rtype);
                         if (OpMethod != null)
                         {
                             RetType = ZTypeManager.GetBySharpType(OpMethod.ReturnType) as ZType;

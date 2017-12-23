@@ -11,12 +11,13 @@ using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using System.Reflection;
 using ZCompileKit;
+using ZCompileDesc.Utils;
 
 namespace ZCompileCore.AST
 {
     public class ExpCallAnalyedBase:Exp
     {
-        protected ZCallDesc ExpProcDesc;
+        protected ZMethodCall ExpProcDesc;
         protected Exp SrcExp;
         protected List<Exp> ArgExps { get; set; }
 
@@ -25,18 +26,18 @@ namespace ZCompileCore.AST
             return SrcExp.GetSubExps();
         }
 
-        protected List<Exp> AnalyArgLambda(List<ZParam> defArgs, List<Exp> expArgs)
+        protected List<Exp> AnalyArgLambda(ZLParamInfo[] defArgs, List<Exp> expArgs)
         {
-            if (defArgs.Count != expArgs.Count) throw new CCException();
+            if (defArgs.Length != expArgs.Count) throw new CCException();
             List<Exp> newExpArgs = new List<Exp>();
-            int size = defArgs.Count;
+            int size = defArgs.Length;
             for (int i = 0; i < size; i++)
             {
                 var defArg = defArgs[i];
                 var expArg = expArgs[i];
-                if (defArg.IsGenericArg ==false )
+                if (defArg.GetIsGenericParam() ==false )
                 {
-                    if (ZLambda.IsFn(defArg.ZParamType.SharpType))
+                    if (ZTypeUtil.IsFn(defArg.ZParamType))//(ZLambda.IsFn(defArg.ZParamType.SharpType))
                     {
                         ExpNewLambda newLambdaExp = new ExpNewLambda(expArg, defArg.ZParamType);
                         newLambdaExp.SetContext(this.ExpContext);

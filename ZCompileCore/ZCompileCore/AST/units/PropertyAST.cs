@@ -6,12 +6,11 @@ using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZCompileDesc;
-using ZCompileDesc.Compilings;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Descriptions;
+
 using ZCompileKit.Tools;
 using ZLangRT.Attributes;
 
@@ -28,12 +27,12 @@ namespace ZCompileCore.AST
         string PropertyName;
         ZType PropertyZType;
         ContextExp PropertyExpContext;
-        ZMemberCompiling ZPropertyCompiling;
+        ZCPropertyInfo ZPropertyCompiling;
 
         bool _isExist = false;
         public override void AnalyText()
         {
-            ZPropertyCompiling = new ZMemberCompiling();
+            ZPropertyCompiling = new ZCPropertyInfo();
             PropertyName = NameToken.GetText();
             if (this.ClassContext.ContainsPropertyName(PropertyName))
             {
@@ -43,7 +42,7 @@ namespace ZCompileCore.AST
             else
             {
                 this.ClassContext.AddPropertyName(PropertyName);
-                ZPropertyCompiling.Name = PropertyName;
+                ZPropertyCompiling.ZPropertyZName = PropertyName;
                 this.ClassContext.AddMember(ZPropertyCompiling);
             }
         }
@@ -56,13 +55,13 @@ namespace ZCompileCore.AST
             //}
             if (_isExist) return;
             PropertyZType = AnalyPropertyZType();
-            ZPropertyCompiling.SetMemberType(PropertyZType);
+            ZPropertyCompiling.ZPropertyType = PropertyZType;//.SetMemberType(PropertyZType);
         }
 
         private ZType AnalyPropertyZType()
         {
             bool isStatic = this.ClassContext.IsStatic();
-            ZPropertyCompiling.SetIsStatic(isStatic);
+            ZPropertyCompiling.IsStatic = isStatic;//.SetIsStatic(isStatic);
             ContextImportUse importUseContext = this.FileContext.ImportUseContext;
             if (HasValue())
             {
@@ -109,8 +108,16 @@ namespace ZCompileCore.AST
         {
             bool isStatic = this.ClassContext.IsStatic();
             var classBuilder = this.ClassContext.GetTypeBuilder();
-            ZPropertyCompiling.SetIsStatic(isStatic);
-            Type propertyType = PropertyZType.SharpType;
+            ZPropertyCompiling.IsStatic = isStatic;//.SetIsStatic(isStatic);
+            Type propertyType = null;//
+            if( PropertyZType is ZLType)
+            {
+                propertyType = ((ZLType)PropertyZType).SharpType;
+            }
+            else// (PropertyZType is ZLType)
+            {
+                propertyType = ((ZCClassInfo)PropertyZType).ClassBuilder;
+            }
             MethodAttributes methodAttr =BuilderUtil.GetMethodAttr(isStatic);
             FieldAttributes fieldAttr = BuilderUtil.GetFieldAttr(isStatic);
 
@@ -120,7 +127,7 @@ namespace ZCompileCore.AST
             EmitGet(classBuilder, PropertyName, propertyType, isStatic, _fieldBuilder, _propertyBuilder, methodAttr);
             EmitSet(classBuilder, PropertyName, propertyType, isStatic, _fieldBuilder, _propertyBuilder, methodAttr);
             SetAttrZCode(_propertyBuilder, PropertyName);
-            ZPropertyCompiling.SetBuilder( _propertyBuilder);
+            ZPropertyCompiling.PropertyBuilder = _propertyBuilder;//.SetBuilder(_propertyBuilder);
             
         }
 
@@ -174,7 +181,7 @@ namespace ZCompileCore.AST
         {
             MethodBuilder methodSet = classBuilder.DefineMethod("set_" + propertyName, methodAttr, typeof(void), new Type[] { propertyType });
             ILGenerator ilSet = methodSet.GetILGenerator();
-            EmitHelper.Emit_LoadThis(ilSet, isStatic);
+            EmitHelper.EmitThis(ilSet, isStatic);
             if (isStatic)
             {
                 ilSet.Emit(OpCodes.Ldarg_0);
@@ -212,7 +219,7 @@ namespace ZCompileCore.AST
         }
 
         
-        public void SetContext(ContextProc procContext)
+        public void SetContext(ContextMethod procContext)
         {
             this.ProcContext = procContext;
             this.ClassContext = this.ProcContext.ClassContext;

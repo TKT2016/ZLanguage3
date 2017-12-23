@@ -10,10 +10,9 @@ using ZCompileCore.Parsers;
 using ZCompileCore.Reports;
 using ZCompileDesc;
 using ZCompileDesc.Collections;
-using ZCompileDesc.Compilings;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit;
 
 namespace ZCompileCore.AST
@@ -49,7 +48,7 @@ namespace ZCompileCore.AST
             }
         }
 
-        public ZClassType Compile()
+        public ZLClassInfo Compile()
         {
             ParseAddDefault();//分析补充默认
             SetPartContext(this.FileContext);
@@ -74,7 +73,8 @@ namespace ZCompileCore.AST
             ParseClassStructText();
             AnalyClassStructType();
             EmitCompilingStruct();
-            this.FileContext.ImportUseContext.ImportCompiling_Body(this.ClassContext.GetZCompilingType());
+            ZCClassInfo cclass = this.ClassContext.GetZCompilingType();
+            this.FileContext.ImportUseContext.ImportCompilingBody(cclass);
         }
 
         private void CompileClassName()
@@ -82,7 +82,8 @@ namespace ZCompileCore.AST
             ClassNameSection.AnalyText();
             ClassNameSection.AnalyType();
             ClassNameSection.EmitName();
-            this.FileContext.ImportUseContext.AddCompiling_Name(this.ClassContext.GetZCompilingType());
+            ZCClassInfo cclass = this.ClassContext.GetZCompilingType();
+            this.FileContext.ImportUseContext.ImportCompilingName(cclass);
         }
 
         private void ParseAddDefault()
@@ -264,13 +265,13 @@ namespace ZCompileCore.AST
             }
         }
 
-        private ZClassType CreateZType()
+        private ZLClassInfo CreateZType()
         {
             if (!HasError())
             {
                 Type type = this.ClassContext.GetTypeBuilder().CreateType();
-                IZDescType ztype = ZTypeManager.GetByMarkType(type);
-                ZClassType zclasstype = (ZClassType)ztype;
+                var ztype = ZTypeManager.GetByMarkType(type);
+                ZLClassInfo zclasstype = (ZLClassInfo)ztype;
                 this.FileContext.EmitedIZDescType = zclasstype;
                 return zclasstype;
             }

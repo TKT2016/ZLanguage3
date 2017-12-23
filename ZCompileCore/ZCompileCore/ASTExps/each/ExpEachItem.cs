@@ -4,25 +4,26 @@ using System.Linq;
 using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc.Descriptions;
 using ZLangRT.Utils;
 using ZCompileCore.Tools;
 using System.Reflection;
 using ZCompileKit.Tools;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileDesc;
+using Z语言系统;
 
 namespace ZCompileCore.AST
 {
     public class ExpEachItem : Exp, ISetter
     {
-        public SymbolLocalVar ListSymbol;
-        public SymbolLocalVar IndexSymbol;
+        public ZCLocalVar ListSymbol;
+        public ZCLocalVar IndexSymbol;
         PropertyInfo Property;
 
-        public ExpEachItem(ContextExp expContext, SymbolLocalVar listSymbol, SymbolLocalVar indexSymbol)
+        public ExpEachItem(ContextExp expContext, ZCLocalVar listSymbol, ZCLocalVar indexSymbol)
         {
             ExpContext = expContext;
             ListSymbol = listSymbol;
@@ -31,10 +32,10 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
-            var subjType = ListSymbol.SymbolZType;
+            var subjType = ListSymbol.GetZType();
             
-            ZClassType zclass = subjType as ZClassType;
-            Property = zclass.SharpType.GetProperty(CompileConst.ZListItemPropertyName);
+            ZLClassInfo zclass = subjType as ZLClassInfo;
+            Property = zclass.SharpType.GetProperty(ZLangUtil.ZListItemPropertyName);
             RetType = ZTypeManager.GetBySharpType( Property.PropertyType) as ZType;
             return this;
         }
@@ -77,7 +78,7 @@ namespace ZCompileCore.AST
 
         public override string ToString()
         {
-            return string.Format("{0}第{1}",ListSymbol.SymbolName,IndexSymbol.SymbolName);
+            return string.Format("{0}第{1}",ListSymbol.ZName,IndexSymbol.ZName);
         }
     }
 }

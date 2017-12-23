@@ -7,11 +7,10 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parser;
 using ZCompileCore.Parsers;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+using ZCompileDesc.Utils;
 using ZCompileKit.Tools;
 using ZLangRT;
 using ZLangRT.Utils;
@@ -26,10 +25,10 @@ namespace ZCompileCore.AST
         public LexToken ItemToken { get; set; }
         public StmtBlock Body { get; set; }
 
-       SymbolLocalVar listSymbol;
-       SymbolLocalVar itemSymbol;
-       SymbolLocalVar indexSymbol;
-       SymbolLocalVar countSymbol;
+       ZCLocalVar listSymbol;
+       ZCLocalVar itemSymbol;
+       ZCLocalVar indexSymbol;
+       ZCLocalVar countSymbol;
 
        MethodInfo getCountMethod;
        MethodInfo itemMethod;
@@ -65,13 +64,13 @@ namespace ZCompileCore.AST
            //    return;
            //}
            //else 
-           if (!checkCanForeach(ListExp.RetType.SharpType))
+           if (!checkCanForeach(ListExp.RetType))
            {
                ErrorF(ForeachToken.Position, "该结果不能用作循环每一个");
                return;
            }
 
-           if (ReflectionUtil.IsExtends(ListExp.RetType.SharpType, typeof(列表<>)))
+           if (ZTypeUtil.IsExtends(ListExp.RetType, typeof(列表<>))) //(ReflectionUtil.IsExtends(ListExp.RetType.SharpType, typeof(列表<>)))
            {
                startIndex = 1;
                compareMethod = typeof(Calculater).GetMethod("LEInt", new Type[] { typeof(int), typeof(int) });
@@ -86,7 +85,17 @@ namespace ZCompileCore.AST
            Body.Analy();
        }
 
-       bool checkCanForeach(Type type)
+       private bool checkCanForeach(ZType ztype)
+       {
+           if(ztype is ZLType)
+           {
+               Type type = ((ZLType)ztype).SharpType;
+               return checkCanForeach(type);
+           }
+           return false;
+       }
+
+       private bool checkCanForeach(Type type)
        {
            PropertyInfo countProperty = type.GetProperty("Count");
            PropertyInfo itemProperty = type.GetProperty("Item");
@@ -134,19 +143,19 @@ namespace ZCompileCore.AST
            var listName = "@foreach" + foreachIndex + "_list";
            var itemName = this.ItemToken.GetText();// "@foreach" + foreachIndex + "_item";
 
-           indexSymbol = new SymbolLocalVar(indexName, ZLangBasicTypes.ZINT);
+           indexSymbol = new ZCLocalVar(indexName, ZLangBasicTypes.ZINT);
            indexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
-           this.ProcContext.AddDefSymbol(indexSymbol);
+           this.ProcContext.AddLocalVar(indexSymbol);
 
-           countSymbol = new SymbolLocalVar(countName, ZLangBasicTypes.ZINT);
+           countSymbol = new ZCLocalVar(countName, ZLangBasicTypes.ZINT);
            countSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(countName);
-           this.ProcContext.AddDefSymbol(countSymbol);
+           this.ProcContext.AddLocalVar(countSymbol);
 
-           listSymbol = new SymbolLocalVar(listName,this.ListExp.RetType);
+           listSymbol = new ZCLocalVar(listName,this.ListExp.RetType);
            listSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(listName);
-           this.ProcContext.AddDefSymbol(listSymbol);
+           this.ProcContext.AddLocalVar(listSymbol);
 
-           var listType = this.ListExp.RetType.SharpType;
+           var listType = ZTypeUtil.GetTypeOrBuilder(this.ListExp.RetType);// this.ListExp.RetType.SharpType;
            Type[] genericTypes = GenericUtil.GetInstanceGenriceType(listType, typeof(列表<>));
            if (genericTypes.Length == 0)
            {
@@ -154,9 +163,9 @@ namespace ZCompileCore.AST
            }
 
            Type ElementType = genericTypes[0];
-           itemSymbol = new SymbolLocalVar(itemName, (ZType)(ZTypeManager.GetBySharpType(ElementType)));
+           itemSymbol = new ZCLocalVar(itemName, (ZType)(ZTypeManager.GetBySharpType(ElementType)));
            itemSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(itemName);
-           this.ProcContext.AddDefSymbol(itemSymbol);
+           this.ProcContext.AddLocalVar(itemSymbol);
        }
 
        //int START_INDEX = 0;

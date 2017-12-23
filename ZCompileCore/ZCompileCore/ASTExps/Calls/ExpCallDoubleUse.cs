@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-using ZCompileDesc.ZMembers;
-using ZCompileDesc.ZTypes;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -22,7 +21,10 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpCallDoubleUse : ExpCallDouble
     {
-        public ExpCallDoubleUse(ZMethodInfo[] methods, Exp argExp, Exp srcExp)
+        private ZLMethodInfo Method;
+        private ZLMethodInfo[] Methods;
+
+        public ExpCallDoubleUse(ZLMethodInfo[] methods, Exp argExp, Exp srcExp)
         {
             this.Methods = methods;
             this.ArgExp = argExp;
@@ -36,7 +38,7 @@ namespace ZCompileCore.ASTExps
             return this;
         }
 
-        private ZMethodInfo SearchZMethod( )
+        private ZLMethodInfo SearchZMethod( )
         {
             return Methods[0];
         }
@@ -52,12 +54,12 @@ namespace ZCompileCore.ASTExps
 
         protected void EmitArgs()
         {
-            EmitArgExp(Method.ZDesces[0].DefArgs[0], ArgExp);
+            EmitArgExp(Method.ZParams[0], ArgExp);//EmitArgExp(Method.ZDesces[0].DefArgs[0], ArgExp);
         }
 
         private void EmitSubject()
         {
-            if (Method.IsStatic == false)
+            if (Method.GetIsStatic() == false)
             {
                 IL.Emit(OpCodes.Ldarg_0);
             }

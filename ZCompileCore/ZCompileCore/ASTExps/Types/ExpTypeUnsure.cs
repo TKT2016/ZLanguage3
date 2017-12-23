@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Symbols;
+
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
+
 using ZCompileCore.ASTExps;
 using ZCompileCore.AST;
 
@@ -75,7 +75,7 @@ namespace ZCompileCore.ASTExps
                 return noneType;
             }
 
-            if (mainZType.SharpType.IsGenericType)
+            if(ZTypeUtil.IsGenericType(mainZType))// (mainZType.SharpType.IsGenericType)
             {
                 return AnalyGeneric();     
             }
@@ -90,7 +90,7 @@ namespace ZCompileCore.ASTExps
              string name = tok.GetText();
              var ztypes = this.ExpContext.FileContext.ImportUseContext.SearchImportType(name);
              if (ztypes.Length == 0) return null;
-             ZClassType ztype = ztypes[0] as ZClassType;
+             ZLClassInfo ztype = ztypes[0] as ZLClassInfo;
              if (ztype == null) return null;
              if (!ztype.IsStatic) return null;
              ExpStaticClassName expStatic = new ExpStaticClassName(tok, ztype);
@@ -100,7 +100,7 @@ namespace ZCompileCore.ASTExps
 
         private Exp AnalyGeneric()
         {
-            int count = GenericUtil.GetGenericTypeArgCount(mainZType.SharpType);
+            int count = GenericUtil.GetGenericTypeArgCount(ZTypeUtil.GetTypeOrBuilder(mainZType));// (mainZType.SharpType);
             if (tsize > count + 1)
             {
                 ErrorF(mainTypeToken.Position, "泛型类型'{0}'声明类型过多", mainTypeToken.GetText());
@@ -136,10 +136,11 @@ namespace ZCompileCore.ASTExps
 
             if (genericArgZType1 != null && genericArgZType2 != null)
             {
-                Type newType = mainZType.SharpType.MakeGenericType(genericArgZType1.SharpType, genericArgZType2.SharpType);
-                ZType newZtype = ZTypeManager.RegNewGenericType(newType);
+                //Type newType = MakeGenericType(mainZType, genericArgZType1, genericArgZType2);
+                //ZType newZtype = ZTypeManager.RegNewGenericType(newType);
                 //RetType = newZtype;
-                ExpTypeThree twoExp = new ExpTypeThree(TypeTokens[0], TypeTokens[1], TypeTokens[2], genericArgZType1, genericArgZType2, mainZType, newZtype);
+                ZLClassInfo newZClass = ZTypeManager.MakeGenericType((ZLClassInfo)mainZType, genericArgZType1, genericArgZType2);
+                ExpTypeThree twoExp = new ExpTypeThree(TypeTokens[0], TypeTokens[1], TypeTokens[2], genericArgZType1, genericArgZType2, mainZType, newZClass);
                 return twoExp.Analy();
             }
             return noneType;
@@ -151,14 +152,27 @@ namespace ZCompileCore.ASTExps
             ZType genericArgZType = SearchZType(genericArgTypeToken);
             if (genericArgZType != null)
             {
-                Type newType = mainZType.SharpType.MakeGenericType(genericArgZType.SharpType);
-                ZType newZtype = ZTypeManager.RegNewGenericType(newType);
-                ExpTypeTwo twoExp = new ExpTypeTwo(TypeTokens[0], TypeTokens[1], genericArgZType, mainZType, newZtype);
+                //Type newType = MakeGenericType(mainZType, genericArgZType); 
+                //ZType newZtype = ZTypeManager.RegNewGenericType(newType);
+                ZLClassInfo newZClass = ZTypeManager.MakeGenericType((ZLClassInfo)mainZType, genericArgZType);
+                ExpTypeTwo twoExp = new ExpTypeTwo(TypeTokens[0], TypeTokens[1], genericArgZType, mainZType, newZClass);
                 return twoExp.Analy();
-                //RetType = newZtype;
             }
             return noneType;
         }
+
+        //private Type MakeGenericType(ZType mainType,params ZType[] argZTypes)
+        //{
+        //    if(mainType is ZLType)
+        //    {
+        //        var args = argZTypes.Select(U=>ZTypeUtil.GetTypeOrBuilder(U)).ToArray();
+        //        return ((ZLType)mainZType).SharpType.MakeGenericType(args);
+        //    }
+        //    else
+        //    {
+        //        throw new CCException();
+        //    }
+        //}
 
         private Exp AnalyNormal()
         {

@@ -7,9 +7,10 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parser;
 using ZCompileCore.Parsers;
-using ZCompileCore.Symbols;
+
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
+using ZCompileDesc.Utils;
 using ZCompileKit.Tools;
 using ZLangRT;
 
@@ -22,9 +23,9 @@ namespace ZCompileCore.AST
        public Exp TimesExp { get; set; }
        public StmtBlock RepeatBody { get; set; }
 
-       SymbolLocalVar IndexSymbol;
-       SymbolLocalVar CountSymbol;
-       SymbolLocalVar CondiSymbol;
+       ZCLocalVar IndexSymbol;
+       ZCLocalVar CountSymbol;
+       ZCLocalVar CondiSymbol;
        protected MethodInfo LTMethod = typeof(Calculater).GetMethod(CompileConst.Calculater_LTInt, new Type[] { typeof(int), typeof(int) });
 
        public override void Analy( )
@@ -39,7 +40,7 @@ namespace ZCompileCore.AST
                TimesExp = TimesExp.Analy();
                if(TimesExp!=null &&TimesExp.AnalyCorrect)
                {
-                   if(TimesExp.RetType.SharpType!= typeof(int))
+                   if (ZTypeUtil.IsInt(TimesExp.RetType))// TimesExp.RetType.SharpType!= typeof(int))
                    {
                        ErrorF(TimesExp.Position, "结果不是整数");
                    }
@@ -83,17 +84,17 @@ namespace ZCompileCore.AST
            var countName = "@repeat" + foreachIndex + "_count";
            var condiName = "@repeat" + foreachIndex + "_bool";
 
-           IndexSymbol = new SymbolLocalVar(indexName, ZLangBasicTypes.ZINT);
+           IndexSymbol = new ZCLocalVar(indexName, ZLangBasicTypes.ZINT);
            IndexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
-           this.ProcContext.AddDefSymbol(IndexSymbol);
+           this.ProcContext.AddLocalVar(IndexSymbol);
 
-           CountSymbol = new SymbolLocalVar(countName, ZLangBasicTypes.ZINT);
+           CountSymbol = new ZCLocalVar(countName, ZLangBasicTypes.ZINT);
            CountSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(countName);
-           this.ProcContext.AddDefSymbol(CountSymbol);
+           this.ProcContext.AddLocalVar(CountSymbol);
 
-           CondiSymbol = new SymbolLocalVar(condiName, ZLangBasicTypes.ZBOOL);
+           CondiSymbol = new ZCLocalVar(condiName, ZLangBasicTypes.ZBOOL);
            CondiSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(condiName);
-           this.ProcContext.AddDefSymbol(CondiSymbol);
+           this.ProcContext.AddLocalVar(CondiSymbol);
        }
 
        int START_INDEX = 0;

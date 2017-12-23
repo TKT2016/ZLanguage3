@@ -42,6 +42,7 @@ namespace ZCompileCore.AST
 
     public abstract class SectionPartProc : SectionPartClass
     {
+        //public ContextMethod ProcContext { get; protected set; }
         public ContextProc ProcContext { get; protected set; }
 
         //public virtual void SetProcContext(ContextProc procContext)

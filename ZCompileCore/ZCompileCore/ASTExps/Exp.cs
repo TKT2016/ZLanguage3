@@ -10,8 +10,7 @@ using ZCompileCore.Tools;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileDesc.ZTypes;
-using ZCompileDesc.ZMembers;
+
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.AST
@@ -63,7 +62,7 @@ namespace ZCompileCore.AST
         }
 
         public ZType RetType { get; set; }
-        public ZType RequireType { get;  set; }
+        public ZType RequireType { get; set; }
 
         public virtual Exp Parse()
         {
@@ -77,7 +76,7 @@ namespace ZCompileCore.AST
 
         public virtual void Emit()
         {
-            throw new NotImplementedException();
+            throw new CCException();
         }
 
         protected CodePosition ZeroCodePostion = new CodePosition(0, 0);
@@ -109,7 +108,8 @@ namespace ZCompileCore.AST
         protected void EmitConv( )
         {
             if (RequireType != null && RetType!=null)
-            EmitHelper.EmitConv(IL, RequireType.SharpType , RetType.SharpType);
+                EmitHelper.EmitConv(IL, RequireType, RetType);
+            //EmitHelper.EmitConv(IL, RequireType.SharpType , RetType.SharpType);
         }
 
         protected void EmitArgsExp(IEnumerable<Exp> args, IEnumerable<ZType> ztypes)
@@ -126,9 +126,9 @@ namespace ZCompileCore.AST
             }
         }
 
-        protected void EmitArgsExp(IEnumerable<Exp> args, ZMethodDesc zdesc)
+        protected void EmitArgsExp(IEnumerable<Exp> args, ZLMethodDesc zdesc)
         {
-            var ztypes = zdesc.DefArgs.Select(p => p.ZParamType).ToArray();
+            var ztypes = zdesc.ZLParams.Select(p => p.ZParamType).ToArray();
             EmitArgsExp( args,ztypes);
         }
 
@@ -144,7 +144,7 @@ namespace ZCompileCore.AST
             EmitArgsExp(args, paramInfos);
         }
 
-        protected void EmitArgsExp(IEnumerable<Exp> args, ZMethodInfo zmethod)
+        protected void EmitArgsExp(IEnumerable<Exp> args, ZLMethodInfo zmethod)
         {
             var method = zmethod.SharpMethod;
             EmitArgsExp(args, method);
