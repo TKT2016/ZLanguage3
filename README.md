@@ -1,3 +1,7 @@
+2017-12-23
+# 更新，修复一些bug，小飞机游戏中的小飞机可以跟着鼠标移动了
+![](https://github.com/TKT2016/ZLanguage3/blob/master/ZCompileCore/ZCompiler/Sample/小飞机游戏/小飞机游戏.jpg)
+----------------------------------------------------------------
 2017-12-2 
 # Z语言编译器 Z4版本
 现在可以支持一个项目的编译,在 ZCompileCore\ZCompiler\Sample\小飞机游戏 是一个比较完整的例子
