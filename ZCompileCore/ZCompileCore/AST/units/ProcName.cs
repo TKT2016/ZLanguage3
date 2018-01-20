@@ -8,7 +8,7 @@ using ZCompileCore.Parsers;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
 using ZLangRT;
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileCore.AST
 {

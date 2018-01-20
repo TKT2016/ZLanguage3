@@ -60,11 +60,11 @@ namespace ZCompileDesc
             return newzclass;
         }
 
-        //public static ZType RegNewGenericType(Type newType)
-        //{
-        //    ZType ztype = CreateZTypeImp(newType) as ZType;
-        //    return ztype;
-        //}
+        public static ZType RegNewGenericType(Type newType)
+        {
+            ZType ztype = CreateZTypeImp(newType) as ZType;
+            return ztype;
+        }
 
         public static ZLType[] GetBySharpName(string sharpName)
         {
@@ -106,8 +106,8 @@ namespace ZCompileDesc
                         return null;
                     }
                 }
-                //ZType newZtype = ZTypeManager.RegNewGenericType(type);
-                //return newZtype;
+                ZType newZtype = ZTypeManager.RegNewGenericType(type);
+                return (ZLType)newZtype;
             }
 
             return null;

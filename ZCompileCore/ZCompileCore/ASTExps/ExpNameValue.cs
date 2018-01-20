@@ -8,7 +8,7 @@ using ZCompileKit;
 using ZCompileKit.Tools;
 
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpNameValue : Exp
     {
@@ -24,8 +24,10 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             ValueExp = ValueExp.Analy();
             RetType = ValueExp.RetType;
+            IsAnalyed = true;
             return this;
         }
 

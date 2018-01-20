@@ -13,7 +13,7 @@ using System.Reflection;
 using ZCompileKit;
 using ZCompileDesc.Utils;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpCallAnalyedBase:Exp
     {
@@ -35,19 +35,20 @@ namespace ZCompileCore.AST
             {
                 var defArg = defArgs[i];
                 var expArg = expArgs[i];
-                if (defArg.GetIsGenericParam() ==false )
+                if (defArg.GetIsGenericParam() == false && ZTypeUtil.IsFn(defArg.ZParamType))
                 {
-                    if (ZTypeUtil.IsFn(defArg.ZParamType))//(ZLambda.IsFn(defArg.ZParamType.SharpType))
-                    {
-                        ExpNewLambda newLambdaExp = new ExpNewLambda(expArg, defArg.ZParamType);
-                        newLambdaExp.SetContext(this.ExpContext);
-                        Exp exp2 = newLambdaExp.Analy();
-                        newExpArgs.Add(exp2);
-                    }
-                    else
-                    {
-                        newExpArgs.Add(expArg);
-                    }
+                    throw new CCException("参数不能同时是泛型参数和lambda参数");
+                }
+                if (defArg.GetIsGenericParam() == false)
+                {
+                    newExpArgs.Add(expArg);
+                }
+                else if (ZTypeUtil.IsFn(defArg.ZParamType))
+                {
+                    ExpNewLambda newLambdaExp = new ExpNewLambda(expArg, defArg.ZParamType);
+                    newLambdaExp.SetContext(this.ExpContext);
+                    Exp exp2 = newLambdaExp.Analy();
+                    newExpArgs.Add(exp2);
                 }
                 else
                 {

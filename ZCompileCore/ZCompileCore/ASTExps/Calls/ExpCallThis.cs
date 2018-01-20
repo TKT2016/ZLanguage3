@@ -11,11 +11,11 @@ using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using System.Reflection;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpCallThis : ExpCallAnalyedBase
     {
-        //ZMethodDesc SearchedProcDesc;
+        
         ZCMethodInfo ZMethod;
         public ExpCallThis(ContextExp context, ZMethodCall expProcDesc, ZCMethodInfo searchedMethod, Exp srcExp, List<Exp> argExps)
         {
@@ -28,7 +28,10 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
+           
             RetType = this.ZMethod.RetZType;
+            IsAnalyed = true;
             return this;
         }
 

@@ -7,6 +7,7 @@ using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
 using ZCompileCore.AST;
+using ZCompileCore.ASTExps;
 
 namespace ZCompileCore.Parsers
 {

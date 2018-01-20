@@ -52,7 +52,7 @@ namespace ZLangRT
         
         public static object Call(object obj, string funcName, params object[] args)
         {
-            object[] newArgs = args;// args.Select(p => Calculater.ConvertObjectType(p)).ToArray();
+            object[] newArgs = args;
             object result = null;
 
             if (obj is Type)
@@ -91,37 +91,6 @@ namespace ZLangRT
             return func;
         }
 
-        /*
-        public static bool SetValue(object obj, string memberName, object value)
-        {
-            object newValue = Calculater.ConvertObjectType(value);
-            Type type = null;
-            if (obj is Type)
-            {
-                type = (Type)obj;
-            }
-            else
-            {
-                type = obj.GetType();
-            }
-           
-            var property = type.GetProperty(memberName);
-            if (property != null)
-            {
-                property.SetValue(obj is Type ? null : obj, newValue, null);
-                return true;
-            }
-
-            var field = type.GetField(memberName);
-            if (field != null)
-            {
-                field.SetValue(obj is Type ? null : obj, newValue);
-                return true;
-            }
-
-            throw new TKTRTException("找不到类型" + type.FullName + "的" + memberName + "成员,无法赋值");
-        }
-        */
         public static object GetValue(object obj, string memberName)
         {
             Type type = null;
@@ -148,24 +117,6 @@ namespace ZLangRT
 
             throw new ZyyRTException("找不到类型" + type.FullName + "的" + memberName + "成员,无法取值");
         }
-        /*
-        public static object NewInstance(Type type, params object[] args)
-        {
-            List<object> argList = new List<object>();
-            //foreach (object arg in args)
-            //{
-            //    argList.Add(Calculater.ConvertObjectType(arg));
-            //}
-            //object[] newArgs = argList.ToArray();
-
-            object[] newArgs = args.Select(p => Calculater.ConvertObjectType(p)).ToArray();
-
-            object obj = Activator.CreateInstance(type, newArgs);//创建一个无参实例
-            if (obj == null)
-            {
-                throw new TKTRTException("无法创建实例"+type.FullName);
-            }
-            return obj;
-        }*/
+        
     }
 }

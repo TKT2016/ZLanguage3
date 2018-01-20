@@ -37,5 +37,14 @@ namespace Z标准包.操作系统
                  return b;
             }
         }
+
+        [ZCode("不可见")]
+        public bool NotVisible
+        {
+            get
+            {
+                return !Visible;
+            }
+        }
     }
 }

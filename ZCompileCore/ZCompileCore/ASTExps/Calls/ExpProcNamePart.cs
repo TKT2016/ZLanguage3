@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-
 using ZCompileDesc.Descriptions;
 using ZLangRT.Utils;
 
@@ -22,7 +22,9 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             PartName = PartNameToken.GetText();
+            IsAnalyed = true;
             return this;
         }
 

@@ -43,6 +43,8 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
+            IsAnalyed = true;
             return this;
         }
         

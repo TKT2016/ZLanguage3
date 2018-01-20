@@ -3,58 +3,53 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using ZCompileCore.ASTExps;
-
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
 using ZCompileKit;
 using ZCompileKit.Tools;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpNewLambda : Exp
     {
         ExpLambdaBody lambdaExp;
-        List<IIdent> BodySymbolVars;
-        Exp actionExp;
-        ZType fnRetType;
-
-        public override Exp[] GetSubExps()
-        {
-            return actionExp.GetSubExps();
-        }
+        LambdaOutModel lambdaInfo;
 
         public ExpNewLambda( Exp actionExp, ZType funcType)
         {
-            this.actionExp = actionExp;
-            this.fnRetType = funcType;
+            lambdaInfo = new LambdaOutModel(actionExp,funcType);
         }
 
-        List<ExpLocal> BodyExpVars;
         public override Exp Analy( )
         {
-            if (actionExp.RetType==null)
+            if (this.IsAnalyed) return this;
+            ChectRetType();
+            lambdaExp = new ExpLambdaBody(this.ExpContext,lambdaInfo);
+            lambdaExp.Analy();
+            IsAnalyed = true;
+            return this;
+        }
+
+        private bool ChectRetType()
+        {
+            if (lambdaInfo.ActionExp.RetType == null)
             {
                 throw new CCException();
             }
-            else if (ZTypeUtil.IsConditionFn(fnRetType))//if (fnRetType.SharpType == typeof(Func<bool>))
+            else if (ZTypeUtil.IsConditionFn(lambdaInfo.FnRetType))
             {
-                if (ZTypeUtil.IsBool(actionExp.RetType))//(actionExp.RetType.SharpType != typeof(bool))
+                if (ZTypeUtil.IsBool(lambdaInfo.ActionExp.RetType))
                 {
-                    ErrorF(actionExp.Position, "结果应该是" + fnRetType.ZTypeName);
+                    ErrorF(lambdaInfo.ActionExp.Position, "结果应该是" + lambdaInfo.FnRetType.ZTypeName);
+                    return false;
                 }
             }
-            else if (ZTypeUtil.IsAction(fnRetType))// (fnRetType.SharpType == typeof(Action))
+            else if (ZTypeUtil.IsAction(lambdaInfo.FnRetType))// (fnRetType.SharpType == typeof(Action))
             {
-                 
+                return true;
             }
-            
-            BodyExpVars = GetAllSubLocalExpVars(actionExp);
-            BodySymbolVars = GetAllSubVars(BodyExpVars);
-
-            lambdaExp = new ExpLambdaBody(actionExp, fnRetType, BodySymbolVars, BodyExpVars,this.ExpContext);
-            lambdaExp.Analy();
-            return this;
+            return true;
         }
 
         public override void Emit()
@@ -63,106 +58,82 @@ namespace ZCompileCore.AST
             LocalBuilder lanmbdaLocalBuilder = IL.DeclareLocal(lambdaExp.NestedClassContext.EmitContext.ClassBuilder);
             IL.Emit(OpCodes.Newobj, lambdaExp.NewBuilder);
             EmitHelper.StormVar(IL, lanmbdaLocalBuilder);
-            int i = 0;
-            if(this.ExpContext.ClassContext.IsStatic()==false)
-            {
-                ZCFieldInfo fieldSymbol = lambdaExp.FieldSymbols[0];
-                EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
-                EmitHelper.EmitThis(IL, false);
-                EmitSymbolHelper.EmitStorm(IL,fieldSymbol);// IL.Emit(OpCodes.Stfld, fieldSymbol.Field);
-                i++;
-            }
 
-            for (;i<this.BodySymbolVars.Count;i++)
-            {
-                throw new NotImplementedException();
-                //IIdent thisSymbol = this.BodySymbolVars[i];
-                //ZCFieldInfo fieldSymbol = lambdaExp.FieldSymbols[i];
-
-                //EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
-                //if (EmitSymbolHelper.NeedCallThis(thisSymbol))
-                //{
-                //    EmitHelper.EmitThis(IL, false);
-                //}
-                //EmitSymbolHelper.EmitLoad(IL, thisSymbol);
-                //EmitSymbolHelper.EmitStorm(IL, fieldSymbol);
-            }
-
+            EmitInitOutField(lanmbdaLocalBuilder);
+            EmitInitArg(lanmbdaLocalBuilder);
+            EmitInitLocal(lanmbdaLocalBuilder);
             EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
             IL.Emit(OpCodes.Ldftn, lambdaExp.ProcBuilder);
-            ConstructorInfo[] constructorInfos = null;// lambdaExp.FnRetType.SharpType.GetConstructors();
-            if (lambdaExp.FnRetType is ZLType)
+            ConstructorInfo[] constructorInfos = null;
+            object retObj = lambdaInfo.FnRetType;
+            if (retObj is ZLType)
             {
-                constructorInfos = ((ZLType)lambdaExp.FnRetType).SharpType.GetConstructors();
+                constructorInfos = ((ZLType)retObj).SharpType.GetConstructors();
             }
             else 
             {
                 //constructorInfos = ((ZCClassInfo)lambdaExp.FnRetType).SharpType.GetConstructors();
-                throw new NotImplementedException();
+                throw new CCException();
             }
             IL.Emit(OpCodes.Newobj, constructorInfos[0]);
             base.EmitConv();
         }
 
-        #region 取得表达式内所有变量
-        private List<ExpLocal> GetAllSubLocalExpVars(Exp exp)
+        private void EmitInitLocal(LocalBuilder lanmbdaLocalBuilder)
         {
-            List<Exp> exps = GetAllSubExps(exp);
-            List<ExpLocal> results = new List<ExpLocal>();
-            foreach (var item in exps)
+            for (int i = 0; i < this.lambdaInfo.BodyZVars.Count; i++)
             {
-                if (item is ExpLocal)
-                {
-                    ExpLocal varExp = item as ExpLocal;
-                    if ( results.IndexOf(varExp) == -1)// (varExp.IsVar() && results.IndexOf(varExp) == -1)
-                    {
-                        results.Add(varExp);
-                    }
-                }
-            }
-            return results;
-        }
-
-        private List<IIdent> GetAllSubVars(List<ExpLocal> exps)
-        {
-            throw new CCException();
-
-            //List<SymbolBase> results = new List<SymbolBase>();
-            //foreach(var item in exps)
-            //{
-            //    if (item is ExpLocal)
-            //    {
-            //        ExpLocalVar varExp = item as ExpLocalVar;
-            //        results.Add(varExp.GetSymbol());
-            //        //if (varExp.VarSymbol is SymbolArg || varExp.VarSymbol is SymbolLocalVar)
-            //        //{
-            //        //    if(results.IndexOf(varExp.VarSymbol)==-1)
-            //        //    {
-            //        //        results.Add(varExp.VarSymbol);
-            //        //    }
-            //        //}
-            //    }
-            //}
-            //return results;
-        }
-
-        private List<Exp> GetAllSubExps(Exp exp)
-        {
-            List<Exp> list = new List<Exp>();
-            AddSubExp(exp, list);
-            return list;
-        }
-
-        private void AddSubExp(Exp exp,List<Exp> list )
-        {
-            list.Add(exp);
-            Exp[] subexps = exp.GetSubExps();
-            foreach (var expsub in subexps)
-            {
-                AddSubExp(expsub, list);
+                ZCLocalVar varSymbol = this.lambdaInfo.BodyZVars[i];
+                ZCFieldInfo fieldSymbol = lambdaExp.lambdaBody.Get(varSymbol.ZName);//.FieldSymbols[i];
+                EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
+                EmitSymbolHelper.EmitLoad(IL, varSymbol);
+                EmitSymbolHelper.EmitStorm(IL, fieldSymbol);
             }
         }
-        #endregion
+
+        private void EmitInitArg(LocalBuilder lanmbdaLocalBuilder)
+        {
+            for (int i = 0; i < this.lambdaInfo.BodyZParams.Count; i++)
+            {
+                ZCParamInfo paramSymbol = this.lambdaInfo.BodyZParams[i];
+                ZCFieldInfo fieldSymbol = lambdaExp.lambdaBody.Get(paramSymbol.ZName);
+                EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
+                EmitSymbolHelper.EmitLoad(IL, paramSymbol);
+                EmitSymbolHelper.EmitStorm(IL, fieldSymbol);
+            }
+        }
+
+        private void EmitInitOutField(LocalBuilder lanmbdaLocalBuilder)
+        {
+            if (this.ExpContext.ClassContext.IsStatic() == false)
+            {
+                ZCFieldInfo fieldSymbol = lambdaExp.lambdaBody.OutClassField;//.FieldSymbols[0];
+                EmitHelper.LoadVar(IL, lanmbdaLocalBuilder);
+                EmitHelper.EmitThis(IL, false);
+                EmitSymbolHelper.EmitStorm(IL, fieldSymbol);
+            }
+        }
+
+        //private void EmitIdent(IIdent varSymbol)
+        //{
+        //    if (varSymbol is ZCLocalVar)
+        //    {
+        //        EmitSymbolHelper.EmitLoad(IL, (ZCLocalVar)varSymbol);
+        //    }
+        //    else if (varSymbol is ZCParamInfo)
+        //    {
+        //        EmitSymbolHelper.EmitLoad(IL, (ZCParamInfo)varSymbol);
+        //    }
+        //    else
+        //    {
+        //        throw new CCException();
+        //    }
+        //}
+
+        public override Exp[] GetSubExps()
+        {
+            return lambdaInfo.ActionExp.GetSubExps();
+        }
 
     }
 }

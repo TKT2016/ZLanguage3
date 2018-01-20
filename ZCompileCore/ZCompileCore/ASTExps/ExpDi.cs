@@ -13,7 +13,7 @@ using ZCompileDesc.Utils;
 using ZCompileKit.Tools;
 using Z语言系统;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpDi : Exp , ISetter
     {
@@ -29,6 +29,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             SubjectExp = AnalySubExp(SubjectExp);
             ArgExp = AnalySubExp(ArgExp);
             if (!this.AnalyCorrect) return this;
@@ -49,6 +50,7 @@ namespace ZCompileCore.AST
             {
                 RetType = ZTypeManager.GetBySharpType( Property.PropertyType) as ZType;
             }
+            IsAnalyed = true;
             return this;
         }
         

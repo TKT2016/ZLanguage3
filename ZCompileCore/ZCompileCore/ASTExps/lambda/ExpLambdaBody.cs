@@ -3,60 +3,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-
-using ZCompileCore.Tools;
-using ZLangRT;
-using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using ZCompileDesc.Utils;
-
 using ZCompileDesc;
 using ZCompileCore.ASTExps;
+using ZCompileCore.AST;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpLambdaBody : Exp
     {
-        List<IIdent> BodyVars;
-        public List<ZCFieldInfo> FieldSymbols { get; private set; }
-        public List<ExpLocal> FieldExpVars { get; private set; }
-
-        public ExpLambdaBody(Exp exp, ZType fnRetType, List<IIdent> bodyVars, List<ExpLocal> fieldExpVars, ContextExp outExpContext)
+        private LambdaOutModel lambdaInfo;
+        public LambdaBodyModel lambdaBody;
+        
+        //List<IIdent> BodyVars;
+        //public List<ZCFieldInfo> FieldSymbols { get; private set; }
+        //public List<ExpLocal> FieldExpVars { get; private set; }
+        
+        public ExpLambdaBody(ContextExp outExpContext, LambdaOutModel lambdaInfo)
         {
-            BodyExp = exp;
-            FnRetType = fnRetType;
-            BodyVars = bodyVars;
-            FieldExpVars = fieldExpVars;
             ExpContext = outExpContext;
+            this.lambdaInfo = lambdaInfo;
+            lambdaBody = new LambdaBodyModel();
         }
-
-        public Exp BodyExp { get; set; }
-        public ZType FnRetType { get; set; }
 
         public override Exp[] GetSubExps()
         {
-            return BodyExp.GetSubExps();
+            return lambdaInfo.ActionExp.GetSubExps();
         }
 
         ZCLocalVar retSymbol;
-        Type NestedType { get; set; }
+        public Type NestedType { get; private set; }
         public ConstructorBuilder NewBuilder { get; private set; }
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             CreateContext();
             AnalyFields();
-            BodyExp.SetContext(NestedExpContext);
-            BodyExp.SetIsNested(true);
-            if (FnRetType == ZLangBasicTypes.ZBOOL)
+            lambdaInfo.ActionExp.SetContext(NestedExpContext);
+            lambdaInfo.ActionExp.SetIsNested(true);
+            if (lambdaInfo.FnRetType == ZLangBasicTypes.ZBOOL)
             {
-                retSymbol = new ZCLocalVar("$RetResult", FnRetType);
+                retSymbol = new ZCLocalVar("$RetResult", lambdaInfo.FnRetType);
             }
+            IsAnalyed = true;
             return this;
         }
 
@@ -79,33 +73,43 @@ namespace ZCompileCore.AST
             NestedStmt.ProcContext = NestedProcContext;
 
             NestedExpContext = new ContextExp(NestedProcContext,NestedStmt);
-            BodyExp.SetContext(NestedExpContext);
+            lambdaInfo.ActionExp.SetContext(NestedExpContext);
+
             CreateEmitContext();
         }
 
-        internal TypeBuilder ClassBuilder;
+        internal TypeBuilder NestedClassBuilder;
         internal MethodBuilder ProcBuilder;
 
         private void CreateEmitContext()
         {
-            string fullName = this.ExpContext.FileContext.ProjectContext.ProjectModel.ProjectPackageName + "." + NestedClassContext.ClassName;
+            var packageName = this.ExpContext.FileContext.ProjectContext.ProjectModel.ProjectPackageName;
+            string fullName = packageName + "." + NestedClassContext.ClassName;
             TypeAttributes typeAttrs = TypeAttributes.NestedPrivate | TypeAttributes.Sealed;
-            ClassBuilder = this.ExpContext.ClassContext.EmitContext.ClassBuilder.DefineNestedType(fullName, typeAttrs);
-            NestedClassContext.EmitContext.ClassBuilder = ClassBuilder;
+            NestedClassBuilder = this.ExpContext.ClassContext.EmitContext.ClassBuilder.DefineNestedType(fullName, typeAttrs);
+            NestedClassContext.EmitContext.ClassBuilder = NestedClassBuilder;
 
             NestedClassContext.EmitContext.IDoc = this.ExpContext.FileContext.ProjectContext.EmitContext.ModuleBuilder.DefineDocument(NestedClassContext.ClassName, Guid.Empty, Guid.Empty, Guid.Empty);
-            ProcBuilder = NestedClassContext.EmitContext.ClassBuilder.DefineMethod(NestedProcContext.ProcName, MethodAttributes.Public | MethodAttributes.HideBySig, typeof(void), new Type[] { });
+            ProcBuilder = NestedClassBuilder.DefineMethod(NestedProcContext.ProcName, MethodAttributes.Public | MethodAttributes.HideBySig, typeof(void), new Type[] { });
             NestedProcContext.SetBuilder(ProcBuilder);
-            //NestedProcContext.EmitContext.ILout = ProcBuilder.GetILGenerator();
         }
 
         public override void Emit()
         {
-            var il = NestedProcContext.GetILGenerator();
-            BodyExp.Emit();
+            EmitCall();
+            EmitConstructor();
+            var classBuilder = NestedClassBuilder; //NestedClassContext.EmitContext.ClassBuilder
+            NestedType = classBuilder.CreateType();
+            base.EmitConv();
+        }
+
+        private void EmitCall()
+        {
+            var il = ProcBuilder.GetILGenerator();// NestedProcContext.GetILGenerator();
+            lambdaInfo.ActionExp.Emit();
             if (retSymbol == null)
             {
-                if (!ZTypeUtil.IsVoid(BodyExp.RetType))//(BodyExp.RetType.SharpType != typeof(void))
+                if (!ZTypeUtil.IsVoid(lambdaInfo.ActionExp.RetType))
                 {
                     il.Emit(OpCodes.Pop);
                 }
@@ -116,67 +120,103 @@ namespace ZCompileCore.AST
             }
 
             il.Emit(OpCodes.Ret);
-            EmitConstructor();
-            NestedType = NestedClassContext.EmitContext.ClassBuilder.CreateType();
-            base.EmitConv();
         }
 
         private void EmitConstructor()
         {
-            NewBuilder = NestedClassContext.EmitContext.ClassBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[] { });
+            NewBuilder = NestedClassBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[] { });
             var il = NewBuilder.GetILGenerator();
             il.Emit(OpCodes.Ret);
         }
+
         string OutClassFieldName = "_$OutClass";
         private void AnalyFields( )
         {
-            throw new CCException();
-            //var symbols = NestedClassContext.Symbols;
-            //FieldSymbols = new List<SymbolDefField>();
-            //if (ExpContext.ClassContext.IsStaticClass == false)
-            //{
-            //    TypeBuilder builder = ExpContext.ClassContext.EmitContext.ClassBuilder;
-            //    FieldBuilder field = ClassBuilder.DefineField(OutClassFieldName,builder, FieldAttributes.Public);
-            //    ZClassCompilingType ztype = new ZClassCompilingType(builder.Name);//(builder, builder, false);
-            //    ztype.SetBuilder(builder);
-            //    SymbolDefField fieldSymbol = new SymbolDefField(OutClassFieldName , ztype, false);
-            //    fieldSymbol.Field = field;
-            //    FieldSymbols.Add(fieldSymbol);
-            //    //symbols.Add(fieldSymbol);
-            //    this.NestedClassContext.NestedOutFieldSymbol = fieldSymbol;
-            //}
+            //FieldSymbols = new List<ZCFieldInfo>();
+            AnalyOutClassField();
+            AnalyOutArgField();
+            AnalyOutLocalField();
 
-            //foreach (SymbolBase symbol in BodyVars)
-            //{
-            //    ZType ztype = symbol.SymbolZType;
-            //    FieldBuilder field = ClassBuilder.DefineField(symbol.SymbolName, ztype.SharpType, FieldAttributes.Public);
-            //    SymbolDefField fieldSymbol = new SymbolDefField(symbol.SymbolName, ztype, false);
-            //    fieldSymbol.Field = field;
-            //    FieldSymbols.Add(fieldSymbol);
-            //    //symbols.Add(fieldSymbol);
-            //}
+            foreach (ExpArg expArg in lambdaInfo.BodyArgExps)
+            {
+                var symbol = lambdaBody.Get(expArg.VarName);
+                expArg.SetAsLambdaFiled(symbol);
+            }
 
-            //foreach (ExpLocal expVar in FieldExpVars)
-            //{
-            //    SymbolDefField symbol = symbols.Get(expVar.VarName) as SymbolDefField;
-            //    expVar.SetAsLambdaFiled(symbol);
-            //}
+            foreach (ExpLocal expVar in lambdaInfo.BodyLocalExps)
+            {
+                var symbol = lambdaBody.Get(expVar.VarName);
+                expVar.SetAsLambdaFiled(symbol);
+            }
+
+            if (ExpContext.ClassContext.IsStatic() == false)
+            {
+                foreach (ExpFieldPropertyBase expField in lambdaInfo.BodyFieldExps)
+                {
+                    expField.SetLambda(lambdaBody.OutClassField);
+                }
+            }
+        }
+
+        private void AnalyOutLocalField()
+        {
+            foreach (ZCLocalVar symbol in lambdaInfo.BodyZVars)
+            {
+                ZType ztype = symbol.GetZType();
+                Type varSharpType = ZTypeUtil.GetTypeOrBuilder(ztype);
+                FieldBuilder field = NestedClassBuilder.DefineField(symbol.ZName, varSharpType, FieldAttributes.Public);
+                ZCFieldInfo fieldSymbol = new ZCFieldInfo();
+                fieldSymbol.ZPropertyZName = symbol.ZName;
+                fieldSymbol.ZPropertyType = (ZAClassInfo)ztype;
+                fieldSymbol.FieldBuilder = field;
+                lambdaBody.FieldSymbols.Add(fieldSymbol);
+            }
+        }
+
+        private void AnalyOutArgField()
+        {
+            foreach (ZCParamInfo symbol in lambdaInfo.BodyZParams)
+            {
+                ZType ztype = symbol.GetZType();
+                Type varSharpType = ZTypeUtil.GetTypeOrBuilder(ztype);
+                FieldBuilder field = NestedClassBuilder.DefineField(symbol.ZName, varSharpType, FieldAttributes.Public);
+                ZCFieldInfo fieldSymbol = new ZCFieldInfo();
+                fieldSymbol.ZPropertyZName = symbol.ZName;
+                fieldSymbol.ZPropertyType = (ZAClassInfo)ztype;
+                fieldSymbol.FieldBuilder = field;
+
+                lambdaBody. FieldSymbols.Add(fieldSymbol);
+            }
+        }
+
+        private void AnalyOutClassField()
+        {
+            if (ExpContext.ClassContext.IsStatic() == false)
+            {
+                ZCClassInfo outzclass = ExpContext.ClassContext.ThisCompilingType;
+                TypeBuilder builder = outzclass.ClassBuilder;
+                FieldBuilder field = NestedClassBuilder.DefineField(OutClassFieldName, builder, FieldAttributes.Public);
+                ZCFieldInfo fieldSymbol = new ZCFieldInfo();
+                fieldSymbol.FieldBuilder = field;
+                fieldSymbol.ZPropertyZName = OutClassFieldName;
+                fieldSymbol.ZPropertyType = outzclass;
+                lambdaBody.OutClassField = fieldSymbol;
+                this.NestedClassContext.NestedOutFieldSymbol = fieldSymbol;
+            }
         }
 
         #region 辅助
 
-       
-
         public override string ToString()
         {
-            return BodyExp.ToString();
+            return lambdaInfo.ActionExp.ToString();
         }
 
         public override CodePosition Position
         {
             get
             {
-                return BodyExp.Position; ;
+                return lambdaInfo.ActionExp.Position; ;
             }
         }
         #endregion

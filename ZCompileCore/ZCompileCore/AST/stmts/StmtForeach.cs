@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parser;
 using ZCompileCore.Parsers;
-
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
@@ -36,15 +36,14 @@ namespace ZCompileCore.AST
 
        int startIndex;
 
-       public override void Analy( )
+       public override void DoAnaly()
        {
+           ListExp.IsTopExp = true;
            AnalyListExp();
            CreateEachSymbols();
            Body.ProcContext = this.ProcContext;
            Body.Analy();
 
-           //base.LoadRefTypes(context);
-           //int foreachIndex =  context.MethodContext.CreateForeachIndex();
            if (ListExp == null)
            {
                ErrorF( ForeachToken.Position,"'循环每一个语句'不存在要循环的列表");
@@ -58,19 +57,13 @@ namespace ZCompileCore.AST
                return;
            }
 
-           //if (ListExp.RetType == null)
-           //{
-           //    TrueAnalyed = false;
-           //    return;
-           //}
-           //else 
            if (!checkCanForeach(ListExp.RetType))
            {
                ErrorF(ForeachToken.Position, "该结果不能用作循环每一个");
                return;
            }
 
-           if (ZTypeUtil.IsExtends(ListExp.RetType, typeof(列表<>))) //(ReflectionUtil.IsExtends(ListExp.RetType.SharpType, typeof(列表<>)))
+           if (ZTypeUtil.IsExtends(ListExp.RetType, typeof(列表<>))) 
            {
                startIndex = 1;
                compareMethod = typeof(Calculater).GetMethod("LEInt", new Type[] { typeof(int), typeof(int) });
@@ -136,12 +129,12 @@ namespace ZCompileCore.AST
        protected void CreateEachSymbols()
        {
            var procContext = this.ProcContext;
-           //var symbols = procContext.Symbols;
+
            int foreachIndex = procContext.CreateRepeatIndex();
            var indexName = "@foreach" + foreachIndex + "_index";
            var countName = "@foreach" + foreachIndex + "_count";
            var listName = "@foreach" + foreachIndex + "_list";
-           var itemName = this.ItemToken.GetText();// "@foreach" + foreachIndex + "_item";
+           var itemName = this.ItemToken.GetText();
 
            indexSymbol = new ZCLocalVar(indexName, ZLangBasicTypes.ZINT);
            indexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
@@ -155,7 +148,7 @@ namespace ZCompileCore.AST
            listSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(listName);
            this.ProcContext.AddLocalVar(listSymbol);
 
-           var listType = ZTypeUtil.GetTypeOrBuilder(this.ListExp.RetType);// this.ListExp.RetType.SharpType;
+           var listType = ZTypeUtil.GetTypeOrBuilder(this.ListExp.RetType);
            Type[] genericTypes = GenericUtil.GetInstanceGenriceType(listType, typeof(列表<>));
            if (genericTypes.Length == 0)
            {

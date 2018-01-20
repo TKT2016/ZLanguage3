@@ -8,7 +8,7 @@ using ZCompileCore.Lex;
 using ZCompileCore.Parser;
 using ZCompileCore.Parsers;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpRaw : Exp
     {
@@ -21,15 +21,12 @@ namespace ZCompileCore.AST
 
         public override Exp Parse()
         {
-            //if (RawTokens.Count > 0 && RawTokens[0].GetText().StartsWith("清除出界子弹"))
-            //{
-            //    Console.WriteLine("清除出界子弹");
-            //}
-
+            if (this.IsAnalyed) return this;
             List<LexToken> tokens = Seg();
             ExpParser parser = new ExpParser();
             Exp exp = parser.Parse(tokens,this.FileContext);
             exp.SetContext(this.ExpContext);
+            IsAnalyed = true;
             return exp;
         }
 

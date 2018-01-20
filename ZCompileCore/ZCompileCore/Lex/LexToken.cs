@@ -79,7 +79,7 @@ namespace ZCompileCore.Lex
             //Dict.Add("循环当", TokenKind.While);
             Dict.Add("重复", TokenKind.Repeat);
             Dict.Add("当", TokenKind.Dang);
-            Dict.Add("次", TokenKind.Times);
+            //Dict.Add("次", TokenKind.Times);
             Dict.Add("循环每一个", TokenKind.Foreach);
             Dict.Add("每一个", TokenKind.Each);
             Dict.Add("捕捉", TokenKind.Catch);

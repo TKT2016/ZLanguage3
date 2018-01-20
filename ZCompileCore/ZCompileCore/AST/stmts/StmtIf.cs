@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Lex;
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
@@ -16,7 +17,7 @@ namespace ZCompileCore.AST
         public List<StmtIfTrue> Parts = new List<StmtIfTrue>();
         public StmtBlock ElsePart { get; set; }
 
-        public override void Analy()
+        public override void DoAnaly()
         {
             foreach (var item in Parts)
             {
@@ -93,9 +94,10 @@ namespace ZCompileCore.AST
             public Label NextLabel { get; set; }
             public Label EndLabel { get; set; }
 
-            public override void Analy( )
+            public override void DoAnaly()
             {
-                Condition = AnalyCondition(Condition, KeyToken.Position);//AnalyCondition();
+                Condition.IsTopExp = true;
+                Condition = AnalyCondition(Condition, KeyToken.Position);
                 Body.ProcContext = this.ProcContext;
                 Body.Analy();
             }

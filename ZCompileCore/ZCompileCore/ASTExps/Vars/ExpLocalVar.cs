@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
@@ -18,6 +17,7 @@ namespace ZCompileCore.ASTExps
     public class ExpLocalVar : ExpLocal
     {
         public ZCLocalVar LocalVarSymbol { get; protected set; }
+        
 
         public ExpLocalVar(LexToken token)
         {
@@ -27,9 +27,18 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             if (this.ExpContext == null) throw new CCException();
-            LocalVarSymbol = this.ProcContext.GetDefLocal(VarName);
+            if (!IsDim)
+            {
+                LocalVarSymbol = this.ProcContext.GetDefLocal(VarName);
+            }
+            else
+            {
+
+            }
             RetType = LocalVarSymbol.GetZType();
+            IsAnalyed = true;
             return this;
         }
 
@@ -88,11 +97,11 @@ namespace ZCompileCore.ASTExps
             }
         }
 
-        ZCFieldInfo NestedFieldSymbol;
-        public override void SetAsLambdaFiled(ZCFieldInfo fieldSymbol)
-        {
-            NestedFieldSymbol = fieldSymbol;
-        }
+        //ZCFieldInfo NestedFieldSymbol;
+        //public override void SetAsLambdaFiled(ZCFieldInfo fieldSymbol)
+        //{
+        //    NestedFieldSymbol = fieldSymbol;
+        //}
 
         private void EmitSetNested(Exp valueExp)
         {

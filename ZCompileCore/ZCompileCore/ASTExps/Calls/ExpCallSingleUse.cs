@@ -28,9 +28,11 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             VarName = VarToken.GetText();
             Method = SearchZMethod(VarName);
             RetType = Method.RetZType;
+            IsAnalyed = true;
             return this;
         }
 
@@ -40,19 +42,7 @@ namespace ZCompileCore.ASTExps
             calldesc.Add(name);
             ContextImportUse contextiu = this.FileContext.ImportUseContext;
             return contextiu.SearchUseMethod(calldesc)[0];
-            //ContextUse cu = this.ClassContext.FileContext.UseContext;
-            //foreach (ZClassType zclass in cu.UseZClassList)
-            //{
-            //    if (zclass.IsStatic)
-            //    {
-            //        var zitem = zclass.SearchZMethod(calldesc);
-            //        if (zitem != null && zitem.Length>0)
-            //        {
-            //            return zitem[0];
-            //        }
-            //    }
-            //}
-            //throw new CCException();
+            
         }
 
         #region Emit

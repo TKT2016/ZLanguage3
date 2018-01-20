@@ -8,7 +8,7 @@ using ZCompileCore.Contexts;
 using ZCompileCore.ASTExps;
 using ZCompileCore.Lex;
 using ZCompileKit.Collections;
-using ZNLP;
+using ZCompileNLP;
 using System.Diagnostics;
 
 namespace ZCompileCore.Parsers
@@ -23,8 +23,6 @@ namespace ZCompileCore.Parsers
         {
             Tape = new ArrayTape<object>(elements.ToArray());
             Context = context;
-
-            //ItemParser = new ChainItemParser(context);
             chains.Clear();
             isParsedCurrCompPart = false;
         }
@@ -33,7 +31,7 @@ namespace ZCompileCore.Parsers
         {
             while (!Tape.IsEnd)
             {
-                var obj = ParseItem();
+                ChainItemFeaturer obj = ParseItem();
                 chains.Push(obj);
             }
             var objs = chains.ToList();
@@ -95,14 +93,37 @@ namespace ZCompileCore.Parsers
                     pptExp.SetContext(this.Context);
                     return pptExp.Analy();
                 }
+                else if (ProcContext.IsUsedProperty(text))
+                {
+                    ExpUseProperty eupExp = new ExpUseProperty(tok);
+                    dataExp.CopyFieldsToExp(eupExp);
+                    Exp exp2 = eupExp.Analy();
+                    return exp2;
+                }
+                else if (ProcContext.IsUsedField(text))
+                {
+                    ExpUseField eufExp = new ExpUseField(tok);
+                    dataExp.CopyFieldsToExp(eufExp);
+                    Exp exp2 = eufExp.Analy();
+                    return exp2;
+                }
+                else if (ProcContext.IsUsedEnumItem(text))
+                {
+                    ExpUseEnumItem eueExp = new ExpUseEnumItem(tok);
+                    dataExp.CopyFieldsToExp(eueExp);
+                    Exp exp2 = eueExp.Analy();
+                    return exp2;
+                }
                 else
                 {
+                    /* 在赋值表达式中会处理ExpErrorToken */
                     return new ExpErrorToken(tok, dataExp.ExpContext);
                 }
             }
             else if(cif.IsExp)
             {
-                return (Exp)data;
+                Exp exp2 = (Exp)data;
+                return exp2.Analy();
             }
             else
             {
@@ -129,27 +150,19 @@ namespace ZCompileCore.Parsers
 
         private ChainItemFeaturer ParseItem()
         {
-            ChainItemFeaturer cf = CurrentItem;// new ChainItemFeaturer(this.Context, Tape.Current);
-            //if (CurrentItem.Data.ToString().IndexOf("W")!=-1)
-            //{
-            //    Console.WriteLine("W");
-            //}
+            ChainItemFeaturer cf = CurrentItem;
             object obj = null;
-            //WordCompilePart curcp = ItemParser.ParseCompilePart(Tape.Current);
-            if (cf.IsDe)//(CurrCompPart == WordCompilePart.de)
+            if (cf.IsDe)
             {
                 obj=ParseDe();
-                //chains.Push(obj);
             }
-            else if (cf.IsDi)//(CurrCompPart == WordCompilePart.di)
+            else if (cf.IsDi)
             {
                 obj = ParseDi();
-                //chains.Push(obj);
             }
-            else if (cf.IsExp)//(CurrCompPart == WordCompilePart.exp)
+            else if (cf.IsExp)
             {
                 obj = ParseItemExp();
-                //chains.Push(obj);
             }
             else if(cf.IsLocalVar || cf.IsLiteral || cf.IsThisProperty || cf.IsSuperProperty
                 || cf.IsUsedEnumItem|| cf.IsUsedProperty||cf.IsParameter|| cf.IsUsedField|| cf.IsThisField)
@@ -160,10 +173,11 @@ namespace ZCompileCore.Parsers
             {
                 Exp exp = ParseTypes();
                 obj = exp;
-                if (exp is ExpTypeUnsure)
+                
+                if (exp is ExpTypeBase)
                 {
-                    ExpTypeUnsure expType = (ExpTypeUnsure)exp;
-                    if (!CurrentItem.IsNone && !CurrentItem.IsDe && !CurrentItem.IsDi  )
+                    ExpTypeBase expType = (ExpTypeBase)exp;
+                    if (!CurrentItem.IsNone && !CurrentItem.IsDe && !CurrentItem.IsDi)
                     {
                         var nextObj = ParseItem();
                         if ((nextObj.Data is ExpBracket)
@@ -171,10 +185,10 @@ namespace ZCompileCore.Parsers
                             || (nextObj.Data is ExpVarBase)
                             )
                         {
-                            Exp newexp = ParseToExpNew(expType,(Exp)nextObj.Data);
+                            Exp newexp = ParseToExpNew(expType, (Exp)nextObj.Data);
                             obj = newexp;
                         }
-                        else 
+                        else
                         {
                             var obj2 = NewFeaturer(exp);
                             chains.Push(obj2);
@@ -205,8 +219,7 @@ namespace ZCompileCore.Parsers
         private ExpBracket WarpExp(Exp exp)
         {
             if (exp is ExpBracket) return exp as ExpBracket;
-            ExpBracket exp2 = new ExpBracket(exp);
-            exp.IsAnalyed = true;
+            ExpBracket exp2 = new ExpBracket(exp,true);
             return exp2;
         }
 
@@ -221,16 +234,16 @@ namespace ZCompileCore.Parsers
 
         private Exp ParseTypes()
         {
-            List<LexToken> tokens = new List<LexToken> ();
-                while(Tape.IsEnd ==false && (CurrentItem.IsThisClassName || CurrentItem.IsImportTypeName) )
-                {
-                    LexToken tok = (LexToken)Tape.Current;
-                    tokens.Add(tok);
-                    MoveNext();
-                }
-                ExpTypeUnsure exptype = new ExpTypeUnsure(tokens);
-                exptype.SetContext(this.Context);
-                return exptype.Analy();
+            List<LexToken> tokens = new List<LexToken>();
+            while (Tape.IsEnd == false && (CurrentItem.IsThisClassName || CurrentItem.IsImportTypeName))
+            {
+                LexToken tok = (LexToken)Tape.Current;
+                tokens.Add(tok);
+                MoveNext();
+            }
+            ExpTypeUnsure exptype = new ExpTypeUnsure(tokens);
+            exptype.SetContext(this.Context);
+            return exptype.Analy();
         }
 
         private Exp ParseDe( )
@@ -281,23 +294,23 @@ namespace ZCompileCore.Parsers
 
         private Exp ParseExpect_Var()
         {
-            if (CurrentItem.IsLocalVar)// == WordCompilePart.localvar)
+            if (CurrentItem.IsLocalVar)
             {
                 return ParseLocalVar();
             }
-            else if (CurrentItem.IsLiteral)// == WordCompilePart.literal)
+            else if (CurrentItem.IsLiteral)
             {
                 return ParseLiteral();
             }
-            else if (CurrentItem.IsParameter)// == WordCompilePart.arg)
+            else if (CurrentItem.IsParameter)
             {
                 return ParseArg();
             }
-            else if (CurrentItem.IsThisProperty)// == WordCompilePart.property_this)
+            else if (CurrentItem.IsThisProperty)
             {
                 return ParsePropertyThis();
             }
-            else if (CurrentItem.IsSuperProperty)// == WordCompilePart.property_base)
+            else if (CurrentItem.IsSuperProperty)
             {
                 return ParsePropertySuper();
             }
@@ -305,11 +318,11 @@ namespace ZCompileCore.Parsers
             {
                 return ParseFieldSuper();
             }
-            else if (CurrentItem.IsUsedEnumItem)// == WordCompilePart.enumitem_use)
+            else if (CurrentItem.IsUsedEnumItem)
             {
                 return ParseEnumItemUse();
             }
-            else if (CurrentItem.IsUsedProperty)// == WordCompilePart.property_use)
+            else if (CurrentItem.IsUsedProperty)
             {
                 return ParsePropertyUse();
             }
@@ -328,7 +341,7 @@ namespace ZCompileCore.Parsers
         {
             LexToken tok = (LexToken)Tape.Current;
             MoveNext();
-            ExpDefField exp2 = new ExpDefField(tok);
+            ExpFieldDef exp2 = new ExpFieldDef(tok);
             exp2.SetContext(this.Context);
             return exp2.Analy();
         }
@@ -364,7 +377,7 @@ namespace ZCompileCore.Parsers
         {
             LexToken tok = (LexToken)Tape.Current;
             MoveNext();
-            ExpSuperProperty exp2 = new ExpSuperProperty(tok);
+            ExpPropertySuper exp2 = new ExpPropertySuper(tok);
             exp2.SetContext(this.Context);
             return exp2.Analy();
         }
@@ -373,7 +386,7 @@ namespace ZCompileCore.Parsers
         {
             LexToken tok = (LexToken)Tape.Current;
             MoveNext();
-            ExpSuperField exp2 = new ExpSuperField(tok);
+            ExpFieldSuper exp2 = new ExpFieldSuper(tok);
             exp2.SetContext(this.Context);
             return exp2.Analy();
         }
@@ -382,7 +395,7 @@ namespace ZCompileCore.Parsers
         {
             LexToken tok = (LexToken)Tape.Current;
             MoveNext();
-            ExpDefProperty exp2 = new ExpDefProperty(tok);
+            ExpPropertyDef exp2 = new ExpPropertyDef(tok);
             exp2.SetContext(this.Context);
             return exp2.Analy();
         }
@@ -459,20 +472,6 @@ namespace ZCompileCore.Parsers
                 return _CurItem;
             }
         }
-
-        //private WordCompilePart CurrCompPart
-        //{
-        //    get
-        //    {
-        //        if (!isParsedCurrCompPart)
-        //        { 
-        //            if (Tape.Current == null) return WordCompilePart.none;
-        //            _CurrCompPart = ItemParser.ParseCompilePart(Tape.Current);
-        //            isParsedCurrCompPart = true;
-        //        }
-        //        return _CurrCompPart;
-        //    }
-        //}
 
         private ChainItemFeaturer PopChains()
         {

@@ -87,7 +87,7 @@ namespace ZCompileCore.Engines
                 }
                 else
                 {
-                    throw new CCException();
+                    //throw new CCException();
                 }
             }
         }

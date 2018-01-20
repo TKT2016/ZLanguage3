@@ -69,6 +69,7 @@
     <Compile Include="Descriptions\InfoClass\C\ZCFieldInfo.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCClassInfo.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCConstructorInfo.cs" />
+    <Content Include="Descriptions\InfoClass\C\ZCLocalIdent.cs.TXT" />
     <Compile Include="Descriptions\InfoClass\C\ZCMethodInfo.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCLocalVar.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCParamInfo.cs" />
@@ -110,9 +111,9 @@
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
       <Name>ZLangRT</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZSegment\ZNLP.csproj">
+    <ProjectReference Include="..\ZCompileNLP\ZCompileNLP.csproj">
       <Project>{3497d4f3-de89-4676-980b-50dab21b824e}</Project>
-      <Name>ZNLP</Name>
+      <Name>ZCompileNLP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
       <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>

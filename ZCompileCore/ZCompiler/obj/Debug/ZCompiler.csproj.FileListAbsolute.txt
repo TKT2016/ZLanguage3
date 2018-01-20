@@ -50,7 +50,6 @@ E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\bin\Debug\Z语言系统.pdb
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\obj\Debug\ZCompiler.exe
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\obj\Debug\ZCompiler.pdb
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\bin\Debug\Newtonsoft.Json.dll
-E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompiler.exe.config
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\obj\Debug\ZCompiler.exe
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\obj\Debug\ZCompiler.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\Z标准包测试\操作系统\测试设置桌面背景图.zyy
@@ -92,7 +91,6 @@ E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileCore4.dll
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileDesc.dll
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileKit.dll
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZLangRT.dll
-E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZNLP.dll
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Z标准包.dll
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Z语言系统.dll
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Newtonsoft.Json.dll
@@ -100,7 +98,6 @@ E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileCore4.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileDesc.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileKit.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZLangRT.pdb
-E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZNLP.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Z标准包.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Z语言系统.pdb
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\obj\Debug\ZCompiler.csprojResolveAssemblyReference.cache
@@ -244,3 +241,8 @@ E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\小飞机游戏\xfjres\
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\小飞机游戏\xfjres\font.fnt
 E:\ProgProj\Z\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\小飞机游戏\游戏预定义.zyy
 E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Resources\dict - 复制.txt
+E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileNLP.dll
+E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\ZCompileNLP.pdb
+E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\Z标准包测试\绘图\测试字体.zyy
+E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\Z标准包测试\设备\测试驱动器.zyy
+E:\MySource\Zyy\Z4\ZCompileCore\ZCompiler\bin\Debug\Sample\Z标准包测试\操作系统\测试快捷方式.zyy

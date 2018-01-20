@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parsers;
@@ -16,9 +17,11 @@ namespace ZCompileCore.AST
        public Exp ConditionExp { get; set; }
        public StmtBlock WhileBody { get; set; }
 
-       public override void Analy( )
+       public override void DoAnaly()
        {
-           ConditionExp = AnalyExpRaw();//Condition = AnalyCondition(Condition, DangToken.Position);
+           ConditionExp.IsTopExp = true;
+           ConditionExp.IsTopExp = true;
+           ConditionExp = AnalyExpRaw();
            ConditionExp = ConditionExp.Analy(); 
            WhileBody.ProcContext = this.ProcContext;
            WhileBody.Analy();

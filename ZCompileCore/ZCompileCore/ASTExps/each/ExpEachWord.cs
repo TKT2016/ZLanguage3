@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using ZCompileCore.Lex;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpEachWord:Exp
     {

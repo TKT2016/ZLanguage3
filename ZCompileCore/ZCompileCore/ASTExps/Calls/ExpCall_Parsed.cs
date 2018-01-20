@@ -11,6 +11,7 @@ using ZCompileDesc.Descriptions;
 using ZCompileKit;
 using ZCompileKit.Tools;
 using ZCompileCore.Parsers;
+using ZCompileCore.ASTExps;
 
 namespace ZCompileCore.AST
 {
@@ -42,9 +43,11 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
              AnalyProcDesc();
             Exp exp = SearchProc();
             exp = exp.Analy();
+            IsAnalyed = true;
             return exp;
         }
 

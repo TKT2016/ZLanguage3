@@ -11,7 +11,7 @@ namespace ZCompileCore.AST
     public class StmtTry: Stmt
     {
         Label tryLabel;
-        public override void Analy( )
+        public override void DoAnaly()
         {
             //base.LoadRefTypes(context);
             //var symbols = this.AnalyStmtContext.Symbols;

@@ -6,7 +6,7 @@ using System.Text;
 using ZCompileKit.Collections;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
-using ZNLP;
+using ZCompileNLP;
 using System.Diagnostics;
 using ZLangRT.Utils;
 using System.Reflection;

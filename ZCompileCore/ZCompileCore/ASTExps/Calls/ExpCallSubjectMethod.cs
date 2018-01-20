@@ -35,12 +35,14 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             MethodName = MethodToken.GetText();
             CallDesc = new ZMethodCall();
             CallDesc.Add(MethodName);
 
             Method = SearchZMethod(MethodName);
             RetType = Method.RetZType;
+            IsAnalyed = true;
             return this;
         }
 

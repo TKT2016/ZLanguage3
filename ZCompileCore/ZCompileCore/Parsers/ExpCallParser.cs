@@ -101,6 +101,10 @@ namespace ZCompileCore.Parsers
             {
                 ParseAsExpTypeBase(subExp);
             }
+            else if (subExp is ExpNew)
+            {
+                ParseAsArg(subExp);
+            }
             else
             {
                 throw new CCException();

@@ -6,7 +6,7 @@ using ZCompileCore.Lex;
 using ZCompileKit.Tools;
 using ZCompileDesc.Collections;
 using ZCompileKit;
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileCore.Parser
 {

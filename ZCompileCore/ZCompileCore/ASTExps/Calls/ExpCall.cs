@@ -12,7 +12,7 @@ using ZCompileKit;
 using ZCompileKit.Tools;
 using ZCompileCore.Parsers;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpCall:Exp
     {
@@ -44,16 +44,11 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
-            //if(this.Elements[0].ToString().StartsWith("点"))
-            //{
-            //    Console.WriteLine("点");
-            //}
+            if (this.IsAnalyed) return this;
             ExpCallParser callPaser = new ExpCallParser(this.Elements, this.ExpContext,this);
-            //if(Elements.Count==3 &&Elements[1].ToString()=="加入" )
-            //{
-            //    Console.WriteLine("子弹管理器加入ZD");
-            //}
+            
             var expNew = callPaser.Parse();
+            IsAnalyed = true;
             return expNew.Analy();
         }
 

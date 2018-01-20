@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileDesc.Descriptions;
 
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileCore.Contexts
 {

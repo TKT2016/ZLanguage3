@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileDesc.Utils;
 
@@ -13,12 +14,8 @@ namespace ZCompileCore.AST
         public Exp CallExp { get; set; }
         ExpEach _eachExp;
 
-        public override void Analy()
+        public override void DoAnaly()
         {
-            //if (this.ToString().StartsWith("清除出界子弹"))
-            //{
-            //    Console.WriteLine("清除出界子弹");
-            //}
             var tempExp1 = CallExp;
             var CallExp2 = ParseExp(tempExp1);
             var CallExp3 = CallExp2.Analy();

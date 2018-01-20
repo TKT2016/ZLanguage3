@@ -7,7 +7,7 @@ using ZCompileCore.AST;
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     internal class NewExpAnalyInfo// : ZNewDesc
     {

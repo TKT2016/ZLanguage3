@@ -13,7 +13,6 @@ namespace ZCompileCore.AST
 {
     public class ExpNew:Exp
     {
-        //public ExpTypeUnsure TypeExp { get; set; }
         public ExpTypeBase TypeExp { get; set; }
         public ExpBracket BracketExp { get; set; }
 
@@ -28,15 +27,10 @@ namespace ZCompileCore.AST
             BracketExp = bracketExp;
         }
 
-        //public ExpNew(ExpTypeUnsure typeExp, ExpBracket bracketExp)
-        //{
-        //    TypeExp = typeExp;
-        //    BracketExp = bracketExp;
-        //}
-
         NewExpAnalyInfo NewAnalyInfo;
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             TypeExp = (ExpTypeBase)(AnalySubExp(TypeExp)); 
             BracketExp = AnalySubExp(BracketExp) as ExpBracket; 
             if (!AnalyCorrect) return this;
@@ -44,6 +38,7 @@ namespace ZCompileCore.AST
             if (ZTypeUtil.IsListClass(TypeExp.RetType))//(IsListClass())
             {
                 ExpNewList newListExp = new ExpNewList(this.ExpContext,TypeExp, BracketExp);
+                IsAnalyed = true;
                 return newListExp.Analy();
             }
             else
@@ -131,14 +126,6 @@ namespace ZCompileCore.AST
             NewAnalyInfo.ArgExps = BracketExp.InneExps;
             NewAnalyInfo.AdjustArgExps();
         }
-
-        //private bool IsListClass()
-        //{
-        //     Type subjectType = TypeExp.RetType.SharpType;
-        //    if (!subjectType.Name.StartsWith(CompileConst.ZListClassZName)) return false;
-        //    if (subjectType.Namespace!= CompileConst.LangPackageName) return false;
-        //    return true;
-        //}
 
         public override void Emit()
         {

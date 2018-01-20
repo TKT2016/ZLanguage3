@@ -82,6 +82,8 @@
     <Compile Include="S4\DemoAssemblyBuilder.cs" />
     <Compile Include="S4\FieldBuilder_Sample.cs" />
     <Compile Include="S4\FieldTest.cs" />
+    <Compile Include="S4\FieldTest2.cs" />
+    <Compile Include="S4\NestedTest.cs" />
     <Compile Include="S4\TestPoint.cs" />
     <Compile Include="S4\ZCCS.cs" />
     <Compile Include="S4\注册表操作Test.cs" />

@@ -29,6 +29,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             ValueExp = AnalySubExp(ValueExp);
             ToExp = AnalyToExp();
             if (ToExp is ExpDe || ToExp is ExpDi)
@@ -50,16 +51,19 @@ namespace ZCompileCore.AST
             this.RetType = ZLangBasicTypes.ZVOID;
             NewValueExp = ValueExp;
             AnalyArgLambda();
+            IsAnalyed = true;
             return this;
         }
 
         private Exp AnalyToExp()
         {
+            ToExp.IsDim = true;
             ToExp = AnalySubExp(ToExp);
             if (ToExp is ExpErrorToken)
             {
                 ExpLocalVar localVarExp = new ExpLocalVar((ToExp as ExpErrorToken).Token);
-                localVarExp.SetContext((ToExp as ExpErrorToken).ExpContext);
+                (ToExp as ExpErrorToken).CopyFieldsToExp(localVarExp);
+                //localVarExp.SetContext((ToExp as ExpErrorToken).ExpContext);
                 ToExp = localVarExp;
                 AnalyToExp_Var();
             }
@@ -69,8 +73,6 @@ namespace ZCompileCore.AST
         private void AnalyToExp_Var()
         {
             var varExp = ToExp as ExpLocalVar;
-            //var table = this.ProcContext.Symbols;
-            //if (!table.Contains(varExp.VarName))
             if (!this.ProcContext.ContainsVarName(varExp.VarName))
             {
                 varExp.SetAssigned(ValueExp.RetType);

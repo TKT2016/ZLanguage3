@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ZLangRT;
 using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileDesc.Descriptions
 {

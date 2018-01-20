@@ -16,14 +16,13 @@ namespace ZCompileCore.AST
 
         List<int> catchStmtIndexList;
 
-        public override void Analy()
+        public override void DoAnaly()
         {
             catchStmtIndexList = new List<int>();
-            //catchStmtIndexList.Add(0);
-            for (var i = 0; i < StmtList.Count; i++)// Stmt stmt in StmtList)
+            for (var i = 0; i < StmtList.Count; i++)
             {
                 Stmt stmt = StmtList[i];
-                stmt.ProcContext = this.ProcContext;//.SetProcContext(this.ProcContext);
+                stmt.ProcContext = this.ProcContext;
                 stmt.Analy();
                 if (stmt is StmtCatch)
                 {

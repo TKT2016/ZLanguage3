@@ -34,6 +34,11 @@ namespace ZCompileCore.AST
             InneExps.Add(exp);
         }
 
+        public ExpBracket(Exp exp, bool isAnalyed):this(exp)
+        {
+            IsAnalyed = isAnalyed;
+        }
+
         public ExpBracket(List<Exp> exps)
         {
             InneExps = exps;
@@ -73,6 +78,7 @@ namespace ZCompileCore.AST
                 }
             }
             AnalyRet();
+            IsAnalyed = true;
             return this;
         }
 

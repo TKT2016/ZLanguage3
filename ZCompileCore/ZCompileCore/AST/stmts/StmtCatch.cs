@@ -25,23 +25,17 @@ namespace ZCompileCore.AST
        ZLType exType;
        ZCLocalVar exSymbol;
 
-       public override void Analy( )
+       public override void DoAnaly()
        {
-           //var retText = ExceptionTypeVarToken.GetText();
            TypeArgParser parser = new TypeArgParser(this.ClassContext);
            TypeArgParser.ParseResult result = parser.Parse(ExceptionTypeVarToken);
            if (result.ResultCount == 1)
            {
-               //var tyedimNames = GetTypeWords();
-               //var segMan = this.FileContext.SegManager;
-               //NameTypeParser parser = new NameTypeParser(segMan.TypeNameDict, segMan.ArgSegementer);
-               //NameTypeParser.ParseResult result = parser.ParseVar(ExceptionTypeVarToken);
-
                exTypeName = result.ArgZTypes[0].ZTypeName;
                exType = (ZLType)result.ArgZTypes[0];
                exName = result.ArgName;
            }
-           if (this.ProcContext.ContainsVarName(exName)==false)// exSymbol2 == null)
+           if (this.ProcContext.ContainsVarName(exName)==false)
            {
                exSymbol = new ZCLocalVar(exName, exType);
                exSymbol.LoacalVarIndex =this.ProcContext.CreateLocalVarIndex(exName);
@@ -49,9 +43,9 @@ namespace ZCompileCore.AST
            }
            else
            {
-               if (this.ProcContext.IsDefLocal(exName))//if (exSymbol2 is SymbolLocalVar)
+               if (this.ProcContext.IsDefLocal(exName))
                {
-                   exSymbol = this.ProcContext.GetDefLocal(exName);// exSymbol2 as SymbolLocalVar;
+                   exSymbol = this.ProcContext.GetDefLocal(exName);
                    if (exSymbol.GetZType() != exType)
                    {
                        ErrorF(ExceptionTypeVarToken.Position, "变量'{0}'的类型与异常的类型不一致", exName);
@@ -62,8 +56,6 @@ namespace ZCompileCore.AST
                    ErrorF(ExceptionTypeVarToken.Position, "变量名称'{0}'已经使用过", exName);
                }
            }
-           //symbols.Add(exSymbol);
-           
            CatchBody.ProcContext = this.ProcContext;
            CatchBody.Analy();
        }

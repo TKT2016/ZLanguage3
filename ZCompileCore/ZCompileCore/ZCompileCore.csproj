@@ -50,10 +50,15 @@
   <ItemGroup>
     <Compile Include="ASTExps\Calls\ExpCallSingleSuper.cs" />
     <Compile Include="ASTExps\Calls\ExpCallSuper.cs" />
+    <Compile Include="ASTExps\lambda\LambdaBodyModel.cs" />
+    <Compile Include="ASTExps\lambda\LambdaOutModel.cs" />
     <Compile Include="ASTExps\Types\ExpTypeSingleBase.cs" />
-    <Compile Include="ASTExps\Vars\ExpDefField.cs" />
-    <Compile Include="ASTExps\Vars\ExpSuperField.cs" />
-    <Compile Include="ASTExps\Vars\ExpSuperProperty.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpPropertyBase.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpFieldDef.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpFieldBase.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpFieldPropertyBase.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpFieldSuper.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpPropertySuper.cs" />
     <Compile Include="ASTExps\Vars\ExpLocal.cs" />
     <Compile Include="ASTExps\Vars\ExpStaticClassName.cs" />
     <Compile Include="ASTExps\Calls\ExpCall_Parsed.cs" />
@@ -99,7 +104,7 @@
     <Compile Include="ASTExps\Calls\ExpCallSingleUse.cs" />
     <Compile Include="ASTExps\Vars\ExpUseProperty.cs" />
     <Compile Include="ASTExps\Vars\ExpUseEnumItem.cs" />
-    <Compile Include="ASTExps\Vars\ExpDefProperty.cs" />
+    <Compile Include="ASTExps\Vars\field_property\ExpPropertyDef.cs" />
     <Compile Include="ASTExps\Vars\ExpArg.cs" />
     <Compile Include="ASTExps\Vars\ExpLocalVar.cs" />
     <Compile Include="ASTExps\ExpVarBase.cs" />
@@ -205,9 +210,9 @@
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
       <Name>ZLangRT</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZSegment\ZNLP.csproj">
+    <ProjectReference Include="..\ZCompileNLP\ZCompileNLP.csproj">
       <Project>{3497d4f3-de89-4676-980b-50dab21b824e}</Project>
-      <Name>ZNLP</Name>
+      <Name>ZCompileNLP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
       <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>

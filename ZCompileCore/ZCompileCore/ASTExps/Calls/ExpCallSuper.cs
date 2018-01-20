@@ -11,7 +11,7 @@ using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using System.Reflection;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpCallSuper : ExpCallAnalyedBase
     {
@@ -27,7 +27,9 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             RetType = this.ZMethod.RetZType;
+            IsAnalyed = true;
             return this;
         }
 

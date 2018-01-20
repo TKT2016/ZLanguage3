@@ -5,10 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
-
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.ASTExps
@@ -18,7 +16,6 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public class ExpArg : ExpLocal
     {
-        //public SymbolArg ArgSymbol { get; protected set; }
         public ZCParamInfo ArgSymbol { get; protected set; }
 
         public ExpArg(LexToken token)
@@ -28,18 +25,13 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             VarName = VarToken.GetText();
-            //var symbols = this.ProcContext.Symbols;
-            ArgSymbol = this.ProcContext.GetParameter(VarName);// symbols.Get(VarName) as SymbolArg;
-            RetType = ArgSymbol.ZParamType;//.SymbolZType;
+            ArgSymbol = this.ProcContext.GetParameter(VarName);
+            RetType = ArgSymbol.ZParamType;
+            IsAnalyed = true;
             return this;
         }
-
-        ZCFieldInfo NestedFieldSymbol;
-        //public void SetAsLambdaFiled(ZMemberCompiling fieldSymbol)
-        //{
-        //    NestedFieldSymbol = fieldSymbol;
-        //}
 
         #region Emit
         public override void Emit()

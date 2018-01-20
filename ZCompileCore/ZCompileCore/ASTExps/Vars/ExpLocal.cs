@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ZCompileCore.AST;
 using ZCompileCore.Lex;
-
 using ZCompileCore.Tools;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
@@ -17,12 +16,10 @@ namespace ZCompileCore.ASTExps
     /// </summary>
     public abstract class ExpLocal : ExpVarBase
     {
-        public ZCFieldInfo MemberCompiling { get; private set; }
-
-        public virtual void SetAsLambdaFiled(ZCFieldInfo memberCompiling)
+        public ZCFieldInfo NestedFieldSymbol { get; protected set; }
+        public virtual void SetAsLambdaFiled(ZCFieldInfo fieldSymbol)
         {
-            MemberCompiling = memberCompiling;
+            NestedFieldSymbol = fieldSymbol;
         }
-
     }
 }

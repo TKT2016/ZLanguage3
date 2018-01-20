@@ -55,8 +55,8 @@ namespace ZCompileCore.ASTExps
 
          public override Exp Analy()
          {
+             if (this.IsAnalyed) return this;
              if (this.ExpContext == null) throw new CCException();
-             //ExpStaticClassName expStaticClassName = null;
              if (TypeTokens.Count==1)
              {
                  var expStaticClassName = ParseExpStaticClass(TypeTokens[0]);
@@ -75,7 +75,8 @@ namespace ZCompileCore.ASTExps
                 return noneType;
             }
 
-            if(ZTypeUtil.IsGenericType(mainZType))// (mainZType.SharpType.IsGenericType)
+            IsAnalyed = true;
+            if(ZTypeUtil.IsGenericType(mainZType))
             {
                 return AnalyGeneric();     
             }

@@ -302,7 +302,7 @@ namespace ZCompileCore.Lex
             //if (processKeyIdent(token, "循环当", TokenKind.While)) return;
             if (processKeyIdent(token, "重复", TokenKind.Repeat)) return;
             if (processKeyIdent(token, "当", TokenKind.Dang)) return;
-            if (processKeyIdent(token, "次", TokenKind.Times)) return;
+            //if (processKeyIdent(token, "次", TokenKind.Times)) return;
             if (processKeyIdent(token, "处理", TokenKind.Catch)) return;
             if (processKeyIdent(token, "循环每一个", TokenKind.Foreach)) return;
             tokenList.Add(token);

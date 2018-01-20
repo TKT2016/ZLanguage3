@@ -7,7 +7,7 @@ using ZLangRT.Attributes;
 
 namespace Z标准包.文件系统
 {
-    [ZInstance]//[ZInstance(typeof(FileInfo))]
+    [ZInstance]
     public class 文件
     {
         internal FileInfo FeInfo;

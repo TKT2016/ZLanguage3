@@ -1,5 +1,5 @@
 ﻿
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public interface ISetter
     {

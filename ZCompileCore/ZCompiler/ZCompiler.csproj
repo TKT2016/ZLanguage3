@@ -45,8 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompileCmdModel.cs" />
-    <Compile Include="MainTester.cs" />
-    <Compile Include="MainEntry.cs" />
+    <Compile Include="MainProgram.cs" />
+    <Content Include="MainEntry.cs.TXT" />
     <Compile Include="Const.cs" />
     <Compile Include="ProjectCompiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,8 +54,10 @@
     <Compile Include="ZProjFileParser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="Sample\Z标准包测试\操作系统\测试设置桌面背景图.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\Z标准包测试\操作系统\测试快捷方式.zyy">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Sample\Z标准包测试\操作系统\测试进程窗口.zyy">
@@ -68,6 +70,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Sample\Z标准包测试\操作系统\测试注册表操作.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\Z标准包测试\绘图\测试字体.zyy">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Sample\Z标准包测试\设备\测试驱动器.zyy">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Sample\小飞机游戏\xfjres\font.fnt">
@@ -235,9 +243,9 @@
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
       <Name>ZLangRT</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZSegment\ZNLP.csproj">
+    <ProjectReference Include="..\ZCompileNLP\ZCompileNLP.csproj">
       <Project>{3497d4f3-de89-4676-980b-50dab21b824e}</Project>
-      <Name>ZNLP</Name>
+      <Name>ZCompileNLP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Z标准包\Z标准包.csproj">
       <Project>{d52c5bd7-dd7d-459a-9953-8b3972fdf2b1}</Project>

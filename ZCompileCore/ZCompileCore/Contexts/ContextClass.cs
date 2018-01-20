@@ -16,46 +16,21 @@ namespace ZCompileCore.Contexts
     public class ContextClass
     {
         public ContextFile FileContext { get; set; }
-        //public ProcContextCollection ProcManagerContext { get; set; }
-
         public string ClassName { get; set; }
-        //public string ExtendsName { get; set; }
-        //public ZClassType BaseZType { get; set; }
-
         public ClassEmitContext EmitContext { get; set; }
-        
         public MethodBuilder InitPropertyMethod { get; set; }
-
-        //public ClassSymbolTable Symbols { get{return CurrentTable;} }
-
-        //public SuperSymbolTable SuperTable { get; private set; }
-        //public ClassSymbolTable CurrentTable { get; private set; }
-
         public ZCFieldInfo NestedOutFieldSymbol { get; set; }
-        //public string ContextKey { get { return FileContext.ContextKey + "." + (ClassName ?? ""); } }
-        //string _KeyContext;
+        public  ZCClassInfo ThisCompilingType { get; private set; }
 
-        //public ContextStructText ClassStruct { get; private set; }
-        //public ZClassCompilingType ThisCompilingType { get; private set; }
-         ZCClassInfo ThisCompilingType;
         public ContextClass(ContextFile fileContext)
         {
             FileContext = fileContext;
             EmitContext = new ClassEmitContext();
             ThisCompilingType = new ZCClassInfo();
-            //ProcManagerContext = new ProcContextCollection();
-            //ProcManagerContext.ClassContext = this;
-            
-            //CurrentTable = new ClassSymbolTable("Class");
-
-            //ClassStruct = new ContextStructText();
-            //_KeyContext = FileContext.FileModel.GetFileNameNoEx() + "." + (ClassName ?? "()");
         }
 
         public void AddMember(ZCPropertyInfo zcp)
         {
-            //Symbols.Add(symbol);
-            //ZMemberCompiling zcp = new ZMemberCompiling(symbol.Name, symbol.SymbolZType,this.IsStaticClass);
             ThisCompilingType.AddProperty(zcp);
         }
 

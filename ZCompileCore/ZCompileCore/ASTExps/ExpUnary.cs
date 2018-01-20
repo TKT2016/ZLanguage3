@@ -10,7 +10,7 @@ using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
 using ZCompileKit.Tools;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpUnary:Exp
     {
@@ -28,6 +28,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             OpKind = OpToken.Kind;
             if (OpKind != TokenKind.ADD && OpKind != TokenKind.SUB)
             {
@@ -42,13 +43,8 @@ namespace ZCompileCore.AST
                 {
                     ErrorF(RightExp.Position, "不能进行'{0}'运算", OpToken.GetText());
                 }
-                //Type stype = RetType.SharpType;
-                //if (stype != typeof(int) && stype != typeof(float) && stype != typeof(double) && stype != typeof(decimal))
-                //{
-                //    ErrorF(RightExp.Position, "不能进行'{0}'运算", OpToken.GetText());
-                //}
             }
-
+            IsAnalyed = true;
             if (OpKind == TokenKind.ADD)
             {
                 return RightExp;

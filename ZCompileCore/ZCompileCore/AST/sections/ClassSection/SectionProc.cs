@@ -99,12 +99,12 @@ namespace ZCompileCore.AST
             {
                 string ident = this.ProcContext.LoacalVarList[i];
                 ZCLocalVar varSymbol = this.ProcContext.GetDefLocal(ident);
-                varSymbol.VarBuilder = IL.DeclareLocal(ZTypeUtil.GetTypeOrBuilder(varSymbol.GetZType()));//varSymbol.SymbolZType.SharpType);
+                varSymbol.VarBuilder = IL.DeclareLocal(ZTypeUtil.GetTypeOrBuilder(varSymbol.GetZType()));
                 varSymbol.VarBuilder.SetLocalSymInfo(varSymbol.ZName);
             }
 
             Body.Emit();
-            if (!ZTypeUtil.IsVoid(this.RetZType))// this.RetZType.SharpType != typeof(void))
+            if (!ZTypeUtil.IsVoid(this.RetZType))
             {
                 IL.Emit(OpCodes.Ldloc_0);
             }

@@ -34,3 +34,5 @@ E:\ProgProj\Z\Z4\ZCompileCore\Z标准包\bin\Debug\Z语言系统.pdb
 E:\ProgProj\Z\Z4\ZCompileCore\Z标准包\obj\Debug\Z标准包.csprojResolveAssemblyReference.cache
 E:\ProgProj\Z\Z4\ZCompileCore\Z标准包\obj\Debug\Z标准包.dll
 E:\ProgProj\Z\Z4\ZCompileCore\Z标准包\obj\Debug\Z标准包.pdb
+E:\MySource\Zyy\Z4\ZCompileCore\Z标准包\obj\Debug\Interop.IWshRuntimeLibrary.dll
+E:\MySource\Zyy\Z4\ZCompileCore\Z标准包\obj\Debug\Z标准包.csproj.ResolveComReference.cache

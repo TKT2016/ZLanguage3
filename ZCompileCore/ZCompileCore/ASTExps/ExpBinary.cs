@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Tools;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-
 using ZCompileKit.Tools;
 
 namespace ZCompileCore.AST
@@ -30,6 +30,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             if (LeftExp == null && RightExp != null)
             {
                 ExpUnary unexp = new ExpUnary(OpToken, RightExp, this.ExpContext);
@@ -61,7 +62,7 @@ namespace ZCompileCore.AST
                 {
                     ZType ltype = LeftExp.RetType;
                     ZType rtype = RightExp.RetType;
-                    if (ZTypeUtil.IsVoid(ltype) || ZTypeUtil.IsVoid(rtype))// (ltype.SharpType == typeof(void) || rtype.SharpType == typeof(void))
+                    if (ZTypeUtil.IsVoid(ltype) || ZTypeUtil.IsVoid(rtype))
                     {
                         ErrorF(OpToken.Position, "没有结果的表达式无法进行'{0}'运算", OpToken.ToCode());
                     }
@@ -83,6 +84,7 @@ namespace ZCompileCore.AST
                     this.RetType = ZLangBasicTypes.ZOBJECT;
                 }
             }
+            IsAnalyed = true;
             return this;
         }
 

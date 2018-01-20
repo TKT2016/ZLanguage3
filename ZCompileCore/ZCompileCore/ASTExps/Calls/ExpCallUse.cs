@@ -10,7 +10,7 @@ using ZLangRT;
 using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpCallUse : ExpCallAnalyedBase
     {
@@ -28,6 +28,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             if (SearchedMethod!=null)
             {
                 var defArgs = SearchedMethod.ZParams;//.ZDesces[0].DefArgs;
@@ -36,6 +37,7 @@ namespace ZCompileCore.AST
                 //ArgExps = newExpArg;
             }
             RetType = SearchedMethod.RetZType;
+            IsAnalyed = true;
             return this;
         }
 

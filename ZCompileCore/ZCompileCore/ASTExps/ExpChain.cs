@@ -37,16 +37,11 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
-            //Console.WriteLine(this.ToString());
+            if (this.IsAnalyed) return this;
             ChainParser parser = new ChainParser();
-            //if (RawElements.Count == 3 && RawElements[0].ToString().IndexOf( "子弹管理器")!=-1)
-            //{
-            //    Console.WriteLine("子弹管理器加入ZD");
-            //}
-           
-            Exp exp = parser.Parse(RawElements, this.ExpContext);
-            var exp2 =  exp.Analy();
-            return exp2;
+            Exp exp = parser.Parse(RawElements, this.ExpContext); //结果已经Analy过
+            IsAnalyed = true;
+            return exp;
         }
 
         public int SubCount

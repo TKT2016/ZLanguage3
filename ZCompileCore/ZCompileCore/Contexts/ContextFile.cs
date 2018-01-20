@@ -11,7 +11,7 @@ using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 
 using ZCompileDesc.Collections;
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileCore.Contexts
 {

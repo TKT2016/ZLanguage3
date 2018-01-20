@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZCompileCore.AST;
+using ZCompileCore.ASTExps;
 using ZCompileDesc.Descriptions;
 using ZCompileKit;
 

@@ -10,30 +10,16 @@ namespace Z语言系统
     public class 常用转义符
     {
         [ZCode("换行符")]
-        public string NewLine
-        {
-            get
-            {
-                return "\n";
-            }
-        }
+        public const string NewLine="\n";
 
         [ZCode("制表符")]
-        public string Tab
-        {
-            get
-            {
-                return "\t";
-            }
-        }
-
+        public const string Tab= "\t";
+        
         [ZCode("单引号")]
-        public string SingleQuotationMarks
-        {
-            get
-            {
-                return "'";
-            }
-        }
+        public const string SingleQuotationMarks= "'";
+
+        [ZCode("双引号")]
+        public const string DoubleQuotationMarks = "\"";
+        
     }
 }

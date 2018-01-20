@@ -15,7 +15,7 @@ using ZCompileDesc.Utils;
 using ZCompileDesc;
 using Z语言系统;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpEachItem : Exp, ISetter
     {
@@ -32,11 +32,13 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             var subjType = ListSymbol.GetZType();
             
             ZLClassInfo zclass = subjType as ZLClassInfo;
             Property = zclass.SharpType.GetProperty(ZLangUtil.ZListItemPropertyName);
             RetType = ZTypeManager.GetBySharpType( Property.PropertyType) as ZType;
+            IsAnalyed = true;
             return this;
         }
         

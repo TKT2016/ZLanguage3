@@ -13,7 +13,7 @@ using ZCompileDesc.Utils;
 using ZCompileKit.Tools;
 using Z语言系统;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public  class ExpLiteral:Exp
     {
@@ -39,14 +39,14 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
-            //LiteralKind = LiteralToken.Kind;
-            //LiteralValue = LiteralToken.GetText();
+            if (this.IsAnalyed) return this;
             RetType = AnalyLiteralZType();
             
             if (RetType == null)
             {
                 ErrorF(this.Position, LiteralToken.ToCode() + "不是正确的值");
             }
+            IsAnalyed = true;
             return this;
         }
         

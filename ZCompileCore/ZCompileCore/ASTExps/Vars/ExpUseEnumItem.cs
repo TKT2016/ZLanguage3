@@ -27,9 +27,11 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             VarName = VarToken.GetText();
             ZEnumItem = SearchValue(VarName);
             RetType = ZEnumItem.ZEnum;
+            IsAnalyed = true;
             return this;
         }
 

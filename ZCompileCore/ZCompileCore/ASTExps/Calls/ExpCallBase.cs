@@ -44,7 +44,6 @@ namespace ZCompileCore.ASTExps
 
     public class ExpCallDouble : ExpCallBase
     {
-        //protected ZLMethodInfo[] Methods;
         protected Exp ArgExp;
         public Exp SrcExp;
 

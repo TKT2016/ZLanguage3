@@ -24,7 +24,9 @@ namespace ZCompileCore.AST
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             if (this.ExpContext == null) throw new CCException();
+           
             LeftExp = AnalyLeft();
             if (RightToken == null)
             {
@@ -32,15 +34,17 @@ namespace ZCompileCore.AST
                 return LeftExp;
             }
 
-
-            if (RightToken.Kind == TokenKind.Ident && RightToken.GetText() == ZKeywords.Each)
+            if (RightToken.Kind == TokenKind.Each)// && RightToken.GetText() == ZKeywords.Each)
             {
                 var eachItemExp = AnalyEach();
                 Exp newExp = eachItemExp.Analy();
                 return newExp;
             }
-
-            AnalyRight();
+            else
+            {
+                AnalyRight();
+            }
+            IsAnalyed = true;
             return this;
         }
 
@@ -75,7 +79,7 @@ namespace ZCompileCore.AST
         private bool IsNeedTempLocal()
         {
             if (!LeftExp.RetType.IsStruct) return false;
-            if(LeftExp is ExpDefProperty ||LeftExp is ExpUseProperty ||LeftExp is ExpSuperProperty)
+            if(LeftExp is ExpPropertyDef ||LeftExp is ExpUseProperty ||LeftExp is ExpPropertySuper)
             {
                 return true;
             }
@@ -253,13 +257,13 @@ namespace ZCompileCore.AST
                     {
                         ((ExpArg)LeftExp).EmitLoadArga();
                     }
-                    else if(LeftExp is ExpDefField)
+                    else if(LeftExp is ExpFieldDef)
                     {
-                        ((ExpDefField)LeftExp).EmitLoadFielda();
+                        ((ExpFieldDef)LeftExp).EmitLoadFielda();
                     }
-                    else if(LeftExp is ExpSuperField)
+                    else if(LeftExp is ExpFieldSuper)
                     {
-                        ((ExpSuperField)LeftExp).EmitLoadFielda();
+                        ((ExpFieldSuper)LeftExp).EmitLoadFielda();
                     }
                     else if(LeftExp is ExpUseField)
                     {

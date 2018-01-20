@@ -4,20 +4,24 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Tools;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-
 using ZCompileKit.Tools;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public abstract class Exp:Tree
     {
-        public bool IsAnalyed { get; set; }
+        public bool IsAnalyed { get;protected set; }
+        public bool IsTopExp { get; set; }
+        public bool IsDim { get; set; }
+        public ZType RetType { get; set; }
+        public ZType RequireType { get; set; }
 
         #region Context
         public ContextExp ExpContext { get;protected set; }
@@ -26,6 +30,16 @@ namespace ZCompileCore.AST
         public override ContextFile FileContext { get { return this.ExpContext.ProcContext.ClassContext.FileContext; } }
         public ContextProject ProjectContext { get { return this.ExpContext.ProcContext.ClassContext.FileContext.ProjectContext; } }
         #endregion
+
+        public void CopyFieldsToExp( Exp newExp)
+        {
+            //newExp.IsAnalyed = this.IsAnalyed;
+            newExp.IsTopExp = this.IsTopExp;
+            newExp.IsDim = this.IsDim;
+            newExp.ExpContext = this.ExpContext;
+            newExp.RequireType = this.RequireType;
+            //newExp.RetType = this.RetType;
+        }
 
         public bool IsNested { get; protected set; }
         public virtual void SetIsNested(bool b)
@@ -61,9 +75,6 @@ namespace ZCompileCore.AST
             }
         }
 
-        public ZType RetType { get; set; }
-        public ZType RequireType { get; set; }
-
         public virtual Exp Parse()
         {
             return this;
@@ -71,6 +82,8 @@ namespace ZCompileCore.AST
 
         public virtual Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
+            IsAnalyed = true;
             return this;
         }
 

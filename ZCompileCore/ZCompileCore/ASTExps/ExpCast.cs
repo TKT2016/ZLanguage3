@@ -31,8 +31,10 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             if (this.ExpContext == null) throw new CCException();
             this.RetType = TypeExp.RetType;
+            IsAnalyed = true;
             return this;
         }
 

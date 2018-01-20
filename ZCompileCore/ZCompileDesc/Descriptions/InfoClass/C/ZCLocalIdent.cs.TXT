@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ZCompileDesc.Descriptions
+{
+    public class ZCLocalIdent:IIdent
+    {
+        public string IdentName { get; set; }
+        public ZType ZType { get; set; }
+        public bool CanRead { get; set; }
+        public bool CanWrite { get; set; }
+
+        public string ZName { get { return IdentName; } }
+        public ZType GetZType() { return ZType; }
+        public bool GetCanRead() { return CanRead; }
+        public bool GetCanWrite() { return CanWrite; }
+
+    }
+}

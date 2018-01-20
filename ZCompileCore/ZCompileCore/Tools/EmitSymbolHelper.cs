@@ -213,28 +213,28 @@ namespace ZCompileCore.Tools
         //    }
         //}
 
-        public static bool NeedCallThis(IIdent symbol)
-        {
-            if (symbol is ZCLocalVar) return false;
-            else if (symbol is ZCParamInfo) return false;
-            //else if (symbol is SymbolDefProperty) 
-            //{
-            //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
-            //    return symbol2.IsStatic == false;
-            //}
-            //else if (symbol is SymbolDefField)
-            //{
-            //    SymbolDefField symbol2 = (symbol as SymbolDefField);
-            //    return symbol2.IsStatic == false;
-            //}
-            //else if (symbol is SymbolRefStaticMember)
-            //{
-            //    return false;
-            //}
-            else
-            {
-                throw new CCException();
-            }
-        }
+        //public static bool NeedCallThis(IIdent symbol)
+        //{
+        //    if (symbol is ZCLocalVar) return false;
+        //    else if (symbol is ZCParamInfo) return false;
+        //    //else if (symbol is SymbolDefProperty) 
+        //    //{
+        //    //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
+        //    //    return symbol2.IsStatic == false;
+        //    //}
+        //    //else if (symbol is SymbolDefField)
+        //    //{
+        //    //    SymbolDefField symbol2 = (symbol as SymbolDefField);
+        //    //    return symbol2.IsStatic == false;
+        //    //}
+        //    //else if (symbol is SymbolRefStaticMember)
+        //    //{
+        //    //    return false;
+        //    //}
+        //    else
+        //    {
+        //        throw new CCException();
+        //    }
+        //}
     }
 }

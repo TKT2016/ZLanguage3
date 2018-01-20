@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Parser;
 using ZCompileCore.Parsers;
-
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
@@ -28,8 +28,9 @@ namespace ZCompileCore.AST
        ZCLocalVar CondiSymbol;
        protected MethodInfo LTMethod = typeof(Calculater).GetMethod(CompileConst.Calculater_LTInt, new Type[] { typeof(int), typeof(int) });
 
-       public override void Analy( )
+       public override void DoAnaly()
        {
+           TimesExp.IsTopExp = true;
            TimesExp = AnalyExpRaw(); 
            if (TimesExp == null)
            {
@@ -40,7 +41,7 @@ namespace ZCompileCore.AST
                TimesExp = TimesExp.Analy();
                if(TimesExp!=null &&TimesExp.AnalyCorrect)
                {
-                   if (ZTypeUtil.IsInt(TimesExp.RetType))// TimesExp.RetType.SharpType!= typeof(int))
+                   if (!ZTypeUtil.IsInt(TimesExp.RetType))
                    {
                        ErrorF(TimesExp.Position, "结果不是整数");
                    }
@@ -77,7 +78,6 @@ namespace ZCompileCore.AST
        protected void CreateEachSymbols()
        {
            var procContext = this.ProcContext;
-           //var symbols = procContext.Symbols;
 
            int foreachIndex = procContext.CreateRepeatIndex();
            var indexName = "@repeat" + foreachIndex + "_index";

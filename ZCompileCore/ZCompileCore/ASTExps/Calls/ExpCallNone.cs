@@ -11,7 +11,7 @@ using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 using ZCompileKit;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     /// <summary>
     /// 无法确定的Call
@@ -28,6 +28,9 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
+            IsAnalyed = true;
+
             AnalyCorrect = false;
             return this;
         }

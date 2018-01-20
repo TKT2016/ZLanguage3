@@ -140,11 +140,6 @@ namespace ZCompileCore.Parsers
         private Exp ParseChain()
         {
             ExpChain expChain = new ExpChain();
-            //Console.WriteLine(tape.Current.GetText());
-            //if (tape.Current.GetText().IndexOf("速度")!=-1)
-            //{      
-            //    Console.WriteLine("速度");
-            //}
             while (tape.Current.Kind != TokenKind.EOF)
             {
                 if (tape.Current.Kind == TokenKind.LBS)
@@ -166,6 +161,7 @@ namespace ZCompileCore.Parsers
                 else if (tape.Current.Kind== TokenKind.Ident
                     || tape.Current.Kind == TokenKind.DE
                     || tape.Current.Kind == TokenKind.DI
+                    || tape.Current.Kind == TokenKind.Each
                     )
                 {
                     LexToken tok = tape.Current;

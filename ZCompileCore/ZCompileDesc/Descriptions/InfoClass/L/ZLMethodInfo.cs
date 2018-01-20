@@ -152,7 +152,6 @@ namespace ZCompileDesc.Descriptions
                 {
                     Type rtype = SharpMethod.ReturnType;
                     _RetZType = ZTypeManager.GetBySharpType(rtype);
-
                 }
                 return _RetZType;
             }

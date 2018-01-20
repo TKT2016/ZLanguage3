@@ -32,8 +32,10 @@ namespace ZCompileCore.ASTExps
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             ZMethod = SearchZMethod();
             RetType = ZMethod.RetZType;
+            IsAnalyed = true;
             return this;
         }
 

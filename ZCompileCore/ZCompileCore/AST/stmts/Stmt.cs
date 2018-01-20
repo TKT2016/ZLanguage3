@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileDesc;
@@ -13,9 +14,9 @@ namespace ZCompileCore.AST
 {
     public abstract  class Stmt:Tree
     {
+        public bool IsAnalyed { get; protected set; }
         #region Context
         public ContextProc ProcContext { get; set; }
-        //public ContextMethod ProcContext { get; set; }
         public ContextClass ClassContext { get { return this.ProcContext.ClassContext; } }
         public override ContextFile FileContext { get { return this.ProcContext.ClassContext.FileContext; } }
         public ContextProject ProjectContext { get { return this.ProcContext.ClassContext.FileContext.ProjectContext; } }
@@ -24,15 +25,23 @@ namespace ZCompileCore.AST
         public bool HasEach { get; set; }
         public int Deep { get; set; }
 
-        public virtual void Analy() { }
+        public void Analy()
+        {
+            if (this.IsAnalyed) return;
+            DoAnaly();
+            IsAnalyed = true;
+        }
+        public abstract void DoAnaly();
         public virtual void Emit() { throw new CCException(); }
 
         protected virtual Exp ParseExp(Exp exp)
         {
+            exp.IsTopExp = true;
             Exp exp2 = null;
             ContextExp context = new ContextExp(this.ProcContext, this);
             exp.SetContext(context);
             exp2 = exp.Parse();
+            exp2.IsTopExp = true;
             return exp2;
         }
 
@@ -52,7 +61,7 @@ namespace ZCompileCore.AST
         {
             get
             {
-                return this.ProcContext.GetILGenerator();//.ILout;
+                return this.ProcContext.GetILGenerator();
             }
         }
 
@@ -77,7 +86,6 @@ namespace ZCompileCore.AST
                 }
             }
             return null;
-            //return condition;
         }
 
         //protected void MarkSequencePoint( )

@@ -14,7 +14,7 @@ using ZCompileDesc.Utils;
 using ZLangRT;
 using ZCompileDesc;
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpEach : Exp
     {
@@ -42,6 +42,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy()
         {
+            if (this.IsAnalyed) return this;
             SubjectExp.SetContext(this.ExpContext);
             SubjectExp = SubjectExp.Analy();
             if(SubjectExp.RetType==null)
@@ -55,6 +56,7 @@ namespace ZCompileCore.AST
             AnalyCountMethod();
             ItemExp = new ExpEachItem(this.ExpContext, this.ListSymbol, this.IndexSymbol);
             this.RetType = ZLangBasicTypes.ZVOID;
+            IsAnalyed = true;
             return this;
         }
 

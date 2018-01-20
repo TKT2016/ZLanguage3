@@ -11,7 +11,7 @@ using ZCompileDesc.Descriptions;
 using ZCompileKit.Tools;
 
 
-namespace ZCompileCore.AST
+namespace ZCompileCore.ASTExps
 {
     public class ExpCallSubject : ExpCallAnalyedBase
     {
@@ -31,10 +31,7 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
-            //if (this.ToString().StartsWith("子弹群添加Z"))
-            //{
-            //    Console.WriteLine("子弹群添加Z");
-            //}
+            if (this.IsAnalyed) return this;
             if (this.ExpContext == null) throw new CCException();
             if (SubjectExp.RetType is ZLEnumInfo)
             {
@@ -57,6 +54,7 @@ namespace ZCompileCore.AST
                     this.RetType = SearchedMethod.RetZType;
                 }
             }
+            IsAnalyed = true;
             return this;
         }
 

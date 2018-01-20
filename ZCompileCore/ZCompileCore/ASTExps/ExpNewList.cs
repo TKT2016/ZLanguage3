@@ -27,13 +27,6 @@ namespace ZCompileCore.AST
             ArgExp = argExp;
         }
 
-        //public ExpNewList(ContextExp context, ExpTypeUnsure typeExp, ExpBracket argExp)
-        //{
-        //    this.ExpContext = context;
-        //    TypeExp = typeExp;
-        //    ArgExp = argExp;
-        //}
-
         public override Exp[] GetSubExps()
         {
             return new Exp[] { TypeExp, ArgExp };
@@ -41,7 +34,9 @@ namespace ZCompileCore.AST
 
         public override Exp Analy( )
         {
+            if (this.IsAnalyed) return this;
             this.RetType = TypeExp.RetType;
+            IsAnalyed = true;
             return this;
         }
 

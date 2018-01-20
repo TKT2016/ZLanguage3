@@ -8,7 +8,7 @@ using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 
 using ZCompileKit.Collections;
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileCore.Contexts
 {

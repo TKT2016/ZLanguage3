@@ -10,7 +10,7 @@ using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
 
-using ZNLP;
+using ZCompileNLP;
 
 namespace ZCompileCore.Parsers
 {
