@@ -10,29 +10,29 @@ namespace ZCompileCore.Lex
 {
     public static class TokenZTypeHelper
     {
-        public static ZLClassInfo GetLiteralZType(LexToken LiteralToken)
+        public static ZLClassInfo GetLiteralZType(LexTokenLiteral LiteralToken)
         {
             ZLClassInfo RetType = null; ;
             var LiteralKind = LiteralToken.Kind;
-            var LiteralValue = LiteralToken.GetText();
+            var LiteralValue = LiteralToken.Text;
 
-            if (LiteralKind == TokenKind.LiteralInt)
+            if (LiteralKind == TokenKindLiteral.LiteralInt)
             {
                 RetType = ZLangBasicTypes.ZINT;
             }
-            else if (LiteralKind == TokenKind.LiteralFloat)
+            else if (LiteralKind == TokenKindLiteral.LiteralFloat)
             {
                 RetType = ZLangBasicTypes.ZFLOAT;
             }
-            else if (LiteralKind == TokenKind.LiteralString)
+            else if (LiteralKind == TokenKindLiteral.LiteralString)
             {
                 RetType = ZLangBasicTypes.ZSTRING;
             }
-            else if (LiteralKind == TokenKind.True || LiteralKind == TokenKind.False)
+            else if (LiteralKind == TokenKindLiteral.True || LiteralKind == TokenKindLiteral.False)
             {
                 RetType = ZLangBasicTypes.ZBOOL;
             }
-            else if (LiteralKind == TokenKind.NULL)
+            else if (LiteralKind == TokenKindLiteral.NULL)
             {
                 RetType = null; //ZTypeCache.CreateZRealType(typeof(整数));// null;
             }

@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZCompileNLP</RootNamespace>
     <AssemblyName>ZCompileNLP</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,11 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormWorderManager.cs" />
+    <Content Include="FormWorderManager.cs.TXT" />
     <Compile Include="ISegementer.cs" />
-    <Content Include="Resources\dict - 复制.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Include="Json\JsonUtil.cs" />
+    <Compile Include="Json\MojoUnityJson.cs" />
+    <Compile Include="ManifestResourceReader.cs" />
     <Compile Include="WordSpeechPart.cs" />
     <Compile Include="UserWordsSegementer.cs" />
     <Compile Include="SimpleSegementer.cs" />
@@ -65,38 +67,23 @@
     <Compile Include="Segement\PosSeg\Pair.cs" />
     <Compile Include="Segement\PosSeg\PosSegmenter.cs" />
     <Compile Include="Segement\PosSeg\Viterbi.cs" />
-    <Content Include="Resources\yuge.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Compile Include="Segement\Spelling\SpellChecker.cs" />
     <Compile Include="Segement\SegToken.cs" />
     <Compile Include="Segement\WordDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\char_state_tab.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\pos_prob_emit.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\pos_prob_start.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\pos_prob_trans.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\prob_emit.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\prob_trans.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="NlpRes\char_state_tab.json" />
+    <EmbeddedResource Include="NlpRes\pos_prob_emit.json" />
+    <EmbeddedResource Include="NlpRes\pos_prob_start.json" />
+    <EmbeddedResource Include="NlpRes\pos_prob_trans.json" />
+    <EmbeddedResource Include="NlpRes\prob_emit.json" />
+    <EmbeddedResource Include="NlpRes\prob_trans.json" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="NlpRes\yuge.txt" />
+    <EmbeddedResource Include="NlpRes\dict_bak.txt" />
     <Content Include="_lib\Newtonsoft.Json.dll" />
-    <Content Include="Resources\dict.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="NlpRes\dict.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

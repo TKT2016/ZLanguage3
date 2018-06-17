@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ZCompileCore.AST;
-using ZCompileCore.ASTExps;
 using ZCompileDesc.Descriptions;
-using ZCompileKit;
+using ZCompileCore;
+using ZCompileCore.AST.Exps;
 
 namespace ZCompileCore.Tools
 {

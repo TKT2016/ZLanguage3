@@ -7,10 +7,6 @@ namespace ZCompileCore
 {
     public static class CompileConst
     {
-        public const String CodeFileExt = ".zyy";
-
-        public const String ProjectFileExt = ".zproj";
-
         public const String Calculater_LEInt = "LEInt";
         public const String Calculater_LTInt = "LTInt";
 

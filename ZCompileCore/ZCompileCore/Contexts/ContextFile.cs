@@ -12,6 +12,7 @@ using ZCompileDesc.Descriptions;
 
 using ZCompileDesc.Collections;
 using ZCompileNLP;
+using ZCompileCore.SourceModels;
 
 namespace ZCompileCore.Contexts
 {
@@ -19,29 +20,37 @@ namespace ZCompileCore.Contexts
     {
         public ContextProject ProjectContext { get; set; }
         public ContextImportUse ImportUseContext { get; private set; }
-        public ContextClass ClassContext { get; set; }
-        public ZFileModel FileModel { get; private set; }
+        public SourceFileModel FileModel { get; private set; }
         public ZLClassInfo EmitedIZDescType { get; set; }
 
         string _KeyContext;
 
-        public ContextFile(ContextProject projectContext,ZFileModel fileModel)
+        public ContextFile(ContextProject projectContext, SourceFileModel fileModel)
         {
             ProjectContext = projectContext;
             FileModel = fileModel;
-            //ClassContext = new ContextClass(this);
             ImportUseContext = new ContextImportUse(this);
-            _KeyContext = FileModel.GetFileNameNoEx();
+            _KeyContext =  FileModel.GeneratedClassName;
         }
 
         #region error 
+        
+        public bool HasError()
+        {
+            var MessageCollection = this.ProjectContext.MessageCollection;
+            if (MessageCollection.ContainsErrorSrcKey(this.FileModel.ShowKeyPath))
+            {
+                return true;
+            }
+            return false;
+        }
 
         private void Error(int line ,int col,string message)
         {
-            var file = this.FileModel.ZFileInfo;
-            CompileMessage cmsg = new CompileMessage( new CompileMessageSrcKey( file.ZFileName) , line, col, message);
+            var file = this.FileModel.ShowKeyPath;//.ZFileInfo;
+            CompileMessage cmsg = new CompileMessage(new CompileMessageSrcKey(file), line, col, message);
             this.ProjectContext.MessageCollection.AddError( cmsg);
-            CompileConsole.Error("文件 '" + file.ZFileName + "' 第" + line + "行,第" + col + "列错误:" + message);
+            CompileConsole.Error("文件 '" + file + "' 第" + line + "行,第" + col + "列错误:" + message);
         }
 
         public void Errorf(int line, int col, string messagef, params object[] args)

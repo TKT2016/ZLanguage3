@@ -16,22 +16,29 @@ namespace ZCompileDesc.Descriptions
         public override bool GetIsStatic() { return IsStatic; }
         public override bool GetCanRead() { return true; }
         public override bool GetCanWrite() { return true; }
-        public override string[] GetZFieldZNames() { return new string[] { ZPropertyZName }; }
-        public override ZType GetZFieldType() { return this.ZPropertyType; }
+        public override string[] GetZFieldZNames() { return new string[] { FieldZName }; }
+        public override ZType GetZFieldType() { return this.FieldZType; }
         public override ZAClassInfo GetZAClass() { return this.ZClass; }
 
         #endregion
 
         public FieldBuilder FieldBuilder { get; set; }
         public bool IsStatic { get; set; }
-        public string ZPropertyZName { get; set; }
+        public string FieldZName { get; set; }
         public ZCClassInfo ZClass { get; set; }
-        public ZAClassInfo ZPropertyType { get; set; }
+        public ZAClassInfo FieldZType { get; set; }
         public bool HasDefaultValue { get; set; }
+
+        public ZCFieldInfo(string name, ZAClassInfo ztype, FieldBuilder builder)
+        {
+            FieldZName = name;
+            FieldZType = ztype;
+            FieldBuilder = builder;
+        }
 
         public override string ToString()
         {
-            return "ZCFieldInfo(" + ZPropertyZName + ")";
+            return "ZCFieldInfo(" + FieldZName + ")";
         }
     }
 }

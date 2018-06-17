@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ZCompileKit.Collections;
-using ZCompileKit.Infoes;
+using ZCompileCore.CommonCollections;
+//using ZCompileKit.Infoes;
 
 namespace ZCompileCore.Reports
 {

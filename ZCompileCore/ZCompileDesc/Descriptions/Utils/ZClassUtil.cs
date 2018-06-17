@@ -179,10 +179,18 @@ namespace ZCompileDesc.Descriptions
 
         public static ZLMethodInfo[] GetZMethods(Type markType, Type sharpType, bool isStatic,ZLClassInfo zclass)
         {
+            //if (markType.Name == "控制台")
+            //{
+            //    Console.WriteLine("控制台");
+            //}
             List<ZLMethodInfo> list = new List<ZLMethodInfo>();
             MethodInfo[] markMethods = markType.GetMethods();
             foreach (MethodInfo method in markMethods)
             {
+                //if (method.Name == "Write")
+                //{
+                //    Console.WriteLine("Write");
+                //}
                 if (!ReflectionUtil.IsDeclare(markType, method)) continue;
                 if (!AttributeUtil.HasAttribute<ZCodeAttribute>(method)) continue;
                 MethodInfo newMethod = ReflectionUtil.GetMethod(sharpType, method);
@@ -194,8 +202,8 @@ namespace ZCompileDesc.Descriptions
                 {
                     if (isStatic == newMethod.IsStatic)
                     {
-                        ZLMethodInfo zproperty = new ZLMethodInfo(method, newMethod, zclass);
-                        list.Add(zproperty);
+                        ZLMethodInfo zmethod = new ZLMethodInfo(method, newMethod, zclass);
+                        list.Add(zmethod);
                     }
                 }
             }

@@ -9,6 +9,7 @@ namespace ZCompileDesc.Descriptions
 {
     public abstract class ZAClassInfo : ZType
     {
+        public abstract bool IsRuntimeType { get; }
         public abstract AccessAttrEnum GetAccessAttr();
         public abstract string GetZClassName();
         public abstract bool GetIsStatic();

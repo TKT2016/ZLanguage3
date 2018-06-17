@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ZCompileKit.Infoes;
+//using ZCompileKit.Infoes;
 
 namespace ZCompileCore.Reports
 {

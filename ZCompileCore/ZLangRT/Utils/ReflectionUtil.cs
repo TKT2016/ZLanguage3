@@ -20,20 +20,6 @@ namespace ZLangRT.Utils
             return type.GetMethod(name, types);
         }
 
-        //public static MethodInfo[] GetMethods(Type type,string name)
-        //{
-        //    List<MethodInfo> list = new List<MethodInfo>();
-        //    MethodInfo[] methods = type.GetMethods();
-        //    foreach(var method in methods)
-        //    {
-        //        if(method.Name==name)
-        //        {
-        //            list.Add(method);
-        //        }
-        //    }
-        //    return list.ToArray();
-        //}
-
         public static AccessAttrEnum GetAccessAttributeEnum(Type type)
         {
             if (type.IsPublic) return AccessAttrEnum.Public;
@@ -189,10 +175,6 @@ namespace ZLangRT.Utils
 
         public static bool IsExtends(Type subType, Type baseType)
         {
-            if (subType==null)
-            {
-                return true;
-            }
             if (subType == baseType)
             {
                 return true;
@@ -292,6 +274,14 @@ namespace ZLangRT.Utils
                 }
             }
             return null;
+        }
+
+        public static bool IsRuntimeType(Type type)
+        {
+            if (type.IsPointer) return true;
+            //if (IsExtends(type, typeof(object))) return false;
+            return false;
+            //return type.ToString() == "System.RuntimeType";
         }
 
     }

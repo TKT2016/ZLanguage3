@@ -2,63 +2,136 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using ZCompileCore.ASTRaws;
+using ZCompileCore.Parsers.Raws;
 
 namespace ZCompileCore.AST
 {
-    public class StmtBlock : Stmt
+    public class StmtBlock:Stmt
     {
-        public List<Stmt> StmtList { get; set; }
-
-        public StmtBlock()
+        private List<Stmt> Stmts;
+        private ProcAST _Proc;
+        public StmtBlockRaw Raw;
+         
+        public StmtBlock(ProcAST proc, StmtBlockRaw raw)
         {
-            StmtList = new List<Stmt>();
+            _Proc = proc;
+            Raw = raw;
+            Stmts = new List<Stmt>();
+            this._ProcContext = proc.GetContextProc();
         }
 
-        List<int> catchStmtIndexList;
+        public StmtBlock(Stmt parentStmt, StmtBlockRaw raw)
+        {          
+            ParentStmt = parentStmt;
+            Raw = raw;
+            Stmts = new List<Stmt>();
+        }
 
-        public override void DoAnaly()
+        public override void AnalyExpDim()
         {
-            catchStmtIndexList = new List<int>();
-            for (var i = 0; i < StmtList.Count; i++)
+            foreach (Stmt stmt in Stmts)
             {
-                Stmt stmt = StmtList[i];
-                stmt.ProcContext = this.ProcContext;
-                stmt.Analy();
-                if (stmt is StmtCatch)
+                stmt.AnalyExpDim();
+            }
+        }
+
+        public override Stmt Analy()
+        {
+            Stmts.Clear();
+            
+            StmtRawParser parser = new StmtRawParser(Raw.LineTokens, this.ProcContext);
+            while (parser.HasCurrent)
+            {
+                object obj = parser.ParseCurrent();
+                if(obj!=null)
                 {
-                    catchStmtIndexList.Add(i+1);
+                    if(obj is StmtRaw)
+                    {
+                        //Console.WriteLine(obj.ToString());
+                        AnalyRaw((StmtRaw)obj);
+                    }
+                    else if (obj is List<StmtRaw>)
+                    {
+                        List<StmtRaw> raws = (List<StmtRaw>)obj;
+                        foreach (StmtRaw item in raws)
+                        {
+                            //Console.WriteLine(item.ToString());
+                            //if(item.ToString().StartsWith("结果=否"))
+                            //{
+                            //    //Console.WriteLine("debug:"+item.ToString());
+                            //    Debugr.IsInDebug = true;
+                            //}
+                            AnalyRaw(item);
+                        }
+                    }
+                    else
+                    {
+                        throw new CCException();
+                    }
                 }
             }
-            if (catchStmtIndexList.Count > 0)
-            {
-                InsertCatch();
-            }
+ 
+            return this;
         }
 
-        private void InsertCatch()
+        private void AnalyRaw(StmtRaw raw)
         {
-            catchStmtIndexList.Insert(0, 0);
-            catchStmtIndexList.RemoveAt(catchStmtIndexList.Count - 1);
-            for (var i = 0; i < catchStmtIndexList.Count; i++)
-            {
-                StmtTry tryStmt = new StmtTry();
-                tryStmt.ProcContext = this.ProcContext;
-                int index = catchStmtIndexList[i] + i;
-                StmtList.Insert(index, tryStmt);
-            }
+            Stmt stmt = CreateStmt((StmtRaw)raw);
+            Stmt stmt2 = stmt.Analy();
+            Stmts.Add(stmt2);
         }
 
         public override void Emit()
         {
-            foreach (Stmt stmt in StmtList)
+            foreach (Stmt stmt in Stmts)
             {
                 stmt.Emit();
             }
         }
 
+        private Stmt CreateStmt(StmtRaw raw)
+        {
+            if(raw is StmtCallRaw)
+            {
+                StmtCall stmt = new StmtCall((StmtCallRaw)raw,this);
+                return stmt;
+            }
+            else if (raw is StmtCatchRaw)
+            {
+                StmtCatch stmt = new StmtCatch((StmtCatchRaw)raw, this);
+                return stmt;
+            }
+            else if (raw is StmtForeachRaw)
+            {
+                StmtForeach stmt = new StmtForeach((StmtForeachRaw)raw, this);
+                return stmt;
+            }
+            else if (raw is StmtIfRaw)
+            {
+                StmtIf stmt = new StmtIf((StmtIfRaw)raw, this);
+                return stmt;
+            }
+            else if (raw is StmtRepeatRaw)
+            {
+                StmtRepeat stmt = new StmtRepeat((StmtRepeatRaw)raw, this);
+                return stmt;
+            }
+            else if (raw is StmtWhileRaw)
+            {
+                StmtWhile stmt = new StmtWhile((StmtWhileRaw)raw, this);
+                return stmt;
+            }
+            else
+            {
+                throw new CCException();
+            }
+        }
+
         public override string ToString()
         {
-            return string.Join(Environment.NewLine, StmtList);
+            return Raw.ToString();
         } 
     }
 }

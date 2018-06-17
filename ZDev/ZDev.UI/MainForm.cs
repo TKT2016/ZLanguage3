@@ -73,17 +73,18 @@ namespace ZDev
             }
             if (fileName.EndsWith(ZDevCompiler.ZYYExt , StringComparison.InvariantCultureIgnoreCase))
             {
-                this.procDock.ShowClass(fi);
+                //this.procDock.ShowClass(fi);
             }
             else if (fileName.EndsWith(ZDevCompiler.ZXMExt, StringComparison.InvariantCultureIgnoreCase))
             {
                 this.procDock.ClearTree();
                 if (isShowProjFile)
                 {
-                    this.projDock.ShowClass(fi);
+                    //this.projDock.ShowClass(fi);
                 }
             }
         }
+
         OpenFileDialog openFileDialog1;// = new OpenFileDialog();
         string fileExtFilter = "Z文件 (*.zyy)|*.zyy|Z项目文件 (*.zxm)|*.zxm|文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*"; 
         void dialogOpenFile()
@@ -100,6 +101,7 @@ namespace ZDev
         void NewFile()
         {
             EditorDockForm cvf = newEditorDockForm();
+            cvf.MasterForm = this;
             cvf.NewFile(newIndex);
             cvf.ParentDockPanel = this.MainDockPanel;
             cvf.Editor.NewFile();
@@ -110,6 +112,7 @@ namespace ZDev
         private EditorDockForm newEditorDockForm()
         {
             EditorDockForm cvf = new EditorDockForm();
+            cvf.MasterForm = this;
             return cvf;
         }
 
@@ -235,14 +238,14 @@ namespace ZDev
                     var fileName = fi.FullName;
                     if (fileName.EndsWith(ZDevCompiler.ZYYExt, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        this.procDock.ShowClass(fi);
+                        //this.procDock.ShowClass(fi);
                     }
                     else if (fileName.EndsWith(ZDevCompiler.ZXMExt, StringComparison.InvariantCultureIgnoreCase))
                     {
                         this.procDock.ClearTree();
                         //if (isShowProjFile)
                         //{
-                            this.projDock.ShowClass(fi);
+                            //this.projDock.ShowClass(fi);
                         //}
                     }
                 }
@@ -279,6 +282,29 @@ namespace ZDev
             {
 
             }
+        }
+
+        private void mainDockPanel_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.All;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
         }   
+
+        private void mainDockPanel_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                //FileInfo fi = new FileInfo(s[i]);
+                OpenFile(s[i],false);
+            }
+        } 
     }
 }

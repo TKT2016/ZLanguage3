@@ -5,6 +5,11 @@ using ZCompileCore.Parsers;
 using ZCompileCore.AST;
 using System.IO;
 using ZCompileCore.Reports;
+using ZCompileCore.SourceModels;
+using ZCompileCore.ASTRaws;
+using System;
+using ZCompileCore.Parsers.Raws;
+using ZCompileCore.Parsers.Asts;
 
 namespace ZCompileCore.Engines
 {
@@ -17,105 +22,78 @@ namespace ZCompileCore.Engines
             this.projectContext = projectContext;
         }
 
-        public FileSource Parse(ZFileModel fileModel)
+        public FileAST Parse(SourceFileModel fileModel)//FileSource
         {
             ContextFile fileContext = new ContextFile(this.projectContext, fileModel);
-            List<LexToken> Tokens = Scan(fileContext, fileModel);
-            FileSectionParser parser = new FileSectionParser();
-            FileMutilType fileMutilType = parser.Parse(Tokens, fileContext);
-            FileSource fileType = ParseSingleMutil(fileMutilType);
-            if (fileType != null)
-            {
-                fileType.FileModel = fileModel;
-                fileType.ProjectContext = this.projectContext;
-            }
-            return fileType;
+            List<LineTokenCollection> Tokens = Scan(fileContext, fileModel);
+            //foreach (LineTokenCollection ltc in Tokens)
+            //{
+            //    Console.WriteLine(ltc);
+            //    foreach(LexToken tok in ltc.ToList())
+            //    {
+            //        Console.Write(tok.Text+" ");
+            //    }
+            //    Console.WriteLine();
+            //}
+            FileRawParser parser = new FileRawParser();
+            FileRaw fileRaw = parser.Parse(Tokens, fileContext); //FileMutilTypeRaw
+            FileASTParser fileASTParser = new FileASTParser();
+            FileAST fileAST = fileASTParser.Parse(fileRaw, fileContext);
+            //FileSource fileType = ParseSingleMutil(fileMutilType);
+            //if (fileType != null)
+            //{
+            //    fileType.FileModel = fileModel;
+            //    fileType.ProjectContext = this.projectContext;
+            //}
+            //return fileType;
+            return fileAST;
         }
 
         #region Scan
-        public List<LexToken> Scan(ContextFile fileContext, ZFileModel fileModel)
+        public List<LineTokenCollection> Scan(ContextFile fileContext, SourceFileModel fileModel)
         {
-            List<LexToken>  Tokens = new List<LexToken>();
-            List<LexToken> preTokens = ScanPreCode(fileModel.ZFileInfo.FilePreText,fileContext);
-            Tokens.AddRange(preTokens);
+            List<LineTokenCollection> Tokens = new List<LineTokenCollection>();
+            if (!string.IsNullOrWhiteSpace(fileModel.PreSourceCode))
+            {
+                List<LineTokenCollection> preTokens = ScanTextCode(fileModel.PreSourceCode, fileContext, fileModel.PreSourceStartLine);
+                Tokens.AddRange(preTokens);
+            }
 
-            List<LexToken> fileTokens = ScanFileCode(fileContext, fileModel);
-            Tokens.AddRange(fileTokens);
+            if (!string.IsNullOrWhiteSpace(fileModel.RealSourceCode))
+            {
+                List<LineTokenCollection> realTokens = ScanTextCode(fileModel.RealSourceCode, fileContext, fileModel.RealSourceStartLine);
+                Tokens.AddRange(realTokens);
+            }
+
+            if (!string.IsNullOrWhiteSpace(fileModel.BackSourceCode))
+            {
+                List<LineTokenCollection> backTokens = ScanTextCode(fileModel.BackSourceCode, fileContext, fileModel.BackSourceStartLine);
+                Tokens.AddRange(backTokens);
+            }
             return Tokens;
         }
 
-        private List<LexToken> ScanFileCode(ContextFile fileContext, ZFileModel fileModel)
+        private List<LineTokenCollection> ScanTextCode(string code, ContextFile fileContext, int startLine)
         {
-            
-            if (fileModel.ZFileInfo.IsVirtual) return new List<LexToken> ();
-            string srcFile = fileModel.ZFileInfo.RealFilePath;// zCompileClassModel.GetSrcFullPath();
-            if (!File.Exists(srcFile))
-            {
-                projectContext.MessageCollection.AddError(
-                    new CompileMessage(new CompileMessageSrcKey( fileModel.ZFileInfo.ZFileName), 0, 0, "源文件'" + srcFile + "'不存在"));
-                return new List<LexToken>();
-            }
-            FileSourceReader reader = new FileSourceReader(srcFile);
-            List<LexToken> tokens2 = ScanReaderTokens(reader, fileContext);
-            return tokens2;
-        }
-
-        private List<LexToken> ScanPreCode(string preCode, ContextFile fileContext)
-        {
-            if (string.IsNullOrEmpty(preCode)) return new List<LexToken>();
-            StringSourceReader reader = new StringSourceReader(preCode);
-            List<LexToken> tokens2 = ScanReaderTokens(reader, fileContext);
-            foreach (var token in tokens2)
-            {
-                token.Line = -token.Line - 1;
-                token.Col = token.Col - 1000;//方法体以行列区分，所以减去一些。
-            }
+            if (string.IsNullOrEmpty(code)) return new List<LineTokenCollection>();
+            StringSourceReader reader = new StringSourceReader(code);
+            List<LineTokenCollection> tokens2 = ScanReaderTokens(reader, fileContext, startLine);
+            //foreach (var token in tokens2)
+            //{
+            //    token.Line = -token.Line - 1;
+            //    token.Col = token.Col - 1000;//方法体以行列区分，所以减去一些。
+            //}
             return tokens2;
         }
 
         Tokenizer tokenizer = new Tokenizer();
-        private List<LexToken> ScanReaderTokens(SourceReader reader, ContextFile fileContext)
+        private List<LineTokenCollection> ScanReaderTokens(SourceReader reader, ContextFile fileContext, int startLine)
         {
-            List<LexToken> tokens = tokenizer.Scan(reader, fileContext);
+            List<LineTokenCollection> tokens = tokenizer.Scan(reader, fileContext, startLine);
             return tokens;
         }
 
         #endregion
 
-        private FileSource ParseSingleMutil(FileMutilType fmt)
-        {
-            //int importCount = fmt.Importes.Count;
-            //int useCount = fmt.Uses.Count;
-            int propertyCount = fmt.Propertieses.Count;
-            int procCount = fmt.Proces.Count;
-
-            int enumCount = fmt.Enumes.Count;
-            int dimCount = fmt.Dimes.Count;
-            int classCount = fmt.Classes.Count;
-
-            if (enumCount == 1 && dimCount == 0 && classCount == 0)
-            {
-                return new FileEnum(fmt.FileContext,fmt.Enumes);
-            }
-            else if (enumCount == 0 && dimCount == 1 && classCount == 0)
-            {
-                return new FileDim(fmt.FileContext, fmt.Dimes[0], fmt.ImporteSection);
-            }
-            else if (enumCount == 0  && classCount == 1)
-            {
-                FileClass fsc = new FileClass(fmt.FileContext, fmt);
-                return fsc;
-            }
-            else if (enumCount == 0 && dimCount == 0 && classCount == 0)
-            {
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        
     }
 }

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using ZCompileDesc.Utils;
 using ZLangRT.Utils;
 
 namespace ZCompileDesc.Descriptions
 {
     public class ZCClassInfo : ZAClassInfo, ICompling,ZCType
     {
+        public override bool IsRuntimeType { get { return false; } }
         #region override
 
         public override AccessAttrEnum GetAccessAttr() { return AccessAttrEnum.Public; }
@@ -136,9 +139,29 @@ namespace ZCompileDesc.Descriptions
             return this.BaseZClass.SearchProperty(zname);
         }
 
-        public void AddConstructor(ZCFieldInfo zmc)
+        public ZCFieldInfo DefineFieldPublic(string name,ZAClassInfo ztype)
         {
-            _ZCompilingFields.Add(zmc);
+            Type varSharpType = ZTypeUtil.GetTypeOrBuilder(ztype);
+            FieldBuilder field = ClassBuilder.DefineField(name, varSharpType, FieldAttributes.Public);
+            ZCFieldInfo zf = new ZCFieldInfo(name, (ZAClassInfo)ztype, field);
+            _ZCompilingFields.Add(zf);
+            return zf;
+        }
+
+        //public void AddField(ZCFieldInfo zmc)
+        //{
+        //    _ZCompilingFields.Add(zmc);
+        //}
+
+        public ZCPropertyInfo DefinePropertyPublic(string PropertyName)
+        {
+            var ZPropertyCompiling = new ZCPropertyInfo();
+            //PropertyName = NameToken.Text;
+             //   this.ClassContext.AddPropertyName(PropertyName);
+                ZPropertyCompiling.ZPropertyZName = PropertyName;
+             //   this.ClassContext.AddMember(ZPropertyCompiling);
+                _ZCompilingPropertys.Add(ZPropertyCompiling);
+                return ZPropertyCompiling;
         }
 
         public void AddProperty(ZCPropertyInfo zmc)

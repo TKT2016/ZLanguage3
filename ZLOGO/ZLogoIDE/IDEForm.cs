@@ -36,7 +36,7 @@ namespace ZLogoIDE
         private void runStripButton_Click(object sender, EventArgs e)
         {
             if (FileFullPath == null) return;
-            Console.WriteLine("runStripButton_Click FileFullPath=" + FileFullPath);
+            //Console.WriteLine("runStripButton_Click FileFullPath=" + FileFullPath);
             if (Save())
             {
                 compileMsgForm.Hide();

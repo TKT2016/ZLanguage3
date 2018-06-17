@@ -68,14 +68,11 @@ namespace ZCompileCore.Contexts
             List<ZLMethodInfo> list = new List<ZLMethodInfo>();
             foreach (ZLClassInfo zclass in UseZClassList)
             {
-                //if (zclass.IsStatic)
-                {
                     var zitem = zclass.SearchZMethod(calldesc);
                     if (zitem != null && zitem.Length > 0)
                     {
                         list.AddRange(zitem);
                     }
-                }
             }
             return list.ToArray();
         }

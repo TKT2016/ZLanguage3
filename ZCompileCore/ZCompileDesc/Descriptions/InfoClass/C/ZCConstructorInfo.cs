@@ -21,7 +21,7 @@ namespace ZCompileDesc.Descriptions
 
         #endregion
 
-         #region 构造函数
+        #region 构造函数
 
         public ZCConstructorInfo(ZCClassInfo zcclass)
         {

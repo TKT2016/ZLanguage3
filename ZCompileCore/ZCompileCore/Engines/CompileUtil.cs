@@ -54,7 +54,7 @@ namespace ZCompileCore.Engines
             {
                 Type myType = typeof(AssemblyVersionAttribute);
                 ConstructorInfo infoConstructor = myType.GetConstructor(new Type[] { typeof(string) });
-                CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { "0.4.0" });
+                CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { "0.5.0" });
                 builder.SetCustomAttribute(attributeBuilder);
             }
             {
@@ -138,7 +138,7 @@ namespace ZCompileCore.Engines
             {
                 Type myType = typeof(TargetFrameworkAttribute);
                 ConstructorInfo infoConstructor = myType.GetConstructor(new Type[] { typeof(string) });
-                CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { ".NETFramework,Version=v4.0" });
+                CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(infoConstructor, new object[] { ".NETFramework,Version=v4.5" });
                 builder.SetCustomAttribute(attributeBuilder);
             }
         }

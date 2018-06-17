@@ -14,7 +14,6 @@ namespace ZCompileNLP.Segment.PosSeg
         private static readonly WordDictionary WordDict = WordDictionary.Instance;
         private static readonly Viterbi PosSeg = Viterbi.Instance;
 
-        // TODO: 
         private static readonly object locker = new object();
 
         #region Regular Expressions
@@ -41,10 +40,11 @@ namespace ZCompileNLP.Segment.PosSeg
 
         private static void LoadWordTagTab()
         {
+            if (!ConfigManager.LoadMainDictFile) return;
             try
             {
                 _wordTagTab = new Dictionary<string, string>();
-                var lines = File.ReadAllLines(ConfigManager.MainDictFile, Encoding.UTF8);
+                var lines = ManifestResourceReader.ReadText(ConfigManager.MainDictFile, Encoding.UTF8);// File.ReadAllLines(ConfigManager.MainDictFile, Encoding.UTF8);
                 foreach (var line in lines)
                 {
                     var tokens = line.Split(' ');

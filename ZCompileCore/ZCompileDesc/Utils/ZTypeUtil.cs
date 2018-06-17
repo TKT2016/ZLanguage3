@@ -17,6 +17,7 @@ namespace ZCompileDesc.Utils
     {
         public static Type GetTypeOrBuilder(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -31,6 +32,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsGenericType(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -41,6 +43,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsBool(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -51,6 +54,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsInt(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -61,6 +65,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsFloat(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -71,6 +76,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsListClass(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -81,20 +87,15 @@ namespace ZCompileDesc.Utils
 
         public static bool IsListClass(Type type)
         {
+            if (type == null) throw new NullReferenceException();
             if (!type.Name.StartsWith(ZLangUtil.ZListClassZName)) return false;
             if (type.Namespace != ZLangUtil.LangPackageName) return false;
             return true;
         }
 
-        //public static bool IsStruct(ZType ztype)
-        //{
-        //    if (!(ztype is ZLType)) return false;
-        //    ZLType zltype = (ZLType)ztype;
-        //    return (ReflectionUtil.IsStruct(zltype.SharpType));
-        //}
-
         public static bool IsVoid(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (!(ztype is ZLType)) return false;
             ZLType zltype = (ZLType)ztype;
             return zltype.SharpType == typeof(void);
@@ -102,6 +103,8 @@ namespace ZCompileDesc.Utils
 
         public static bool IsExtends(ZType subType, ZType supType)
         {
+            if (subType == null) throw new NullReferenceException();
+            if (supType == null) throw new NullReferenceException();
             if (supType is ZLType)
             {
                 Type type = ((ZLType)supType).SharpType;
@@ -112,6 +115,8 @@ namespace ZCompileDesc.Utils
 
         public static bool IsExtends(ZType subType,Type supType)
         {
+            if (subType == null) throw new NullReferenceException();
+            if (supType == null) throw new NullReferenceException();
             if (subType is ZLType)
             {
                 Type type = ((ZLType)subType).SharpType;
@@ -122,6 +127,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsFn(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -132,6 +138,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsAction(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;
@@ -142,6 +149,7 @@ namespace ZCompileDesc.Utils
 
         public static bool IsConditionFn(ZType ztype)
         {
+            if (ztype == null) throw new NullReferenceException();
             if (ztype is ZLType)
             {
                 Type type = ((ZLType)ztype).SharpType;

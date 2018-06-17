@@ -5,11 +5,20 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using ZLangRT;
+using ZLangRT.Utils;
 
 namespace ZCompileDesc.Descriptions
 {
     public class ZLParamInfo : ZAParamInfo, ICompleted, IParameter
     {
+        public bool IsRuntimeType
+        {
+            get
+            {
+                Type parameterType = ParameterInfo.ParameterType;
+                return ReflectionUtil.IsRuntimeType(parameterType);
+            }
+        }
         #region override
 
         public override bool GetIsFnParam() { return IsFnParam; }
@@ -30,7 +39,7 @@ namespace ZCompileDesc.Descriptions
 
         #region 构造函数
 
-        private ZLParamInfo(ParameterInfo parameterInfo, int paramIndex)//, bool isGenericArg)
+        private ZLParamInfo(ParameterInfo parameterInfo, int paramIndex)
         {
             ParameterInfo = parameterInfo;
             ZParamName = parameterInfo.Name;
@@ -84,10 +93,17 @@ namespace ZCompileDesc.Descriptions
         {
             get
             {
-                if (IsGenericArg) { return ZLangBasicTypes.ZOBJECT; }
-                else { return (ZLType)ZTypeManager.GetBySharpType(ParameterInfo.ParameterType); }
+                if (IsGenericArg) 
+                { 
+                    return ZLangBasicTypes.ZOBJECT;
+                }
+                else {
+                    Type parameterType = ParameterInfo.ParameterType;
+                    return (ZLType)ZTypeManager.GetBySharpType(parameterType); 
+                }
             }
         }
+
         public ParameterInfo ParameterInfo { get; private set; }
 
         public bool IsFnParam

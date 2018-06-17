@@ -4,18 +4,16 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using ZCompileCore.AST;
-
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using Z语言系统;
 
 namespace ZCompileCore.Contexts
 {
-    public class ContextExp //:IWordDictionary
+    public class ContextExp
     {
         public Stmt Stmt { get;private set; }
         public ContextProc ProcContext { get; private set; }
-        //public SymbolTable Table { get; set; }
 
         public ContextExp(ContextProc procContext)
         {
@@ -44,39 +42,9 @@ namespace ZCompileCore.Contexts
             }
         }
 
-        //#region IWordDictionary实现
-        //public bool ContainsWord(string text)
-        //{
-        //    return ProcContext.ContainsWord(text)
-        //    ;
-        //}
-
-        //public WordInfo SearchWord(string text)
-        //{
-        //    return ProcContext.SearchWord(text);
-        //}
-        //#endregion
-
-        //public IWordDictionary ExpWordDictionary
-        //{
-        //    get{
-        //        return this.ProcContext.ClassWordDictionary;
-        //    }
-        //}
-        //{
-        //    return this.ProcContext.GetWordCollection();
-            //if(ExpWordCollection==null)
-            //{
-            //    //ExpWordCollection = new WordCollection();
-            //    //ExpWordCollection.Add(this.ProcContext.ClassContext.FileContext.GetWordCollection().ToArray());
-            //    //ExpWordCollection.Add(this.ProcContext.ClassContext.FileContext.ImportContext.DictMember);
-
-            //    //ExpWordCollection.Add(this.ProcContext.ProcWordDictionary);
-            //    ////ExpWordManager.Add(this.ProcContext.ClassContext.ClassWordDictionary);
-            //    //var WordManager2 = this.ProcContext.ClassContext.FileContext.GetWordCollection();
-            //    //ExpWordCollection.Add(WordManager2.GetDictionaryArray());
-            //}
-            //return ExpWordCollection;
-       // }
+        public override string ToString()
+        {
+            return string.Format("ContextExp->{0}", this.ProcContext);
+        }
     }
 }

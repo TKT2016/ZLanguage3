@@ -54,9 +54,9 @@
       <Project>{47777972-9e15-4ab2-89dc-a6c988864847}</Project>
       <Name>ZCompileCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ZCompileCore\ZCompileKit\ZCompileKit.csproj">
-      <Project>{0744fe01-7ebf-42ca-ac05-869ec1d24f6c}</Project>
-      <Name>ZCompileKit</Name>
+    <ProjectReference Include="..\..\ZCompileCore\ZCompiler\ZCompiler.csproj">
+      <Project>{e67a9e30-33bf-4396-8ead-2d100b3db84a}</Project>
+      <Name>ZCompiler</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ZCompileCore\ZLangRT\ZLangRT.csproj">
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using ZCompileKit.Collections;
+using ZCompileCore.CommonCollections;
 using ZCompileCore.Engines;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
@@ -13,19 +13,19 @@ using ZLangRT.Utils;
 using ZCompileDesc.Descriptions;
 using System.IO;
 using ZCompileDesc.Collections;
-
+using ZCompileCore.SourceModels;
 
 namespace ZCompileCore.Contexts
 {
     public  class ContextProject
     {
         public string PackageName { get; set; }
-        public ZProjectModel ProjectModel { get;private set; }
+        public SourceProjectModel ProjectModel { get; private set; }
         public Dictionary<Assembly, ZAssemblyInfo> AssemblyDescDictionary { get; private set; }
         public ZLCollection CompiledTypes { get; private set; }
         public CompileMessageCollection MessageCollection { get; private set; }
 
-        public ContextProject(ZProjectModel projectModel, CompileMessageCollection messageCollection)
+        public ContextProject(SourceProjectModel projectModel, CompileMessageCollection messageCollection)
         {
             ProjectModel = projectModel;
             PackageName = ProjectModel.ProjectPackageName;
@@ -76,7 +76,7 @@ namespace ZCompileCore.Contexts
 
         public void Error(int line, int col, string message)
         {
-            var fileName = this.ProjectModel.ProjectFileInfo.ZFileName;
+            var fileName = this.ProjectModel.ProjectFilePath;// ProjectFileInfo.ZFileName;
             CompileMessage cmsg = new CompileMessage( new CompileMessageSrcKey( fileName), line, col, message);
             this.MessageCollection.AddError(cmsg);        
         }

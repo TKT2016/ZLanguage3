@@ -11,7 +11,7 @@ namespace ZCompileNLP.Segment
     public class WordDictionary
     {
         private static readonly Lazy<WordDictionary> lazy = new Lazy<WordDictionary>(() => new WordDictionary());
-        private static readonly string MainDict = ConfigManager.MainDictFile;
+        //private static readonly string MainDict = ConfigManager.MainDictFile;
 
         internal IDictionary<string, int> Trie = new Dictionary<string, int>();
 
@@ -35,16 +35,21 @@ namespace ZCompileNLP.Segment
 
         private void LoadDict()
         {
+            if (!ConfigManager.LoadMainDictFile) return;
             try
             {
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
-
-                using (var sr = new StreamReader(MainDict, Encoding.UTF8))
+                Stream stream = ManifestResourceReader.GetStream(ConfigManager.MainDictFile);
+                using (var sr = new StreamReader(stream , Encoding.UTF8))//MainDict, Encoding.UTF8))
                 {
                     string line = null;
                     while ((line = sr.ReadLine()) != null)
                     {
+                        if(string.IsNullOrWhiteSpace(line))
+                        {
+                            continue;
+                        }
                         var tokens = line.Split(' ');
                         if (tokens.Length < 2)
                         {
@@ -74,7 +79,7 @@ namespace ZCompileNLP.Segment
             }
             catch (IOException e)
             {
-                Debug.Fail(string.Format("{0} load failure, reason: {1}", MainDict, e.Message));
+                Debug.Fail(string.Format("{0} load failure, reason: {1}", ConfigManager.MainDictFile, e.Message));
             }
             catch (FormatException fe)
             {

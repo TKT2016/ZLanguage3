@@ -23,7 +23,7 @@ namespace Z语言系统
         }
 
         [ZCode("换(int:k)行")]
-        public static void 换行(int k)
+        public static void 换X行(int k)
         {
             for (int i = 0; i < k; i++)
             {

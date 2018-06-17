@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
-using ZCompileKit.Collections;
+using ZCompileCore.CommonCollections;
 
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
@@ -17,8 +17,83 @@ namespace ZCompileCore.Contexts
 {
     public abstract class ContextProc
     {
+        public bool IsNested { get; protected set; }
+        public bool IsConstructor { get; protected set; }
+        public bool IsNormal { get { return !(IsConstructor || IsNested); } }
+
+        public ContextProc()
+        {
+            LocalManager = new ProcLocalManager(this);
+        }
+
+        public ContextProc(ContextClass classContext):this()
+        {
+            this.ClassContext = classContext;
+            ProcIndex++;
+            //_KeyContext = ProcIndex.ToString();
+        }
+
         public ContextClass ClassContext { get; protected set; }
-        private string _KeyContext;
+        private ContextNestedClass _NestedClassContext;
+        public ZCLocalVar NestedInstance { get; protected set; }
+
+        public ContextNestedClass GetNestedClassContext()
+        {
+            return _NestedClassContext;
+        }
+
+        public ContextNestedClass CreateNestedClassContext()
+        {
+            if(_NestedClassContext==null )
+            {
+                _NestedClassContext = new ContextNestedClass(this);
+                _NestedClassContext.SetClassName(this.CreateNestedClassName());
+                var nestedClassInstanceName = _NestedClassContext.ClassName + "_0";
+
+                var packageName = this.ClassContext.FileContext.ProjectContext.ProjectModel.ProjectPackageName;
+                string fullName = packageName + "." + _NestedClassContext.ClassName;
+                TypeAttributes typeAttrs = TypeAttributes.NestedPrivate | TypeAttributes.Sealed;
+                TypeBuilder NestedClassBuilder = this.ClassContext.SelfCompilingType.ClassBuilder.DefineNestedType(fullName, typeAttrs);
+                _NestedClassContext.SetTypeBuilder(NestedClassBuilder);
+
+                ZCClassInfo ztype = _NestedClassContext.SelfCompilingType;
+                if (NestedInstance == null)
+                {
+                    NestedInstance = new ZCLocalVar(nestedClassInstanceName, ztype, true) { IsNestedClassInstance = true };
+                    this.LocalManager.Add(NestedInstance);
+                }
+
+                if(!this.IsStatic())
+                {
+                   ZCFieldInfo  zf2= _NestedClassContext.SelfCompilingType.DefineFieldPublic
+                       (ContextNestedClass.MasterClassFieldName,this.ClassContext.SelfCompilingType);
+                   _NestedClassContext.MasterClassField = zf2;
+                }
+
+                if(this.ArgList.Count>0)
+                {
+                    foreach(var arg in this.ArgList)
+                    {
+                        ZCParamInfo zp = this.GetParameter(arg);
+                        ZCFieldInfo zf3 = _NestedClassContext.SelfCompilingType.DefineFieldPublic
+                       (arg, zp.GetZClass());
+                        _NestedClassContext.MasterArgDict.Add(arg,zf3);
+                    }
+                }
+                /* 生成内部类默认构造函数 */
+                {
+                    ConstructorBuilder NewBuilder = NestedClassBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[] { });
+                    var il = NewBuilder.GetILGenerator();
+                    il.Emit(OpCodes.Ret);
+                    ZCConstructorInfo zcc = new ZCConstructorInfo(this._NestedClassContext.SelfCompilingType) { ConstructorBuilder = NewBuilder };
+                    this._NestedClassContext.SelfCompilingType.AddConstructord(zcc);
+                    this._NestedClassContext.DefaultConstructorBuilder = NewBuilder;
+                }
+            }
+            return _NestedClassContext;
+        }
+
+        //private string _KeyContext;
         private static int ProcIndex = 0;
 
         public abstract bool HasParameter(string name);
@@ -26,7 +101,7 @@ namespace ZCompileCore.Contexts
         public abstract ZCParamInfo GetParameter(int i);
         public abstract int GetParametersCount();
         public abstract ILGenerator GetILGenerator();
-        //public abstract ParameterBuilder DefineParameter(int position, string strParamName);
+
         public virtual void DefineParameter(ZCParamInfo zcparam)
         {
             zcparam.DefineParameter();
@@ -37,7 +112,7 @@ namespace ZCompileCore.Contexts
         public bool ContainsVarName(string name)
         {
             if (this.HasParameter(name)) return true;
-            if (this.IsDefLocal(name)) return true;
+            if (this.LocalManager.IsDefLocal(name)) return true;
             if (this.IsThisField(name)) return true;
             if (this.IsThisProperty(name)) return true;
             if (this.IsSuperField(name)) return true;
@@ -47,6 +122,7 @@ namespace ZCompileCore.Contexts
             return false;
         }
 
+        #region 判读是否是
         public bool IsThisProperty(string name)
         {
             ZCClassInfo zct = this.ClassContext.GetZCompilingType();//.ThisCompilingType;
@@ -137,35 +213,23 @@ namespace ZCompileCore.Contexts
             return methods != null && methods.Length > 0;
         }
 
-        public ContextProc(ContextClass classContext)
-        {
-            this.ClassContext = classContext;
-            ProcIndex++;
-            _KeyContext = ProcIndex.ToString();
-        }
+        //protected Dictionary<string, ZCLocalVar> localDefDict = new Dictionary<string, ZCLocalVar>();
 
-        protected Dictionary<string, ZCLocalVar> localDefDict = new Dictionary<string, ZCLocalVar>();
+        //public bool IsDefLocal(string name)
+        //{
+        //    return localDefDict.ContainsKey(name);
+        //}
 
-        public bool IsDefLocal(string name)
-        {
-            return localDefDict.ContainsKey(name);
-        }
+        //public ZCLocalVar GetDefLocal(string name)
+        //{
+        //    return localDefDict[name];
+        //}
 
-        public ZCLocalVar GetDefLocal(string name)
-        {
-            return localDefDict[name];
-        }
-
+        #endregion
 
         #region create index :localvar ,arg, each
-        int LoacalVarIndex = -1;
-        public List<string> LoacalVarList = new List<string>();
-        public int CreateLocalVarIndex(string name)
-        {
-            LoacalVarIndex++;
-            LoacalVarList.Add(name);
-            return LoacalVarIndex;
-        }
+
+        public ProcLocalManager LocalManager { get; private set; }
 
         int ArgIndex = -1;
         public List<string> ArgList = new List<string>();
@@ -199,11 +263,10 @@ namespace ZCompileCore.Contexts
         }
 
         int EachIndex = -1;
-        //public List<string> ArgList = new List<string>();
+
         public int CreateEachIndex()
         {
             EachIndex++;
-            //ArgList.Add(name);
             return EachIndex;
         }
 
@@ -234,10 +297,18 @@ namespace ZCompileCore.Contexts
             }
         }
 
-        public void AddLocalVar(ZCLocalVar localSymbol)
+        public int AddLocalVar(ZCLocalVar localSymbol)
         {
-            this.ProcSegmenter.AddWord(localSymbol.ZName);
-            localDefDict.Add(localSymbol.ZName, localSymbol);
+            int index =  LocalManager.Add(localSymbol);
+            if (!localSymbol.IsAutoGenerated)
+            {
+                this.ProcSegmenter.AddWord(localSymbol.ZName);
+                //localDefDict.Add(localSymbol.ZName, localSymbol);
+            }
+            return index;
         }
+
+        
     }
+     
 }

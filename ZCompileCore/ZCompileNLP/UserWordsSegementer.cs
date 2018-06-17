@@ -24,6 +24,11 @@ namespace ZCompileNLP
             UserWords.Add(word);
         }
 
+        public bool ContainerWord(string word)
+        {
+            return UserWords.IndexOf(word) != -1;
+        }
+
         public void AddWords(IEnumerable<string> words)
         {
             foreach (var word in words)

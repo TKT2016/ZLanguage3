@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ZCompileDesc</RootNamespace>
     <AssemblyName>ZCompileDesc</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -69,7 +69,6 @@
     <Compile Include="Descriptions\InfoClass\C\ZCFieldInfo.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCClassInfo.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCConstructorInfo.cs" />
-    <Content Include="Descriptions\InfoClass\C\ZCLocalIdent.cs.TXT" />
     <Compile Include="Descriptions\InfoClass\C\ZCMethodInfo.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCLocalVar.cs" />
     <Compile Include="Descriptions\InfoClass\C\ZCParamInfo.cs" />
@@ -86,7 +85,6 @@
     <Compile Include="Descriptions\Interfaces\IInfo.cs" />
     <Compile Include="Descriptions\Interfaces\InfoInterfaces.cs" />
     <Compile Include="Descriptions\Interfaces\IZTypeDictionary.cs" />
-    <Compile Include="Collections\NamingList.cs" />
     <Compile Include="Descriptions\Utils\ZDescUtil.cs" />
     <Compile Include="Descriptions\Utils\ZTypeCompareEnum.cs" />
     <Compile Include="Utils\EnumerableHelper.cs" />
@@ -107,13 +105,13 @@
     <Compile Include="Descriptions\DescZCode\ZCodeParser.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ZCompileNLP\ZCompileNLP.csproj">
+      <Project>{716da6c3-f5c0-40e4-a587-b3a416cfb467}</Project>
+      <Name>ZCompileNLP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ZLangRT\ZLangRT.csproj">
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
       <Name>ZLangRT</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ZCompileNLP\ZCompileNLP.csproj">
-      <Project>{3497d4f3-de89-4676-980b-50dab21b824e}</Project>
-      <Name>ZCompileNLP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
       <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>

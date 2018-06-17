@@ -11,6 +11,31 @@ namespace ZLangRT
         {
             T t = (T)obj;
             return t;
+
+            //if(typeof(T)== typeof(int))
+            //{
+            //    if (obj.GetType() == typeof(int))
+            //    {
+            //        return (T)((int)(obj));
+            //    }
+            //    else if (obj.GetType() == typeof(float))
+            //    {
+
+            //    }
+            //    else
+            //    {
+            //        throw new InvalidCastException();
+            //    }
+            //}
+            //else if (typeof(T) == typeof(float))
+            //{
+
+            //}
+            //else
+            //{
+            //    T t = (T)obj;
+            //    return t;
+            //}
         }
 
         public static int AddInt(int a, int b)
@@ -51,7 +76,11 @@ namespace ZLangRT
 
         public static float DivInt(int a, int b)
         {
-            return (float)a / (float)b;
+            float fa =(float)a;
+            float fb = (float)b;
+            float c= (float)(fa/ fb);
+            //Console.WriteLine(string.Format("{0} / {1} = {2} ",fa,fb,c));
+            return c;
         }
         /*
         private static void debug(string message)
@@ -74,6 +103,7 @@ namespace ZLangRT
 
         public static string ObjToString(object obj)
         {
+            if (obj == null) throw new NullReferenceException("obj不能为null"); //ZyyRTException("obj不能为null");
             if (obj is bool)
             {
                 return ((bool)obj) ? "是" : "否";
@@ -86,6 +116,8 @@ namespace ZLangRT
 
         public static string AddString(object a, object b)
         {
+            if (a == null) throw new NullReferenceException("a不能为null");
+            if (b == null) throw new NullReferenceException("b不能为null");
             string str1 = ObjToString(a);
             string str2 = ObjToString(b);
             return str1 + str2;

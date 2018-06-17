@@ -75,11 +75,13 @@ namespace ZCompileNLP.Segment.FinalSeg
                 {'S', -1.4652633398537678}
             };
 
-            var transJson = File.ReadAllText(Path.GetFullPath(ConfigManager.ProbTransFile));
-            _transProbs = JsonConvert.DeserializeObject<IDictionary<char, IDictionary<char, double>>>(transJson);
+            var transJson = ManifestResourceReader.ReadAllText(ConfigManager.ProbTransFile, Encoding.UTF8);
+            // File.ReadAllText(Path.GetFullPath(ConfigManager.ProbTransFile));
+            _transProbs = ZCompileNLP.Json.JsonUtil.ToObject<IDictionary<char, IDictionary<char, double>>>(transJson);
 
-            var emitJson = File.ReadAllText(Path.GetFullPath(ConfigManager.ProbEmitFile));
-            _emitProbs = JsonConvert.DeserializeObject<IDictionary<char, IDictionary<char, double>>>(emitJson);
+            var emitJson = ManifestResourceReader.ReadAllText(ConfigManager.ProbEmitFile, Encoding.UTF8);
+            //File.ReadAllText(Path.GetFullPath(ConfigManager.ProbEmitFile));
+            _emitProbs = ZCompileNLP.Json.JsonUtil.ToObject<IDictionary<char, IDictionary<char, double>>>(emitJson);
 
             stopWatch.Stop();
             Debug.WriteLine("model loading finished, time elapsed {0} ms.", stopWatch.ElapsedMilliseconds);
@@ -94,7 +96,11 @@ namespace ZCompileNLP.Segment.FinalSeg
             v.Add(new Dictionary<char, double>());
             foreach (var state in States)
             {
-                var emP = _emitProbs[state].GetDefault(sentence[0], Constants.MinProb);
+                //var emP = _emitProbs[state].GetDefault(sentence[0], Constants.MinProb);
+                var ep = _emitProbs[state];
+                var sentence0 = sentence[0];
+                var emP = ep.GetDefault(sentence0, Constants.MinProb);
+
                 v[0][state] = _startProbs[state] + emP;
                 path[state] = new Node(state, null);
             }

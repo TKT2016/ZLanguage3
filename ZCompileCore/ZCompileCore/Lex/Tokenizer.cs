@@ -6,70 +6,51 @@ using System.Diagnostics;
 using ZCompileCore.Reports;
 using ZCompileCore.Tools;
 using ZCompileCore.Contexts;
-using ZCompileKit.Tools;
 
 namespace ZCompileCore.Lex
 {
     public class Tokenizer
     {
-        int line;
-        int col;
-        SourceReader reader;
+        private int line;
+        private SourceReader reader;
         private const char END = '\0';
         private const int EOF = -1;
-        ContextFile fileContext;
-        List<LexToken> tokenList = new List<LexToken>();
+        private ContextFile fileContext;
+        private LineTextWidther Widther = new LineTextWidther();
+
+        private List<LineTokenCollection> lineTokens = new List<LineTokenCollection>();
+        private LineTokenCollection curToks;
 
         public Tokenizer()
         {
 
         }
 
-        public void Reset(SourceReader sr, ContextFile fileContext)
-        {
-            reader = sr;
-            this.fileContext = fileContext;
-
-            line = 1;
-            col =1;
-        }
-
-        //private void report(string msg)
-        //{
-        //    Console.WriteLine("[" + line + "," + col + "]:" + (ch != '\n' ? ch.ToString() : "(换行)") + ":" + msg);
-        //}
-
-        char ch
-        {
-            get
-            {
-                if (reader.Peek() == -1) return END;
-                return reader.PeekChar();
-            }
-        }
-
-        public char Next()
-        {
-            col++;
-            if (ch == '\t') col+=3;
-            return reader.ReadChar();
-        }
-
-        public char GetNext()
-        {
-            return reader.GetNextChar();
-        }
-
-
-        public List<LexToken> Scan(SourceReader sr, ContextFile fileContext)
+        public List<LineTokenCollection> Scan(SourceReader sr, ContextFile fileContext, int startLine)
         {
             Reset(sr,fileContext);
-
+            line = startLine;
+            curToks = new LineTokenCollection();
             //report("开始");
-            tokenList.Clear();
+            //InitLineFirst();
+
             while (ch != END)
             {
                 //report("ch="+ch+" "+(int)ch);
+                //if (line == 33  )// ch == '控' && line == 18)
+                //{
+                //    //report("col:" + col);
+                //    Widther.IsDebug = true;
+                //}
+                //else if (  line == 34)// ch == '控' && line == 18)
+                //{
+                //    Widther.IsDebug = true;
+                //}
+                //else
+                //{
+                //    Widther.IsDebug = false;
+                //}
+                
                 char nextChar = GetNext();
                 if (ch==' ' || ch=='\t')
                 {
@@ -86,35 +67,29 @@ namespace ZCompileCore.Lex
                 }
                 else if (ch == '/')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.DIV };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line,col,TokenKindSymbol.DIV);// { Col = col, Line = line, };
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == '"'||ch=='“'||ch=='”')
                 {
                     string str = scanString();
-                    LexToken tok = new LexToken() { Col = col - 1, Line = line, Text = str, Kind = TokenKind.LiteralString };
-                    tokenList.Add(tok);
+                    LexTokenLiteral tok = new LexTokenLiteral(line, col - 1, TokenKindLiteral.LiteralString, str);// { Col = col - 1, Line = line, Text = str, Kind = TokenKindSymbol.LiteralString };
+                    curToks.Add(tok);
                 }
                 else if (ch == '\r' && nextChar == '\n')
                 {
-                    LexToken tok = ScanNewLine(2);// new Token() { Col = col, Line = line, Text = "\r\n", Kind = TokenKind.NewLine };
-                    //report("扫描换行符");
-                    //Next(); Next();
-                    //col = 1;
-                    //line++;
-                    tokenList.Add(tok);
+                    Next(); Next();
+                    AddLineToken();//lineTokens.Add(curToks);
+                    curToks = new LineTokenCollection();
+                    ScanNewLine();
                 }
                 else if (ch == '\n' || ch == '\r')
                 {
-                    LexToken tok = ScanNewLine(1);
-                    tokenList.Add(tok);
-                    //SkipLine();
-                    //Token tok = new Token() { Col = col, Line = line, Text = "\r\n", Kind = TokenKind.NewLine };
-                    //Next(); 
-                    //col = 1;
-                    //line++;
-                    //tokenList.Add(tok);
+                    Next();
+                    AddLineToken(); //lineTokens.Add(curToks);
+                    curToks = new LineTokenCollection();
+                    ScanNewLine();
                 }
                 else if ( "0123456789".IndexOf(ch)!=-1)
                 {
@@ -122,134 +97,122 @@ namespace ZCompileCore.Lex
                     var temp = col;
                     if (StringHelper.IsInt(str))
                     {
-                        LexToken tok = new LexToken() { Col = temp, Line = line, Text = str, Kind = TokenKind.LiteralInt };
-                        tokenList.Add(tok);
+                        LexTokenLiteral tok = new LexTokenLiteral(line, temp, TokenKindLiteral.LiteralInt, str);
+                        curToks.Add(tok);
                     }
                     else if (StringHelper.IsFloat(str))
                     {
-                        LexToken tok = new LexToken() { Col = temp, Line = line, Text = str, Kind = TokenKind.LiteralFloat };
-                        tokenList.Add(tok);
+                        LexTokenLiteral tok = new LexTokenLiteral(line, temp, TokenKindLiteral.LiteralFloat, str);
+                        curToks.Add(tok);
                     }
                     else
                     {
                         lexError(str+"不是正确的数字");
                     }
                 }
-                else if (ch == '+' || ch == '＋')
+                else if (ch == '+')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.ADD };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.ADD);
+                    curToks.Add(tok);
                     Next(); 
                 }
-                else if (ch == '-' || ch == '－')
+                else if (ch == '-')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.SUB };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.SUB);
+                    curToks.Add(tok);
                     Next();
                 }
-                else if ((ch == '=' || ch == '＝') && (nextChar == '=' || nextChar == '＝'))
+                else if ((ch == '=' ) && (nextChar == '=' ))
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.EQ };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.EQ);
+                    curToks.Add(tok);
                     Next(); Next();
                 }
-                else if ((ch == '=' || ch == '＝') && (nextChar == '>'))
+                else if ((ch == '=' ) && (nextChar == '>'))
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.AssignTo };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.AssignTo);
+                    curToks.Add(tok);
                     Next(); Next();
                 }
-                else if ((ch == '=' || ch == '＝'))
+                else if ((ch == '=' ))
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.Assign };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.Assign);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if ((ch == '*'))
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.MUL };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.MUL);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == ','||ch=='，')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.Comma };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.Comma);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == ';' || ch == '；')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.Semi };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.Semi);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == '(' || ch == '（')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.LBS };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.LBS);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == ')' || ch == '）')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.RBS };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.RBS);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == '>' && GetNext() == '=')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.GE };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.GE);
+                    curToks.Add(tok);
                     Next(); Next();
                 }
                 else if (ch == '>')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.GT };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.GT);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if (ch == '<' && nextChar == '=')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.LE };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.LE);
+                    curToks.Add(tok);
                     Next(); Next();
                 }
                 else if (ch == '<')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.LT };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.LT);
+                    curToks.Add(tok);
                     Next();
                 }
                 else if ((nextChar == '!' || nextChar == '！')&& (nextChar == '=' || nextChar == '＝'))
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.NE };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.NE);
+                    curToks.Add(tok);
                     Next(); Next();
                 }
-                /*else if (ch == ':' && nextChar == ':')
-                {
-                    Token tok = new Token() { Col = col, Line = line, Kind = TokenKind.Colond };
-                    tokenList.Add(tok);
-                    Next(); Next();
-                }*/
                 else if (ch == ':' || ch == '：')
                 {
-                    LexToken tok = new LexToken() { Col = col, Line = line, Kind = TokenKind.Colon };
-                    tokenList.Add(tok);
+                    LexTokenSymbol tok = new LexTokenSymbol(line, col, TokenKindSymbol.Colon);// { Col = col, Line = line, Kind = TokenKindSymbol.Colon };
+                    curToks.Add(tok);
                     Next();
                 }
                 else if ((ch >= 'A' && ch <= 'Z') /*|| (ch == '_') */|| (ch >= 'a' && ch <= 'z') || ChineseHelper.IsChineseLetter(ch))
                 {
                     var tempCol = col;
                     var tempLine = line;
-                    LexToken t1 = scanKeyIdent();
-                    //if (t1.GetText().StartsWith("否则如果") || t1.GetText().StartsWith("否则") || t1.GetText().StartsWith("如果"))
-                    //{
-                    //    Console.WriteLine("否则如果");
-                    //}
-                    //tokenList.Add(t1);
-                    if (t1.GetText() == "说明")
+                    LexToken t1 = scanIdentToken();
+                    if (t1.Text == "说明")
                     {
-//                      char nchar = GetNext();
                         if (ch == ':' || ch == '：')
                         {
                             SkipSingleLineComment();
@@ -265,8 +228,7 @@ namespace ZCompileCore.Lex
                         Next();
                         if ((int)ch == 13)
                         {
-                            line++;
-                            col = 1;
+                            ScanNewLine();
                         }
                     }
                 }
@@ -276,108 +238,72 @@ namespace ZCompileCore.Lex
                     Next();
                 }
             }
-            return tokenList;
+            if (curToks!=null && curToks.Count>0)
+            {
+                AddLineToken();
+            }
+            return lineTokens;
         }
 
-        private LexToken ScanNewLine(int i)
+        private void AddLineToken()
         {
-            LexToken tok = new LexToken() { Col = col, Line = line, Text = "\r\n", Kind = TokenKind.NewLine };
-            if (i >= 1) Next();
-            if (i >= 2) Next();
-            col = 1;
+            lineTokens.Add(curToks);
+            curToks = new LineTokenCollection();
+        }
+
+        private void ScanNewLine()
+        {
+            //ResetCol();
+            //InitLineFirst();
             line++;
-            return tok;
         }
 
-        void addIdentOrKey(LexToken token)
+        private void addIdentOrKey(LexToken token)
         {
-            if(!isNewLine())
-            {
-                tokenList.Add(token);
-                return;
-            }
-            if (processKeyIdent(token, "如果",TokenKind.IF)) return;
-            if (processKeyIdent(token, "否则如果", TokenKind.ELSEIF)) return;
-            if (processKeyIdent(token, "否则", TokenKind.ELSE)) return;
+            //if (processKeyIdent(token, "如果",TokenKindSymbol.IF)) return;
+            //if (processKeyIdent(token, "否则如果", TokenKindSymbol.ELSEIF)) return;
+            //if (processKeyIdent(token, "否则", TokenKindSymbol.ELSE)) return;
             //if (processKeyIdent(token, "循环当", TokenKind.While)) return;
-            if (processKeyIdent(token, "重复", TokenKind.Repeat)) return;
-            if (processKeyIdent(token, "当", TokenKind.Dang)) return;
+            //if (processKeyIdent(token, "重复", TokenKindSymbol.Repeat)) return;
+            //if (processKeyIdent(token, "当", TokenKindSymbol.Dang)) return;
             //if (processKeyIdent(token, "次", TokenKind.Times)) return;
-            if (processKeyIdent(token, "处理", TokenKind.Catch)) return;
-            if (processKeyIdent(token, "循环每一个", TokenKind.Foreach)) return;
-            tokenList.Add(token);
+            //if (processKeyIdent(token, "处理", TokenKindSymbol.Catch)) return;
+            //if (processKeyIdent(token, "循环每一个", TokenKindSymbol.Foreach)) return;
+            curToks.Add(token);
         }
-
-        bool processKeyIdent(LexToken token,string keyContent,TokenKind keyKind)
-        {
-            string srcContent = token.GetText();
-            if (!srcContent.StartsWith(keyContent)) return false;
-            LexToken keyToken = new LexToken(keyContent, keyKind, token.Line, token.Col);
-            tokenList.Add(keyToken);
-            if (srcContent.Length > keyContent.Length)
-            {
-                int keyLength = keyContent.Length;
-                LexToken identToken = new LexToken(srcContent.Substring(keyLength), TokenKind.Ident, token.Line, token.Col + keyLength);
-                tokenList.Add(identToken);
-            }
-            return true;
-        }
-
-        LexToken getPreToken()
-        {
-            if (tokenList.Count == 0) return null;
-            int lastIndex = tokenList.Count - 1;
-            return tokenList[lastIndex];
-        }
-
-        bool isNewLine()
-        {
-            LexToken preToken = getPreToken();
-            if (preToken == null)
-            {
-                return true;
-            }
-            else if (preToken.Line < this.line)
-            {
-                return true;
-            }
-            else if (preToken.Kind == TokenKind.Semi)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private LexToken scanKeyIdent()
+         
+        private LexTokenText scanIdentToken()
         {
             var tempCol = col;
-            string idtext = scanIdent();
-            TokenKind kind = LexToken.GetKindByText(idtext);
-            LexToken token = new LexToken() { Col = tempCol, Line = line, Kind = kind };
-            if (kind == TokenKind.Ident)
-            {
-                token.Text = idtext;
-            }
+            string idtext = scanIdentText();
+            LexTokenText token = new LexTokenText(line, tempCol, idtext);
+            token.CheckKind();
             return token;
         }
 
-        private string scanIdent()
+        private string scanIdentText()
         {
             StringBuilder buf = new StringBuilder();
-            if (ch == '的' || ch == '第')
+            while (is_identifier_part_character(ch))
             {
-                string str = ch.ToString();
+                buf.Append(ch);
                 Next();
-                return str;
             }
-            else
-            {
-                while (is_identifier_part_character(ch) && ch != '的' && ch != '第')
-                {
-                    buf.Append(ch);
-                    Next();
-                }
-            }
+
+            //if (ch == '的' || ch == '第')
+            //{
+            //    string str = ch.ToString();
+            //    Next();
+            //    return str;
+            //}
+            //else
+            //{
+            //    while (is_identifier_part_character(ch) && ch != '的' && ch != '第')
+            //    {
+            //        buf.Append(ch);
+            //        Next();
+            //    }
+            //}
             return buf.ToString();
         }
 
@@ -433,22 +359,20 @@ namespace ZCompileCore.Lex
                     //line++;
                     //Token tok = ScanNewLine(1);
                     //tokenList.Add(tok);
-                    LexToken tok = ScanNewLine(2);
-                    tokenList.Add(tok);
+                    //LexToken tok = ScanNewLine(2);
+                    //curToks.Add(tok);
+
+                    Next(); Next();
+                    ScanNewLine();
                 }
-                else if (ch == '\n')
+                else if (ch == '\n' || ch == '\r')
                 {
                     //report("扫描换行符");
                     //SkipLine();
-                    LexToken tok = ScanNewLine(1);
-                    tokenList.Add(tok);
-                }
-                else if (ch == '\r')
-                {
-                    //report("扫描换行符");
-                    //SkipLine();
-                    LexToken tok = ScanNewLine(1);
-                    tokenList.Add(tok);
+                    //LexToken tok = ScanNewLine(1);
+                    //curToks.Add(tok);
+                    Next();
+                    ScanNewLine();
                 }
                 else
                 {
@@ -562,6 +486,106 @@ namespace ZCompileCore.Lex
             }
             lexError("文本没有对应的结束双引号");
             return buf.ToString();
+        }
+
+        #region rest ch next getnext
+        public void Reset(SourceReader sr, ContextFile fileContext)
+        {
+            reader = sr;
+            this.fileContext = fileContext;
+
+            line = 1;
+            //ResetCol();
+            lineTokens.Clear();
+        }
+
+        //private void ResetCol()
+        //{
+        //    //col = 0;
+        //    //linCharCount = 0;
+        //    //linCharWide = 0;
+        //    //linCharWidePre = 0;
+        //    //lineWidthTotal = 0;
+        //    //lineCharWidths.Clear();
+        //    Widther.Clear(line);
+        //}
+
+        public char ch
+        {
+            get
+            {
+                if (reader.Peek() == -1) return END;
+                return reader.PeekChar();
+            }
+        }
+
+        //public int chWidth
+        //{
+        //    get
+        //    {
+        //        int charWidth = 0;
+        //        if (ch == '\t')
+        //        {
+        //            int lineWidthTotal = GetLinePreCharTotal();
+        //            charWidth = (8 - lineWidthTotal % 8);
+        //            Console.WriteLine(line+" : "+ charWidth + " " + lineWidthTotal+" ");
+        //        }
+        //        else
+        //        {
+        //            //charWidth =// Encoding.GetEncoding("utf-8").GetByteCount(ch.ToString());
+        //            charWidth = Encoding.GetEncoding("GBK").GetByteCount(ch.ToString());
+        //        }
+        //        return charWidth;
+        //    }
+        //}
+
+        //private List<int> lineCharWidths = new List<int>();
+
+        //private int GetLinePreCharTotal()
+        //{
+        //    int sum = 0;
+        //    for (int i = 0; i < lineCharWidths.Count - 1; i++)
+        //    {
+        //        sum += lineCharWidths[i];
+        //    }
+        //    return sum;
+        //}
+
+        private int col
+        {
+            get
+            {
+                return Widther.Col;
+            }
+        }
+
+        public void Next()
+        {
+            char ch2= reader.ReadChar();
+            //lineCharWidths.Add(chWidth);
+            Widther.Append(ch2);
+        }
+
+        //public void InitLineFirst()
+        //{
+        //    //col = 1;
+        //    //lineWidthTotal = chWidth;
+        //    //linCharWidePre = 0;
+        //    //lineCharWidths.Clear();
+        //    //lineCharWidths.Add(chWidth);
+        //    Widther.Clear(1);
+        //}
+
+        public char GetNext()
+        {
+            return reader.GetNextChar();
+        }
+
+        #endregion
+
+        private void report(string msg)
+        {
+            Console.WriteLine("[" + line + "," + col + "]:" + (ch != '\n' ? ch.ToString() : "(换行)") + ":" + msg);
         }
     }
 }

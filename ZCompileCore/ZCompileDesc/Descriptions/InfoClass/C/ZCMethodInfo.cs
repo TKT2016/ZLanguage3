@@ -29,6 +29,13 @@ namespace ZCompileDesc.Descriptions
             ZMethodDesc = new ZCMethodDesc(this);
         }
 
+        public ZCMethodInfo(ZCClassInfo zcclass,bool isStatic)
+        {
+            ZClass = zcclass;
+            IsStatic = isStatic;
+            ZMethodDesc = new ZCMethodDesc(this);
+        }
+
         #endregion
 
         #region 字段
@@ -86,6 +93,7 @@ namespace ZCompileDesc.Descriptions
         {
             if (HasParameter(zcparamName)) return null;
             ZCParamInfo zcparam = new ZCParamInfo(zcparamName,this);
+            zcparam.ParamIndex = _cparams.Count;
             _cparams.Add(zcparam);
             return zcparam;
         }

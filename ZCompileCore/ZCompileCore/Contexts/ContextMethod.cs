@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
-using ZCompileKit.Collections;
+using ZCompileCore.CommonCollections;
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
 using ZCompileNLP;
@@ -23,6 +23,11 @@ namespace ZCompileCore.Contexts
             ZCClassInfo cclass = this.ClassContext.GetZCompilingType();
             ZMethodInfo = new ZCMethodInfo(cclass);
             cclass.AddMethod(ZMethodInfo);
+        }
+
+        public void SetIsStatic(bool isStatic)
+        {
+            this.ZMethodInfo.IsStatic = isStatic;
         }
 
         public override ZCParamInfo GetParameter(string paramName)
@@ -79,25 +84,19 @@ namespace ZCompileCore.Contexts
             this.ZMethodInfo.MethodBuilder = methodBuilder;
         }
 
-        //public override ParameterBuilder DefineParameter(int position, string strParamName)
-        //{
-        //    var mbuilder = this.ZMethodInfo.MethodBuilder;
-        //    ParameterBuilder pb = mbuilder.DefineParameter(position, ParameterAttributes.None, strParamName);
-        //    return pb;
-        //}
-
-        //public override void DefineParameter(ZCParamInfo zcparam)
-        //{
-        //    zcparam.DefineParameter();
-        ////    var mbuilder = this.ZMethodInfo.MethodBuilder;
-        ////    ParameterBuilder pb = mbuilder.DefineParameter(zcparam.ParamIndex, ParameterAttributes.None, zcparam.ZParamName);
-        ////    zcparam.ParamBuilder = pb;
-        //}
+        public MethodBuilder GetBuilder()
+        {
+            return this.ZMethodInfo.MethodBuilder;
+        }
 
         public override ILGenerator GetILGenerator()
         {
-            return this.ZMethodInfo.MethodBuilder.GetILGenerator();// this.EmitContext.ILout;
+            return this.ZMethodInfo.MethodBuilder.GetILGenerator();
         }
 
+        public override string ToString()
+        {
+            return string.Format("ContextMethod[{0}]->{1}",ProcName, this.ClassContext.ToString() );
+        }
     }
 }

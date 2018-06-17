@@ -26,22 +26,22 @@ namespace ZLangRT.Collections
             return true;
         }
 
-        public bool Containsk(K k)
+        public bool ContainsK(K k)
         {
             return kvdict.ContainsKey(k);
         }
 
-        public bool Containsv(V v)
+        public bool ContainsV(V v)
         {
             return vkdict.ContainsKey(v);
         }
 
-        public V Getv(K k)
+        public V GetV(K k)
         {
             return kvdict[k];
         }
 
-        public K Getk(V v)
+        public K GetK(V v)
         {
             return vkdict[v];
         }

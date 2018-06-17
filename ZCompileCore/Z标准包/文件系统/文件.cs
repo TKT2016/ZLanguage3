@@ -10,20 +10,20 @@ namespace Z标准包.文件系统
     [ZInstance]
     public class 文件
     {
-        internal FileInfo FeInfo;
+        public FileInfo FileInfo { get; private set; }
         public 文件(string path)
         {
-            FeInfo = new FileInfo(path);
+            FileInfo = new FileInfo(path);
         }
 
         [ZCode("名称")]
-        public string Name { get { return FeInfo.Name; } }
+        public string Name { get { return FileInfo.Name; } }
 
         [ZCode("全路径")]
-        public string FullName { get { return FeInfo.FullName; } }
+        public string FullName { get { return FileInfo.FullName; } }
 
         [ZCode("所在文件夹")]
-        public 文件夹 所在文件夹 { get { return new 文件夹(FeInfo.Directory); } }
+        public 文件夹 所在文件夹 { get { return new 文件夹(FileInfo.Directory); } }
 
         //[ZCode("存在")]
         //public bool Exists { get; set; }

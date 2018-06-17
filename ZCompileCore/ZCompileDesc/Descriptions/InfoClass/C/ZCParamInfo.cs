@@ -10,6 +10,7 @@ namespace ZCompileDesc.Descriptions
 {
     public class ZCParamInfo : ZAParamInfo, ICompling,IParameter,IIdent
     {
+        public bool IsRuntimeType { get { return false; } }
         #region override
 
         public override bool GetIsFnParam(){return IsFnParam; }

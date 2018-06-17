@@ -101,7 +101,10 @@ namespace Z标准包.绘图
         {
             绘图器 x = 创建绘图器();
             绘图(x);
+          
             e.Graphics.DrawImage(背景图像, new Point(0, 0));
+            //x.销毁();
+            //e.Graphics.Dispose();
             //Console.WriteLine(背景图像.Width);
             //Console.WriteLine(背景图像.Height);
         }
@@ -130,11 +133,13 @@ namespace Z标准包.绘图
 
         }
 
+        //private Graphics _gs;
         [ZCode("创建绘图器")]
         public 绘图器 创建绘图器()
         {
-            Graphics gs = Graphics.FromImage(背景图像);
-            var _绘图器 = new 绘图器(gs);
+            //if (_gs==null)
+            Graphics _gs = Graphics.FromImage(背景图像);
+            var _绘图器 = new 绘图器(_gs);
             return _绘图器;
         }
     }

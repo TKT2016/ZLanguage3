@@ -37,23 +37,30 @@ namespace ZCompileDesc.Collections
             }
         }
 
-        public void Add(ZLClassInfo zc)
+        public void Add(IZObj zc)
         {
-            ZLClassList.Add(zc);
-        }
-
-        public void Add(ZLEnumInfo zc)
-        {
-            ZLEnumList.Add(zc);
-        }
-
-        public void Add(ZLDimInfo zc)
-        {
-            ZLDimList.Add(zc);
+            if (zc == null) throw new NullReferenceException("不能加入null");
+            if(zc is ZLClassInfo)
+            {
+                ZLClassList.Add((ZLClassInfo)zc);
+            }
+            else if (zc is ZLEnumInfo)
+            {
+                ZLEnumList.Add((ZLEnumInfo)zc);
+            }
+            else if (zc is ZLDimInfo)
+            {
+                ZLDimList.Add((ZLDimInfo)zc);
+            }
+            else
+            {
+                throw new Exception("类型超出范围");
+            }
         }
 
         public void Add(ZLCollection zc)
         {
+            if (zc == null) throw new NullReferenceException("不能加入null");
             ZLClassList.AddRange(zc.ZLClassList);
             ZLEnumList.AddRange(zc.ZLEnumList);
             ZLDimList.AddRange(zc.ZLDimList);
@@ -71,6 +78,14 @@ namespace ZCompileDesc.Collections
             foreach(var  item in ZLClassList)
             {
                 if(item.ZClassName==className)
+                {
+                    return item;
+                }
+            }
+
+            foreach (var item in ZLEnumList)
+            {
+                if (item.ZTypeName == className)
                 {
                     return item;
                 }

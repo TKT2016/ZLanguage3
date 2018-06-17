@@ -3,140 +3,155 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using ZCompileCore.ASTExps;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Parser;
 using ZCompileCore.Parsers;
 using ZCompileDesc;
 using ZCompileDesc.Descriptions;
 using ZCompileDesc.Utils;
-using ZCompileKit.Tools;
+using ZCompileCore.Tools;
 using ZLangRT;
+using ZCompileCore.AST.Exps;
+using ZCompileCore.ASTRaws;
 
 namespace ZCompileCore.AST
 {
-    public class StmtRepeat:Stmt
+    public class StmtRepeat: Stmt
     {
-       public LexToken RepeatToken { get; set; }
-       public LexToken TimesToken { get; set; }
-       public Exp TimesExp { get; set; }
-       public StmtBlock RepeatBody { get; set; }
+        private StmtRepeatRaw Raw;
+        private StmtBlock RepeatBody;
+        private Exp TimesExp;
 
-       ZCLocalVar IndexSymbol;
-       ZCLocalVar CountSymbol;
-       ZCLocalVar CondiSymbol;
-       protected MethodInfo LTMethod = typeof(Calculater).GetMethod(CompileConst.Calculater_LTInt, new Type[] { typeof(int), typeof(int) });
+        public StmtRepeat(StmtRepeatRaw raw, Stmt parentStmt)
+        {
+            Raw = raw;
+            ParentStmt = parentStmt;
+            RepeatBody = new StmtBlock(this, raw.RepeatBody);
+        }
 
-       public override void DoAnaly()
-       {
-           TimesExp.IsTopExp = true;
-           TimesExp = AnalyExpRaw(); 
-           if (TimesExp == null)
-           {
-               ErrorF(RepeatToken.Position, "重复语句没有表达式");
-           }
-           else
-           {
-               TimesExp = TimesExp.Analy();
-               if(TimesExp!=null &&TimesExp.AnalyCorrect)
-               {
-                   if (!ZTypeUtil.IsInt(TimesExp.RetType))
-                   {
-                       ErrorF(TimesExp.Position, "结果不是整数");
-                   }
-               }
-           }
-           CreateEachSymbols();
-           RepeatBody.ProcContext = this.ProcContext;
-           RepeatBody.Analy();
-       }
+        ZCLocalVar IndexSymbol;
+        ZCLocalVar CountSymbol;
+        ZCLocalVar CondiSymbol;
+        protected MethodInfo LTMethod = typeof(Calculater).GetMethod(CompileConst.Calculater_LTInt, new Type[] { typeof(int), typeof(int) });
 
-       private Exp AnalyExpRaw()
-       {
-           ExpRaw rawExp = (ExpRaw)TimesExp;
-           ContextExp context = new ContextExp(this.ProcContext, this);
-           rawExp.SetContext(context);
-           List<LexToken> tokens = rawExp.Seg();
-           if (tokens.Count > 0)
-           {
-               var lastIndex = tokens.Count - 1;
-               TimesToken = tokens[lastIndex];
-               if (TimesToken.GetText() == "次" || TimesToken.IsKeyIdent("次"))
-               {
-                   tokens.RemoveAt(lastIndex);
-               }
-           }
-           //var lastIndex = tokens.Count - 1;
-           //tokens.RemoveAt(lastIndex);
-           ExpParser parser = new ExpParser();
-           Exp exp = parser.Parse(tokens, this.FileContext);
-           exp.SetContext(rawExp.ExpContext);
-           return exp;
-       }
+        public override Stmt Analy()
+        {
+            //TimesExp.IsTopExp = true;
+            TimesExp = AnalyRepeateExpRaw(Raw.TimesExp);// ParseAnalyRawExp(Raw.TimesExp);
+            if (TimesExp == null)
+            {
+                Errorf(Raw.RepeatToken.Position, "重复语句没有表达式");
+            }
+            else
+            {
+                TimesExp = TimesExp.Analy();
+                if (TimesExp != null && TimesExp.AnalyCorrect)
+                {
+                    if (!ZTypeUtil.IsInt(TimesExp.RetType))
+                    {
+                        Errorf(TimesExp.Position, "结果不是整数");
+                    }
+                }
+            }
+            CreateEachSymbols();
+            //RepeatBody.ProcContext = this.ProcContext;
+            RepeatBody.Analy();
+            return this;
+        }
 
-       protected void CreateEachSymbols()
-       {
-           var procContext = this.ProcContext;
+        public override void AnalyExpDim()
+        {
+            TimesExp.AnalyDim();
+            RepeatBody.AnalyExpDim();
+        }
 
-           int foreachIndex = procContext.CreateRepeatIndex();
-           var indexName = "@repeat" + foreachIndex + "_index";
-           var countName = "@repeat" + foreachIndex + "_count";
-           var condiName = "@repeat" + foreachIndex + "_bool";
+        private Exp AnalyRepeateExpRaw(ExpRaw rawExp)
+        {
+            //ExpRaw rawExp = (ExpRaw)TimesExp;
+            //ContextExp context = new ContextExp(this.ProcContext, this);
+            //rawExp.SetContext(context);
+            List<LexToken> tokens = rawExp.RawTokens;
+            if (tokens.Count > 0)
+            {
+                var lastIndex = tokens.Count - 1;
+                var TimesToken = tokens[lastIndex];
+                if (TimesToken is LexTokenText && TimesToken.Text == "次")//|| TimesToken.IsKeyIdent("次"))
+                {
+                    tokens.RemoveAt(lastIndex);
+                }
+                else
+                {
+                    Errorf(TimesToken.Position, "循环语句的条件末尾缺少‘次’");
+                }
+            }
+            //var lastIndex = tokens.Count - 1;
+            //tokens.RemoveAt(lastIndex);
+            //ExpParser parser = new ExpParser();
+            //Exp exp = parser.Parse(tokens, this.FileContext);
+            //exp.SetContext(rawExp.ExpContext);
+            Exp exp = ParseAnalyRawExp(rawExp);
+            return exp;
+        }
 
-           IndexSymbol = new ZCLocalVar(indexName, ZLangBasicTypes.ZINT);
-           IndexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
-           this.ProcContext.AddLocalVar(IndexSymbol);
+        protected void CreateEachSymbols()
+        {
+            var procContext = this.ProcContext;
 
-           CountSymbol = new ZCLocalVar(countName, ZLangBasicTypes.ZINT);
-           CountSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(countName);
-           this.ProcContext.AddLocalVar(CountSymbol);
+            int foreachIndex = procContext.CreateRepeatIndex();
+            var indexName = "@loop" + foreachIndex + "_index";
+            var countName = "@loop" + foreachIndex + "_count";
+            var condiName = "@loop" + foreachIndex + "_bool";
 
-           CondiSymbol = new ZCLocalVar(condiName, ZLangBasicTypes.ZBOOL);
-           CondiSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(condiName);
-           this.ProcContext.AddLocalVar(CondiSymbol);
-       }
+            IndexSymbol = new ZCLocalVar(indexName, ZLangBasicTypes.ZINT, true);
+            //IndexSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(indexName);
+            this.ProcContext.AddLocalVar(IndexSymbol);
 
-       int START_INDEX = 0;
-       public override void Emit()
-       {
-           TimesExp.Emit();
-           EmitHelper.StormVar(IL, CountSymbol.VarBuilder);
+            CountSymbol = new ZCLocalVar(countName, ZLangBasicTypes.ZINT, true);
+            //CountSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(countName);
+            this.ProcContext.AddLocalVar(CountSymbol);
 
-           EmitHelper.LoadInt(IL, START_INDEX);
-           EmitHelper.StormVar(IL, IndexSymbol.VarBuilder);
+            CondiSymbol = new ZCLocalVar(condiName, ZLangBasicTypes.ZBOOL, true);
+            //CondiSymbol.LoacalVarIndex = procContext.CreateLocalVarIndex(condiName);
+            this.ProcContext.AddLocalVar(CondiSymbol);
+        }
 
-           var True_Label = IL.DefineLabel();
-           var False_Label = IL.DefineLabel();
+        int START_INDEX = 0;
+        public override void Emit()
+        {
+            TimesExp.Emit();
+            EmitHelper.StormVar(IL, CountSymbol.VarBuilder);
 
-           EmitCondition();
-           IL.Emit(OpCodes.Brfalse, False_Label);
+            EmitHelper.LoadInt(IL, START_INDEX);
+            EmitHelper.StormVar(IL, IndexSymbol.VarBuilder);
 
-           //定义一个标签，表示从下面开始进入循环体
-           IL.MarkLabel(True_Label);
-           RepeatBody.Emit();
-           EmitHelper.Inc(IL, IndexSymbol.VarBuilder);
-           EmitCondition();
-           
-           IL.Emit(OpCodes.Brtrue, True_Label);
-           IL.MarkLabel(False_Label); 
-       }
+            var True_Label = IL.DefineLabel();
+            var False_Label = IL.DefineLabel();
 
-       protected void EmitCondition()
-       {
-           EmitHelper.LoadVar(IL, IndexSymbol.VarBuilder);
-           EmitHelper.LoadVar(IL, CountSymbol.VarBuilder);
-           IL.Emit(OpCodes.Clt);
-           EmitHelper.StormVar(IL, CondiSymbol.VarBuilder);
-           EmitHelper.LoadVar(IL, CondiSymbol.VarBuilder);
-       }    
+            EmitCondition();
+            IL.Emit(OpCodes.Brfalse, False_Label);
 
-       public override string ToString()
-       {
-           StringBuilder buff = new StringBuilder();
-           buff.AppendFormat("重复{0}次\n", TimesExp);
-           buff.AppendLine(RepeatBody.ToString());
-           return buff.ToString();
-       } 
+            //定义一个标签，表示从下面开始进入循环体
+            IL.MarkLabel(True_Label);
+            RepeatBody.Emit();
+            EmitHelper.Inc(IL, IndexSymbol.VarBuilder);
+            EmitCondition();
+
+            IL.Emit(OpCodes.Brtrue, True_Label);
+            IL.MarkLabel(False_Label);
+        }
+
+        protected void EmitCondition()
+        {
+            EmitHelper.LoadVar(IL, IndexSymbol.VarBuilder);
+            EmitHelper.LoadVar(IL, CountSymbol.VarBuilder);
+            IL.Emit(OpCodes.Clt);
+            EmitHelper.StormVar(IL, CondiSymbol.VarBuilder);
+            EmitHelper.LoadVar(IL, CondiSymbol.VarBuilder);
+        }
+
+        public override string ToString()
+        {
+            return Raw.ToString();
+        }
     }
 }

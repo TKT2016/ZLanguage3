@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ZDev.Schema.Parses;
+using ZCompileCore.Lex;
 
 namespace ZDev.Schema.Models.Lang
 {

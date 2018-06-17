@@ -16,6 +16,13 @@ namespace ZCompileDesc
 
         static ZTypeManager()
         {
+            InitZLangBasicTypes();
+        }
+
+        internal static void InitZLangBasicTypes()
+        {
+            if (ZLangBasicTypes.ZOBJECT != null) return;
+
             ZLangBasicTypes.ZOBJECT = (ZLClassInfo)(CreateZTypeImp(typeof(事物))) ;
             Cache.AddCache(ZLangBasicTypes.ZOBJECT);
             Cache.AddCache(ZLangBasicTypes.ZOBJECT, "object");

@@ -9,10 +9,11 @@ using ZCompileCore.AST;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
 using ZCompileCore.Reports;
-using ZCompileKit.Tools;
+using ZCompileCore.Tools;
 using ZLangRT;
 using ZCompileDesc.Descriptions;
-using ZCompileKit;
+using ZCompileCore;
+using ZCompileCore.SourceModels;
 
 
 namespace ZCompileCore.Engines
@@ -23,9 +24,9 @@ namespace ZCompileCore.Engines
 
         CompileMessageCollection MessageCollection;
         ProjectCompileResult result;
-        ZProjectModel projectModel;
+        SourceProjectModel projectModel;
 
-        public ZProjectEngine(CompileMessageCollection cmc, ZProjectModel zCompileProjectModel)
+        public ZProjectEngine(CompileMessageCollection cmc, SourceProjectModel zCompileProjectModel)
         {
             MessageCollection = cmc;
             this.projectModel = zCompileProjectModel;
@@ -62,32 +63,18 @@ namespace ZCompileCore.Engines
             ZFileEngine parser = new ZFileEngine(ProjectContext);
             foreach (var item in projectModel.SouceFileList)
             {
-                FileSource fileType = parser.Parse(item);
+                FileAST fileType = parser.Parse(item);
                 if (fileType != null)
                 {
-                    if (fileType is FileEnum)
+                    List<IZObj> zltypes = fileType.Compile();
+                    foreach(var zltype in zltypes)
                     {
-                        ZLEnumInfo zenum = (fileType as FileEnum).Compile();
-                        this.ProjectContext.CompiledTypes.Add(zenum);
+                        this.ProjectContext.CompiledTypes.Add(zltype);
                     }
-                    else if (fileType is FileDim)
-                    {
-                        ZLDimInfo zdim = (fileType as FileDim).Compile();
-                        this.ProjectContext.CompiledTypes.Add(zdim);
-                    }
-                    else if (fileType is FileClass)
-                    {
-                        ZLClassInfo zclass = (fileType as FileClass).Compile();
-                        this.ProjectContext.CompiledTypes.Add(zclass);
-                    }
-                    else
-                    {
-                        throw new CCException();
-                    }      
                 }
                 else
                 {
-                    //throw new CCException();
+                    throw new CCException();
                 }
             }
         }

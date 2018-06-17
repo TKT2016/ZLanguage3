@@ -1,75 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
+using ZCompileCore.ASTRaws;
 using ZCompileCore.Contexts;
 using ZCompileCore.Lex;
-using ZCompileCore.Reports;
 using ZCompileDesc.Descriptions;
-
 
 namespace ZCompileCore.AST
 {
-    public class SectionImport : SectionBase
+    public class SectionImport
     {
-        public LexToken KeyToken;
-        public List<PackageNameAST> Packages = new List<PackageNameAST>();
+        private FileAST ASTFile;
+        private SectionImportRaw Raw;
 
-        public override void AnalyText()
+        public SectionImport(FileAST fileAST, SectionImportRaw sectionImportRaw)
         {
-            foreach (PackageNameAST itemPackage in this.Packages)
+            ASTFile = fileAST;
+            Raw = sectionImportRaw;
+        }
+
+        public void Analy()
+        {
+            foreach (ZCompileCore.ASTRaws.SectionImportRaw.PackageRaw itemPackage in this.Raw.Packages)
             {
-                itemPackage.AnalyText();
+                AnalyPackageRaw(itemPackage);
             }
         }
 
-        public override void AnalyType()
+        private string AnalyPackageRaw(ZCompileCore.ASTRaws.SectionImportRaw.PackageRaw packageRaw)
         {
-            foreach (PackageNameAST itemPackage in this.Packages)
+            ContextImportUse contextiu = this.ASTFile.FileContext.ImportUseContext;
+            List<LexTokenText> Tokens = packageRaw.Parts;
+            string PackageFullName = string.Join("/", Tokens.Select(p => p.Text));
+            if (contextiu.ContainsImportPackageName(PackageFullName))
             {
-                itemPackage.AnalyType();
+                this.ASTFile.FileContext.Errorf(packageRaw.Position, "开发包'{0}'已经导入", PackageFullName);
             }
+            else
+            {
+                contextiu.AddImportPackageName(PackageFullName);
+                LoadPackageTypes(PackageFullName, packageRaw.Position);
+                return PackageFullName;
+            }
+            return null;
         }
 
-        public override void AnalyBody()
+        private bool LoadPackageTypes(string PackageFullName, CodePosition position)
         {
+            var fileContext = this.ASTFile.FileContext;
+            ZPackageInfo packageDesc = fileContext.ProjectContext.SearchZPackageDesc(PackageFullName);
+            if (packageDesc == null)
+            {
+                this.ASTFile.FileContext.Errorf(position, "不存在'{0}'开发包", PackageFullName);
+                return false;
+            }
+            else
+            {
+                this.AddPackage(packageDesc);
+            }
+            return true;
+        }
+
+        private void AddPackage(ZPackageInfo zdesc)
+        {
+            ContextImportUse contextiu = this.ASTFile.FileContext.ImportUseContext;
+            foreach (var item in zdesc.EnumTypes)
+            {
+                contextiu.AddImportType(item);
+            }
+
+            foreach (ZLDimInfo item in zdesc.DimTypes)
+            {
+                contextiu.AddDimType(item);
+            }
+
+            foreach (var item in zdesc.ClassTypes)
+            {
+                contextiu.AddImportType(item);
+            }
             return;
         }
-
-        public override void EmitName()
-        {
-            return;
-        }
-
-        public override void EmitBody()
-        {
-            return;
-        }
-
-        public void SetContext(ContextFile fileContext)
-        {
-            this.FileContext = fileContext;
-            foreach (PackageNameAST itemPackage in this.Packages)
-            {
-                itemPackage.SetContext(fileContext);
-            }
-        }
-
-        public override string ToString()
-        {
-            StringBuilder buf = new StringBuilder();
-            buf.Append(KeyToken.GetText());
-            buf.Append(":");
-            List<string> tempList = new List<string>();
-            foreach (var item in this.Packages)
-            {
-                buf.Append(item.ToString());
-            }
-            buf.Append(string.Join(",", tempList));
-            buf.AppendLine(";");
-            return buf.ToString();
-        }
-
     }
 }

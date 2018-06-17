@@ -10,6 +10,7 @@ namespace ZCompileDesc.Descriptions
 {
     public class ZArgCall : ACall, IParameter
     {
+        public bool IsRuntimeType { get { return false; } }
         public bool IsGeneric { get; set; }
         public bool HasCallParameterName() {  return !string.IsNullOrWhiteSpace(ZArgName); } 
         public string ZArgName { get; set; }

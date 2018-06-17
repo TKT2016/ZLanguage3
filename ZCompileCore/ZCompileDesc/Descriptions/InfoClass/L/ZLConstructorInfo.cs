@@ -45,7 +45,7 @@ namespace ZCompileDesc.Descriptions
 
         public virtual bool HasZConstructorDesc(ZNewCall newCall)
         {
-            return ZDescUtil.ZEqualsDesc(this.ZDesc,newCall);// ZDesc.ZEquals(procDesc);
+            return ZDescUtil.ZEqualsDesc(this.ZDesc,newCall);
         }
 
         public ZLConstructorDesc ZDesc { get; protected set; }

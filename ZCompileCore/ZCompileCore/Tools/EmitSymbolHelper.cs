@@ -2,57 +2,13 @@
 using System.Reflection.Emit;
 
 using ZCompileDesc.Descriptions;
-using ZCompileKit;
-using ZCompileKit.Tools;
+using ZCompileCore;
+using ZCompileCore.Tools;
 
 namespace ZCompileCore.Tools
 {
     public static class EmitSymbolHelper
     {
-        //public static bool EmitLoad(ILGenerator il, IIdent iident)
-        //{
-        //    if (iident is ZLParamInfo)
-        //    {
-        //        EmitLoad(il, (ZLParamInfo)iident); 
-        //        return true;
-        //    }
-        //    else if (iident is ZCParamInfo)
-        //    {
-        //        EmitLoad(il, (ZCParamInfo)iident);
-        //        return true;
-        //    }
-        //    else if (iident is ZCLocalVar)
-        //    {
-        //        EmitLoad(il, (ZCLocalVar)iident);
-        //        return true;
-        //    }
-        //    else if (iident is ZCFieldInfo)
-        //    {
-        //        EmitLoad(il, (ZCFieldInfo)iident);
-        //        return true;
-        //    }
-        //    else if (iident is ZLFieldInfo)
-        //    {
-        //        EmitLoad(il, (ZLFieldInfo)iident);
-        //        return true;
-        //    }
-        //    else if (iident is ZLPropertyInfo)
-        //    {
-        //        EmitLoad(il, (ZLPropertyInfo)iident);
-        //        return true;
-        //    }
-        //    else if (iident is ZCPropertyInfo)
-        //    {
-        //        EmitLoad(il, (ZCPropertyInfo)iident);
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //    //EmitHelper.LoadArg(il, zcparam.EmitIndex);
-        //}
-
         public static bool EmitLoada(ILGenerator il, IIdent iident)
         {
             if (iident is ZAParamInfo)
@@ -128,12 +84,12 @@ namespace ZCompileCore.Tools
 
         public static void EmitLoad(ILGenerator il, ZCParamInfo zcparam)
         {
-            EmitHelper.LoadArg(il,zcparam.EmitIndex);
+            ILGeneratorUtil.LoadArg(il, zcparam.EmitIndex);
         }
 
         public static void EmitLoad(ILGenerator il, ZLParamInfo zcparam)
         {
-            EmitHelper.LoadArg(il, zcparam.EmitIndex);
+            ILGeneratorUtil.LoadArg(il, zcparam.EmitIndex);
         }
 
         public static void EmitLoad(ILGenerator il, ZCFieldInfo memberCompiling)
@@ -179,62 +135,6 @@ namespace ZCompileCore.Tools
         {
             EmitHelper.StormArg(il, zp.EmitIndex);
         }
-
-        //public static void EmitStorm(ILGenerator il, IIdent symbol)
-        //{
-        //    if (symbol is ZCLocalVar)
-        //    {
-        //        var symbolVar = symbol as ZCLocalVar;
-        //        EmitHelper.StormVar(il, symbolVar.VarBuilder);
-        //    }
-        //    //else if (symbol is SymbolArg)
-        //    //{
-        //    //    SymbolArg argsymbol = (symbol as SymbolArg);
-        //    //    EmitHelper.StormArg(il, argsymbol.ArgIndex);
-        //    //}
-        //    //else if (symbol is SymbolDefProperty)
-        //    //{
-        //    //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
-        //    //    MethodInfo setMethod = symbol2.Property.GetSetMethod();
-        //    //    EmitHelper.CallDynamic(il, setMethod);
-        //    //}
-        //    //else if (symbol is SymbolDefField)
-        //    //{
-        //    //    SymbolDefField symbol2 = (symbol as SymbolDefField);
-        //    //    EmitHelper.StormField(il, symbol2.Field);
-        //    //}
-        //    //else if (symbol is SymbolRefStaticMember)
-        //    //{
-        //    //    EmitStorm(il, symbol as SymbolRefStaticMember);
-        //    //}
-        //    else
-        //    {
-        //        throw new CCException();
-        //    }
-        //}
-
-        //public static bool NeedCallThis(IIdent symbol)
-        //{
-        //    if (symbol is ZCLocalVar) return false;
-        //    else if (symbol is ZCParamInfo) return false;
-        //    //else if (symbol is SymbolDefProperty) 
-        //    //{
-        //    //    SymbolDefProperty symbol2 = (symbol as SymbolDefProperty);
-        //    //    return symbol2.IsStatic == false;
-        //    //}
-        //    //else if (symbol is SymbolDefField)
-        //    //{
-        //    //    SymbolDefField symbol2 = (symbol as SymbolDefField);
-        //    //    return symbol2.IsStatic == false;
-        //    //}
-        //    //else if (symbol is SymbolRefStaticMember)
-        //    //{
-        //    //    return false;
-        //    //}
-        //    else
-        //    {
-        //        throw new CCException();
-        //    }
-        //}
+         
     }
 }

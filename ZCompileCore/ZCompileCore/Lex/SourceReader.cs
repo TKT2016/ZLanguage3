@@ -26,8 +26,6 @@ namespace ZCompileCore.Lex
             return (char)(Read());
         }
 
-        
-
         //public char GetNextChar()
         //{
         //    if (_sourceText != null && pointer < _sourceText.Length-1)

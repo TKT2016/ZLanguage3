@@ -8,48 +8,6 @@ namespace ZLangRT
 {
     public static class Invoker
     {
-        //private static void debug(string message)
-        //{
-        //    var temp = Console.ForegroundColor;
-        //    Console.ForegroundColor = ConsoleColor.Green;
-        //    Console.WriteLine("Debug:" + message);
-        //    Console.ForegroundColor = temp;
-        //}
-        /*
-        public static void SetIndex(object instance,  object index ,object value )
-        {
-            Type type = instance.GetType();
-            var method = type.GetMethod("set_Item");
-            if (method == null)
-            {
-                throw new TKTRTException("类型" + type.FullName + "没有索引器,无法对实例赋值");
-            }
-
-            if (index is int || index is double)
-            {
-                index = Calculater.Obj2Int(index);
-            }
-
-            object newValue = Calculater.ConvertObjectType(value);
-            method.Invoke(instance, new object[] { index, newValue });
-        }
-
-        public static object GetIndex(object instance, object index)
-        {
-            Type type = instance.GetType();
-            var method = type.GetMethod("get_Item");
-            if (method == null)
-            {
-                throw new TKTRTException("类型" + type.FullName + "没有索引器,无法对实例赋值");
-            }
-            if (index is int || index is double)
-            {
-                index = Calculater.Obj2Int(index);
-            }
-            return  method.Invoke(instance, new object[] { index });
-        }
-        */
-        
         public static object Call(object obj, string funcName, params object[] args)
         {
             object[] newArgs = args;

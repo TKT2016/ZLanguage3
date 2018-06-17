@@ -78,7 +78,7 @@ namespace ZCompileDesc.Descriptions
         {
             foreach (ZLMethodDesc item in ZDescs)
             {
-                if (ZDescUtil.ZEqualsDesc(item, procDesc))//)item.ZEquals(procDesc))
+                if (ZDescUtil.ZEqualsDesc(item, procDesc))
                     return true;
             }
             return false;

@@ -8,6 +8,14 @@ namespace ZCompileDesc
 {
     public static class ZLangBasicTypes
     {
+        static ZLangBasicTypes()
+        {
+            if(ZVOID==null)
+            {
+                ZTypeManager.InitZLangBasicTypes();
+            }
+        }
+
         #region 核心类型
 
         public static ZLClassInfo ZVOID { get; internal set; }

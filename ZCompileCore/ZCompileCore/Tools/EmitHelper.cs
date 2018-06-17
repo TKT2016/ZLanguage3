@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 using System.Reflection;
 using ZCompileDesc.Descriptions;
 
-namespace ZCompileKit.Tools
+namespace ZCompileCore.Tools
 {
     public static class EmitHelper
     {
@@ -20,6 +20,46 @@ namespace ZCompileKit.Tools
             il.Emit(OpCodes.Ldloca, local);
         }
 
+        public static void LoadDefaultValue(ILGenerator il, Type type)
+        {
+            if (type == typeof(bool))
+            {
+                il.Emit(OpCodes.Ldc_I4_0);
+            }
+            else if (type == typeof(int))
+            {
+                il.Emit(OpCodes.Ldc_I4_0);
+            }
+            else if (type == typeof(float))
+            {
+                il.Emit(OpCodes.Ldc_R4, (float)0.0);
+            }
+            else if (type == typeof(double))
+            {
+                il.Emit(OpCodes.Ldc_R8, (float)0.0);
+            }
+            else if (type == typeof(string))
+            {
+                il.Emit(OpCodes.Ldstr, "");
+            }
+            else if (type == typeof(char))
+            {
+                il.Emit(OpCodes.Ldc_I4_0);
+            }
+            else
+            {
+                ConstructorInfo constructor = type.GetConstructor(new Type[] { });
+                if (constructor == null)
+                {
+                    il.Emit(OpCodes.Ldnull);
+                }
+                else
+                {
+                    EmitHelper.NewObj(il, constructor);
+                }
+            }
+        }
+
         //public static void LoadVar(ILGenerator il, LocalBuilder local, bool isStruct)
         //{
         //    if (!isStruct)
@@ -28,10 +68,10 @@ namespace ZCompileKit.Tools
         //        il.Emit(OpCodes.Ldloca, local);
         //}
 
-        public static void LoadArg(ILGenerator il, int argIndex)
-        {
-            il.Emit(OpCodes.Ldarg, argIndex);
-        }
+        //public static void LoadArg(ILGenerator il, int argIndex)
+        //{
+        //    il.Emit(OpCodes.Ldarg, argIndex);
+        //}
 
         public static void LoadArga(ILGenerator il, int argIndex)
         {
@@ -179,52 +219,45 @@ namespace ZCompileKit.Tools
             il.Emit(OpCodes.Ldstr, str);
         }
 
-
         public static void LoadInt(ILGenerator il, int value)
         {
-            if (value == 0)
+            switch (value)
             {
-                il.Emit(OpCodes.Ldc_I4_0);
+                case -1:
+                    il.Emit(OpCodes.Ldc_I4_M1);
+                    return;
+                case 0:
+                    il.Emit(OpCodes.Ldc_I4_0);
+                    return;
+                case 1:
+                    il.Emit(OpCodes.Ldc_I4_1);
+                    return;
+                case 2:
+                    il.Emit(OpCodes.Ldc_I4_2);
+                    return;
+                case 3:
+                    il.Emit(OpCodes.Ldc_I4_3);
+                    return;
+                case 4:
+                    il.Emit(OpCodes.Ldc_I4_4);
+                    return;
+                case 5:
+                    il.Emit(OpCodes.Ldc_I4_5);
+                    return;
+                case 6:
+                    il.Emit(OpCodes.Ldc_I4_6);
+                    return;
+                case 7:
+                    il.Emit(OpCodes.Ldc_I4_7);
+                    return;
+                case 8:
+                    il.Emit(OpCodes.Ldc_I4_8);
+                    return;
             }
-            else if (value == 1)
+
+            if (value > -129 && value < 128)
             {
-                il.Emit(OpCodes.Ldc_I4_1);
-            }
-            else if (value == 2)
-            {
-                il.Emit(OpCodes.Ldc_I4_2);
-            }
-            else if (value == 3)
-            {
-                il.Emit(OpCodes.Ldc_I4_3);
-            }
-            else if (value == 4)
-            {
-                il.Emit(OpCodes.Ldc_I4_4);
-            }
-            else if (value == 5)
-            {
-                il.Emit(OpCodes.Ldc_I4_5);
-            }
-            else if (value == 6)
-            {
-                il.Emit(OpCodes.Ldc_I4_6);
-            }
-            else if (value == 7)
-            {
-                il.Emit(OpCodes.Ldc_I4_7);
-            }
-            else if (value == 8)
-            {
-                il.Emit(OpCodes.Ldc_I4_8);
-            }
-            else if (value == -1)
-            {
-                il.Emit(OpCodes.Ldc_I4_M1);
-            }
-            else if (value >= -127 && value <= 128)
-            {
-                il.Emit(OpCodes.Ldc_I4_S, value);
+                il.Emit(OpCodes.Ldc_I4_S, (SByte)value);
             }
             else
             {

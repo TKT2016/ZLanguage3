@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using ZCompileNLP.Segment.Common;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace ZCompileNLP.Segment.PosSeg
 {
@@ -64,17 +65,22 @@ namespace ZCompileNLP.Segment.PosSeg
 
         private static void LoadModel()
         {
-            var startJson = File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbStartFile));
-            _startProbs = JsonConvert.DeserializeObject<IDictionary<string, double>>(startJson);
+            var startJson = ManifestResourceReader.ReadAllText(ConfigManager.PosProbStartFile, Encoding.UTF8); 
+            //File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbStartFile));
+            _startProbs = ZCompileNLP.Json.JsonUtil.ToObject<IDictionary<string, double>>(startJson);
+            // JsonConvert.DeserializeObject<IDictionary<string, double>>(startJson);
 
-            var transJson = File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbTransFile));
-            _transProbs = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<string, double>>>(transJson);
+            var transJson = ManifestResourceReader.ReadAllText(ConfigManager.PosProbTransFile, Encoding.UTF8); 
+            //File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbTransFile));
+            _transProbs = ZCompileNLP.Json.JsonUtil.ToObject<IDictionary<string, IDictionary<string, double>>>(transJson);
 
-            var emitJson = File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbEmitFile));
-            _emitProbs = JsonConvert.DeserializeObject<IDictionary<string, IDictionary<char, double>>>(emitJson);
+            var emitJson = ManifestResourceReader.ReadAllText(ConfigManager.PosProbEmitFile, Encoding.UTF8);
+            //File.ReadAllText(Path.GetFullPath(ConfigManager.PosProbEmitFile));
+            _emitProbs = ZCompileNLP.Json.JsonUtil.ToObject<IDictionary<string, IDictionary<char, double>>>(emitJson);
 
-            var tabJson = File.ReadAllText(Path.GetFullPath(ConfigManager.CharStateTabFile));
-            _stateTab = JsonConvert.DeserializeObject<IDictionary<char, List<string>>>(tabJson);
+            var tabJson = ManifestResourceReader.ReadAllText(ConfigManager.CharStateTabFile, Encoding.UTF8); 
+            //File.ReadAllText(Path.GetFullPath(ConfigManager.CharStateTabFile));
+            _stateTab = ZCompileNLP.Json.JsonUtil.ToObject<IDictionary<char, List<string>>>(tabJson);
         }
 
         // TODO: change sentence to obs?

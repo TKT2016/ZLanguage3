@@ -14,6 +14,7 @@ namespace ZCompileDesc.Descriptions
     /// </summary>
     public class ZLEnumInfo : ZLType, IZLObj
     {
+        public bool IsRuntimeType { get { return false; } }
         public ZEnumAttribute MarkAttribute { get; protected set; }
         public ZLEnumItemInfo[] EnumElements { get; protected set; }
         public Type MarkType { get; protected set; }

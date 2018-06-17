@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
-using ZCompileKit.Collections;
+using ZCompileCore.CommonCollections;
 
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
@@ -26,6 +26,7 @@ namespace ZCompileCore.Contexts
         public ContextConstructor(ContextClass classContext)
             : base(classContext)
         {
+            IsConstructor = true;
             ZConstructorInfo = new ZCConstructorInfo(classContext.GetZCompilingType());
         }
 
@@ -68,18 +69,10 @@ namespace ZCompileCore.Contexts
             return  "__new__" + "Nested" + NestedIndex;
         }
 
-
         public void SetBuilder(ConstructorBuilder builder)
         {
             this.ZConstructorInfo.ConstructorBuilder = builder;
         }
-
-        //public override void DefineParameter(ZCParamInfo zcparam)
-        //{
-        //    var mbuilder = this.ZConstructorInfo.ConstructorBuilder;
-        //    ParameterBuilder pb = mbuilder.DefineParameter(zcparam.EmitIndex, ParameterAttributes.None, zcparam.ZParamName);
-        //    zcparam.ParamBuilder = pb;
-        //}
 
         public override ILGenerator GetILGenerator()
         {

@@ -104,12 +104,15 @@
             // 
             // mainDockPanel
             // 
+            this.mainDockPanel.AllowDrop = true;
             this.mainDockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainDockPanel.Location = new System.Drawing.Point(0, 25);
             this.mainDockPanel.Name = "mainDockPanel";
             this.mainDockPanel.Size = new System.Drawing.Size(984, 587);
             this.mainDockPanel.TabIndex = 2;
             this.mainDockPanel.ActiveDocumentChanged += new System.EventHandler(this.mainDockPanel_ActiveDocumentChanged);
+            this.mainDockPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.mainDockPanel_DragDrop);
+            this.mainDockPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.mainDockPanel_DragEnter);
             // 
             // MainForm
             // 

@@ -5,7 +5,6 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using ZCompileCore.Tools;
-using ZCompileKit.Tools;
 
 namespace ZCompileCore.Lex
 {

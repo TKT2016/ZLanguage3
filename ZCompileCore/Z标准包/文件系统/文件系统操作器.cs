@@ -15,7 +15,8 @@ namespace Z标准包.文件系统
         [ZCode("创建(文件夹:wjj)")]
         public static void 创建(文件夹 wjj)
         {
-            wjj.DirInfo.Create();
+            //wjj.DirInfo.Create();
+            Directory.CreateDirectory(wjj.FullName);
         }
 
         [ZCode("删除(文件夹:wjj)")]
@@ -74,13 +75,14 @@ namespace Z标准包.文件系统
 
         #endregion
 
-
         #region 文件操作
 
         [ZCode("创建(文件:wj)")]
-        public static void 创建(文件 wj)
+        public static void 创建WJ(文件 wj)
         {
-            wj.FeInfo.Create();
+            //Console.WriteLine(wj.FullName);
+            //wj.FeInfo.Create();
+            File.Create(wj.FullName);
         }
 
         [ZCode("复制(文件:wa)到(文件:wb)")]

@@ -119,9 +119,9 @@ namespace ZCompileDesc.Descriptions.Utils
                 if (item1 is IBracket)
                 {
                     if (!(item2 is IBracket)) return false;
-                    var b1 = item2 as IBracket;
-                    var b2 = item1 as IBracket;
-                    return ZEqualsIBracketCount(b1, b2);
+                    var b1 = item1 as IBracket;
+                    var b2 = item2 as IBracket;
+                    return ZEqualsIBracket(b1 ,b2);
                 }
             }
             return true;
@@ -157,6 +157,7 @@ namespace ZCompileDesc.Descriptions.Utils
         public static ZTypeCompareEnum Compare(ZType z1, ZType z2)
         {
             if (z1 is ZLEnumInfo || z2 is ZLEnumInfo) return ZTypeCompareEnum.NEQ;
+            if (z1.IsRuntimeType || z2.IsRuntimeType) return ZTypeCompareEnum.NEQ;
             if (z1 is ZCClassInfo)
             {
                 if (z2 is ZCClassInfo)
@@ -181,7 +182,7 @@ namespace ZCompileDesc.Descriptions.Utils
             }
         }
 
-        private static ZTypeCompareEnum ZEquals(IParameter p1, IParameter p2)
+        public static ZTypeCompareEnum ZEquals(IParameter p1, IParameter p2)
         {
             if(!(ZEqualsName(p1,p2)))
             {
@@ -191,7 +192,13 @@ namespace ZCompileDesc.Descriptions.Utils
             {
                  throw new Exception("调用参数只能在第二个");
             }
-            ZTypeCompareEnum eqResult = Compare(p1.GetZParamType(),p2.GetZParamType());
+            if (p1.IsRuntimeType || p2.IsRuntimeType) return ZTypeCompareEnum.NEQ;
+            
+            var t1 = p1.GetZParamType();
+            var t2 = p2.GetZParamType();
+            if (t1 == null) return ZTypeCompareEnum.NEQ;
+            if (t2 == null) throw new ZLibRTException();// return ZTypeCompareEnum.NEQ;
+            ZTypeCompareEnum eqResult = Compare(t1,t2);
             return eqResult;
         }
 
@@ -238,11 +245,10 @@ namespace ZCompileDesc.Descriptions.Utils
         private static ZTypeCompareEnum Compare(Type t1, Type t2)
         {
             if (t1 == t2) return ZTypeCompareEnum.EQ;
-            if (ReflectionUtil.IsExtends(t1, t1)) return ZTypeCompareEnum.ExtendsOf;
-            if (ReflectionUtil.IsExtends(t2, t2)) return ZTypeCompareEnum.SuperOf;
+            if (ReflectionUtil.IsExtends(t1, t2)) return ZTypeCompareEnum.ExtendsOf;
+            if (ReflectionUtil.IsExtends(t2, t1)) return ZTypeCompareEnum. SuperOf;  
             return ZTypeCompareEnum.NEQ;
         }
 
-        
     }
 }

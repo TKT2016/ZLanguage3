@@ -23,7 +23,6 @@ namespace ZDev.UI.Compilers
         public const string ZXMExt = ".zxm";
 
         private FileInfo srcFileInfo;
-
         public ProjectCompileResult CompileResult { get; private set;}
 
         public ZDevCompiler(FileInfo zlogoFileInfo)
@@ -41,10 +40,14 @@ namespace ZDev.UI.Compilers
 
         ProjectCompileResult CompileProject(string srcFile)
         {
-            CompileMessageCollection MessageCollection = new CompileMessageCollection();
-            FileInfo srcFileInfo = new FileInfo(srcFile);
-            ProjectCompiler compiler = new ProjectCompiler();
-            ProjectCompileResult result = compiler.Compile(srcFileInfo, MessageCollection);
+            CompileMessageCollection messageCollection = new CompileMessageCollection();
+            //FileInfo srcFileInfo = new FileInfo(srcFile);
+            //ProjectCompiler compiler = new ProjectCompiler();
+            //ProjectCompileResult result = compiler.Compile(srcFileInfo, MessageCollection);
+            //return result;
+
+            ProjectFileCompiler compiler = new ProjectFileCompiler(srcFile, messageCollection);
+            ProjectCompileResult result = compiler.Compile();
             return result;
         }
 
@@ -67,12 +70,23 @@ namespace ZDev.UI.Compilers
 
         public void Run()
         {
-            if (CompileResult.CompiledTypes.Count > 0)
+            if (CompileResult.MessageCollection.Errors.Count==0)
             {
                 RunProcess(CompileResult.BinaryFilePath);
+                //RunExe(CompileResult.BinaryFilePath, CompileResult.EntrtyZType.SharpType);
             }
         }
-        
+
+        private static void RunExe(string exePath, Type CompiledMainType)
+        {
+            //string exePath = __CompileResult.BinaryFilePath;
+            string exeDirectory = (new FileInfo(exePath)).DirectoryName;
+            var tempEnv = Environment.CurrentDirectory;
+            Environment.CurrentDirectory = exeDirectory;
+            Invoker.Call(CompiledMainType, "启动");
+            Environment.CurrentDirectory = tempEnv;
+        }
+
         private void RunProcess(string exe)
         {
             string exeFile = Path.Combine(Application.StartupPath, "ZDev.RunExe.exe");

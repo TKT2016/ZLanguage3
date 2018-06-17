@@ -11,16 +11,28 @@ namespace ZCompileCore.AST
     public class StmtTry: Stmt
     {
         Label tryLabel;
-        public override void DoAnaly()
+        public override Stmt Analy()
         {
             //base.LoadRefTypes(context);
             //var symbols = this.AnalyStmtContext.Symbols;
+            return this;
         }
 
         public override void Emit( )
         {
             tryLabel = IL.BeginExceptionBlock();
         }
+
+        public override void AnalyExpDim()
+        {
+
+        }
+
+        //public override CodePosition Position
+        //{
+        //    get { return new CodePosition (0,0); }
+        //}
+
 
         #region 覆盖
         public override string ToString()

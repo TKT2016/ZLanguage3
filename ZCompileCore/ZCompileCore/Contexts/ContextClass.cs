@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using ZCompileKit.Collections;
+using ZCompileCore.CommonCollections;
 
 using ZCompileDesc.Collections;
 using ZCompileDesc.Descriptions;
@@ -16,119 +16,118 @@ namespace ZCompileCore.Contexts
     public class ContextClass
     {
         public ContextFile FileContext { get; set; }
-        public string ClassName { get; set; }
+        public string ClassName { get { return SelfCompilingType.ZClassName; } }
         public ClassEmitContext EmitContext { get; set; }
         public MethodBuilder InitPropertyMethod { get; set; }
-        public ZCFieldInfo NestedOutFieldSymbol { get; set; }
-        public  ZCClassInfo ThisCompilingType { get; private set; }
+        //public ZCFieldInfo NestedOutFieldSymbol { get; set; }
+        public ZCClassInfo SelfCompilingType { get; private set; }
+        public bool IsNested { get;protected set; }
 
-        public ContextClass(ContextFile fileContext)
+        protected ContextClass( )
+        {
+            EmitContext = new ClassEmitContext();
+            SelfCompilingType = new ZCClassInfo();
+        }
+
+        public ContextClass(ContextFile fileContext):this()
         {
             FileContext = fileContext;
-            EmitContext = new ClassEmitContext();
-            ThisCompilingType = new ZCClassInfo();
         }
 
-        public void AddMember(ZCPropertyInfo zcp)
-        {
-            ThisCompilingType.AddProperty(zcp);
-        }
-
-        public void AddMethod(ZCMethodInfo zcp)
-        {
-            ThisCompilingType.AddMethod(zcp);
-        }
-
-        Dictionary<string, string> _properties = new Dictionary<string, string>();
         public bool ContainsPropertyName(string name)
         {
-            return _properties.ContainsKey(name);
-        }
-
-        public void AddPropertyName(string name)
-        {
-            _properties.Add(name, name);
+            //return _properties.ContainsKey(name);
+            ZCPropertyInfo zp = SelfCompilingType.SearchDeclaredZProperty(name);
+            return zp != null;
         }
 
         public void SetClassName(string name)
         {
-            ThisCompilingType.ZClassName = name;//.SetClassName(name);
+            SelfCompilingType.ZClassName = name;
         }
 
         public void SetIsStatic(bool isStatic)
         {
-            ThisCompilingType.IsStatic = isStatic;//.SetIsStatic(isStatic);
+            SelfCompilingType.IsStatic = isStatic;
         }
 
         public void SetSuperClass(ZLClassInfo baseType)
         {
-            ThisCompilingType.BaseZClass = baseType;//.SetBaseZType(baseType);
+            SelfCompilingType.BaseZClass = baseType;
+        }
+
+        public void AddMember(ZCPropertyInfo zcp)
+        {
+            SelfCompilingType.AddProperty(zcp);
         }
 
         public string GetClassName()
         {
-            return ThisCompilingType.GetZClassName();
+            return SelfCompilingType.GetZClassName();
         }
 
         public ZCPropertyInfo SeachZProperty(string name)
         {
-            return (ZCPropertyInfo)ThisCompilingType.SearchDeclaredZProperty(name);
+            return (ZCPropertyInfo)SelfCompilingType.SearchDeclaredZProperty(name);
         }
 
         public ZCFieldInfo SeachZField(string name)
         {
-            return ThisCompilingType.SearchDeclaredZField(name);
+            return SelfCompilingType.SearchDeclaredZField(name);
         }
 
         public ZCClassInfo GetZCompilingType()
         {
-            return this.ThisCompilingType;
+            return this.SelfCompilingType;
         }
 
         public bool IsStatic()
         {
-            return this.ThisCompilingType.IsStatic;
+            return this.SelfCompilingType.IsStatic;
         }
 
         public ZLClassInfo GetSuperZType()
         {
-            return this.ThisCompilingType.BaseZClass;
+            return this.SelfCompilingType.BaseZClass;
         }
 
         public ZLMethodInfo[] SearchSuperProc(ZMethodCall procDesc)
         {
-            return ThisCompilingType.BaseZClass.SearchZMethod(procDesc);
+            return SelfCompilingType.BaseZClass.SearchZMethod(procDesc);
         }
 
         public ZCMethodInfo[] SearchThisProc(ZMethodCall procDesc)
         {
-            return (ZCMethodInfo[])ThisCompilingType.SearchDeclaredZMethod(procDesc);
+            return (ZCMethodInfo[])SelfCompilingType.SearchDeclaredZMethod(procDesc);
         }
-
-        //public bool ContainsProc(ZAMethodDesc zdesc)
-        //{
-        //    var methods = ThisCompilingType.SearchDeclaredZMethod(zdesc);
-        //    return methods.Length > 0;
-        //}
 
         public void SetTypeBuilder(TypeBuilder typeBuilder)
         {
-            this.FileContext.ClassContext.EmitContext.ClassBuilder = typeBuilder;
-            this.ThisCompilingType.ClassBuilder = typeBuilder;//.SetBuilder(typeBuilder);
+            //this.FileContext.ClassContext.EmitContext.ClassBuilder = typeBuilder;
+            if (this.SelfCompilingType.ClassBuilder == null)
+                this.SelfCompilingType.ClassBuilder = typeBuilder;
+            else
+                throw new CCException();
         }
 
         public TypeBuilder GetTypeBuilder( )
         {
-            return this.ThisCompilingType.ClassBuilder;
+            if (this.SelfCompilingType.ClassBuilder == null)
+                throw new CCException();
+            return this.SelfCompilingType.ClassBuilder;
         }
 
         public class ClassEmitContext
         {
-            public TypeBuilder ClassBuilder { get; set; }
+            //public TypeBuilder ClassBuilder { get; set; }
             public ConstructorBuilder ZeroConstructor { get;  set; }
             public MethodBuilder InitMemberValueMethod { get;  set; }
             public ISymbolDocumentWriter IDoc { get;  set; }
         }
 
+        public override string ToString()
+        {
+            return string.Format("ContextClass[{0}]", SelfCompilingType.ZClassName);
+        }
     }
 }

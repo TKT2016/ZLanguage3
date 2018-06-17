@@ -19,6 +19,7 @@ namespace ZCompileNLP
             segmenter.AddWord("每一个");
             segmenter.AddWord("否则如果");
             segmenter.AddWord("重复");
+            segmenter.AddWord("新的");
         }
 
         public void AddWord(string word)
@@ -35,6 +36,16 @@ namespace ZCompileNLP
         {
             IEnumerable<string> tokens = segmenter.Cut(src);
             return tokens.ToArray();
+
+            //if (src.Length == 2)
+            //{
+
+            //}
+            //else
+            //{
+            //    IEnumerable<string> tokens = segmenter.Cut(src);
+            //    return tokens.ToArray();
+            //}
         }
     }
 }

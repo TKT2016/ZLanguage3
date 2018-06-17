@@ -91,7 +91,6 @@ namespace Z标准包.操作系统
         internal void Open()
         {
             OpenRoot();
-            //if (keySub == null)
                 keySub = keyRoot.OpenSubKey(subKeyName,true);
         }
 

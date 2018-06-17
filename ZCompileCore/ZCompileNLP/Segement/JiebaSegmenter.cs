@@ -349,7 +349,12 @@ namespace ZCompileNLP.Segment
 
                 if (reHan.IsMatch(blk))
                 {
-                    foreach (var word in cutMethod(blk))
+                    //if(blk.IndexOf("之")!=-1)
+                    //{
+                    //    Console.WriteLine(blk);
+                    //}
+                    var words = cutMethod(blk);
+                    foreach (var word in words)//cutMethod(blk))
                     {
                         result.Add(word);
                     }

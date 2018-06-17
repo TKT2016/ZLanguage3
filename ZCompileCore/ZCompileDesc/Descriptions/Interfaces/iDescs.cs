@@ -25,7 +25,7 @@ namespace ZCompileDesc.Descriptions
         bool HasCallParameterName();
         bool IsCallArg();
         ZType GetZParamType();
-        //ZTypeCompareEnum Compare(IParameter p2);
+        bool IsRuntimeType { get; }
     }
 
     public interface IParameterCollection
@@ -36,13 +36,8 @@ namespace ZCompileDesc.Descriptions
     public interface IIdent
     {
         string ZName{get;}
-        ZType GetZType();// { get;}
-        bool GetCanRead();// { get; }
-        bool GetCanWrite();// { get; }
-        //bool IsStruct { get; }
-        //public override string ToString()
-        //{
-        //    return this.GetType().Name + "-" + SymbolName + "-" + SymbolZType.ZTypeName;
-        //}
+        ZType GetZType();
+        bool GetCanRead();
+        bool GetCanWrite();
     }
 }

@@ -17,21 +17,25 @@ namespace ZDev.Forms
 {
     public class EditorDockForm : DockFormBase
     {
+        public MainForm MasterForm { get; set; } 
         public EditorDockForm()
         {
             //InitializeComponent();
             //setEditor();
             //OpenFile(fi);
+            this.AllowDrop = true;
+            this.DragEnter += new DragEventHandler(editorDock_DragEnter);
+            this.DragDrop += new DragEventHandler(editorDock_DragDrop);
         }
 
-        public CodeEditor Editor { get; private set; }
+        public CodeEditor Editor { get;private set; }
 
         public void NewFile(int i )
         {
             TKTCodeEditor tktEditor = new TKTCodeEditor();
             Editor = tktEditor;
             this.TabText = "新建" + i + "." + ZDevCompiler.ZYYExt;
-            InitializeComponent();
+            InitializeForm();
             Editor.DockForm = this;
             //Editor.OpenFile(fi);
         }
@@ -56,10 +60,36 @@ namespace ZDev.Forms
                 Editor = txtEditor;
             }
             this.TabText = Path.GetFileName(fileName);
-            InitializeComponent();
+            InitializeForm();
             Editor.DockForm = this;
             Editor.OpenFile(fi);
+        }
 
+        private void editorDock_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.All;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void editorDock_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                //FileInfo fi = new FileInfo(s[i]);
+                //OpenFile(s[i], false);
+                if(MasterForm!=null)
+                {
+                    this.MasterForm.OpenFile(s[i], false);
+                }
+            }
         }
 
         #region Windows Form Designer generated code
@@ -85,7 +115,7 @@ namespace ZDev.Forms
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private void InitializeForm()
         {
             //this.codeEditor = new ScintillaNET.Scintilla();
             this.SuspendLayout();

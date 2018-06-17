@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZCompileDesc.Descriptions.Utils;
 using ZCompileDesc.Utils;
 using ZLangRT.Utils;
 
@@ -11,7 +12,12 @@ namespace ZCompileDesc.Descriptions
     public class ZLClassInfo  : ZAClassInfo, ICompleted, ZLType, IZLObj
     {
         #region override
-
+        public override bool IsRuntimeType { get {
+            var type = this.SharpType;
+            return type.ToString() == "System.RuntimeType";
+            //return ZTypeUtil.IsExtends(this.SharpType, typeof(System.RuntimeType));
+            //return ReflectionUtil.IsStruct(this.SharpType);
+        } }
         public override AccessAttrEnum GetAccessAttr() { return this._AccessAttribute; }
         public override string GetZClassName() { return this.ZClassName; }
         public override bool GetIsStatic() { return this._IsStatic; }
@@ -259,11 +265,29 @@ namespace ZCompileDesc.Descriptions
         {
             List<ZLConstructorInfo> constructors = new List<ZLConstructorInfo>();
             var ZConstructors = this.GetZConstructors();
-            foreach (ZLConstructorInfo item in ZConstructors)
+            if (this.SharpType != typeof(string) 
+                && this.SharpType != typeof(object)
+                 && this.SharpType != typeof(char)
+                 && this.SharpType != typeof(bool)
+                 && this.SharpType != typeof(int)
+                 && this.SharpType != typeof(float)
+                 && this.SharpType != typeof(double)
+                 && this.SharpType != typeof(byte)
+                 && this.SharpType != typeof(sbyte)
+                 && this.SharpType != typeof(short)
+                )
             {
-                if (item.HasZConstructorDesc(znew))
+
+
+                foreach (ZLConstructorInfo item in ZConstructors)
                 {
-                    constructors.Add(item);
+                    if (item.Constructor.IsPublic)
+                    {
+                        if (item.HasZConstructorDesc(znew))
+                        {
+                            constructors.Add(item);
+                        }
+                    }
                 }
             }
             return constructors.ToArray();
@@ -272,15 +296,46 @@ namespace ZCompileDesc.Descriptions
         public ZLMethodInfo[] SearchDeclaredZMethod(ZMethodCall zcall)
         {
             List<ZLMethodInfo> methods = new List<ZLMethodInfo>();
-            var ZMethods = this.ZMethods; //.GetZMethods();
-            foreach (var item in ZMethods)
+            foreach (var item in this.ZMethods)
             {
                 if (item.HasZProcDesc(zcall))
                 {
                     methods.Add(item);
                 }
             }
+            if(methods.Count>1)
+            {
+                ZLMethodInfo tempMethod = methods[0];
+                for (int i = 1; i < methods.Count; i++)
+                {
+                    var itemMethod =methods[i];
+                    ZTypeCompareEnum compareEnum = ParamCompare(tempMethod, itemMethod);
+                    if(compareEnum== ZTypeCompareEnum.SuperOf)
+                    {
+                        tempMethod = itemMethod;
+                    }
+                }
+                methods.Clear();
+                methods.Add(tempMethod);
+            }
             return methods.ToArray();
+        }
+
+        private static ZTypeCompareEnum ParamCompare(ZLMethodInfo method1, ZLMethodInfo method2)
+        {
+            var parames1 =  method1.ZParams;
+            var parames2 = method2.ZParams;
+            for(int i=0;i<parames1.Length;i++)
+            {
+                var p1 = parames1[i];
+                var p2 = parames2[i];
+                var ztype1 = p1.GetZParamType();
+                var ztype2 = p2.GetZParamType();
+                ZTypeCompareEnum compareEnum = ZDescUtil.Compare(ztype1,ztype2);
+                if (compareEnum != ZTypeCompareEnum.EQ)
+                    return compareEnum;
+            }
+            return ZTypeCompareEnum.EQ;
         }
 
         public ZLMethodInfo[] SearchDeclaredZMethod(ZCMethodDesc zcall)

@@ -8,10 +8,14 @@ namespace ZCompileNLP
     {
         static ConfigManager()
         {
-            var domainDir = AppDomain.CurrentDomain.BaseDirectory;
-            var configFileDir = Path.Combine(domainDir, "Resources");
-            ConfigManager.ConfigFileBaseDir = configFileDir;
+            //var domainDir = AppDomain.CurrentDomain.BaseDirectory;
+            //var configFileDir = Path.Combine(domainDir, "NlpRes");
+            //ConfigManager.ConfigFileBaseDir = configFileDir;
+
+            ConfigManager.ConfigFileBaseDir = "ZCompileNLP.NlpRes.";
         }
+
+        public static bool LoadMainDictFile { get; set; }
 
         public static string ConfigFileBaseDir
         {
@@ -19,44 +23,44 @@ namespace ZCompileNLP
             set;
         }
 
-        public static string YugeFile
-        {
-            get { return Path.Combine(ConfigFileBaseDir, "yuge.txt"); }
-        }
+        //public static string YugeFile
+        //{
+        //    get { return ConfigFileBaseDir +"yuge.txt";}// Path.Combine(ConfigFileBaseDir, "yuge.txt"); }
+        //}
 
         public static string MainDictFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "dict.txt"); }
+            get { return ConfigFileBaseDir +"dict.txt";}// Path.Combine(ConfigFileBaseDir, "dict.txt"); }
         }
 
         public static string ProbTransFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "prob_trans.json"); }
+            get { return ConfigFileBaseDir + "prob_trans.json"; }// Path.Combine(ConfigFileBaseDir, "prob_trans.json"); }
         }
 
         public static string ProbEmitFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "prob_emit.json"); }
+            get { return ConfigFileBaseDir + "prob_emit.json"; }// Path.Combine(ConfigFileBaseDir, "prob_emit.json"); }
         }
 
         public static string PosProbStartFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "pos_prob_start.json"); }
+            get { return ConfigFileBaseDir + "pos_prob_start.json"; }// Path.Combine(ConfigFileBaseDir, "pos_prob_start.json"); }
         }
 
         public static string PosProbTransFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "pos_prob_trans.json"); }
+            get { return ConfigFileBaseDir + "pos_prob_trans.json"; }// Path.Combine(ConfigFileBaseDir, "pos_prob_trans.json"); }
         }
 
         public static string PosProbEmitFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "pos_prob_emit.json"); }
+            get { return ConfigFileBaseDir + "pos_prob_emit.json"; }// Path.Combine(ConfigFileBaseDir, "pos_prob_emit.json"); }
         }
 
         public static string CharStateTabFile
         {
-            get { return Path.Combine(ConfigFileBaseDir, "char_state_tab.json"); }
+            get { return ConfigFileBaseDir + "char_state_tab.json"; }// Path.Combine(ConfigFileBaseDir, "char_state_tab.json"); }
         }
     }
 }

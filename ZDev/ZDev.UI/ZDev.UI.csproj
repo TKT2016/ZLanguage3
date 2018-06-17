@@ -209,13 +209,13 @@
       <Project>{d6ed0d5e-d787-4aa6-b814-13ecd88ca14a}</Project>
       <Name>ZCompileDesc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ZCompileCore\ZCompileKit\ZCompileKit.csproj">
-      <Project>{0744fe01-7ebf-42ca-ac05-869ec1d24f6c}</Project>
-      <Name>ZCompileKit</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\ZCompileCore\ZCompiler\ZCompiler.csproj">
       <Project>{e67a9e30-33bf-4396-8ead-2d100b3db84a}</Project>
       <Name>ZCompiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZCompileCore\ZExcel开发包\ZExcel开发包.csproj">
+      <Project>{b1a8bdfb-0859-4af4-a1f7-5e5cfe971e09}</Project>
+      <Name>ZExcel开发包</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ZCompileCore\ZLangRT\ZLangRT.csproj">
       <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
