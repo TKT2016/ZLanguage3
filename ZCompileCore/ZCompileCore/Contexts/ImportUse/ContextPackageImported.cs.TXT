@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ZCompileDesc.Descriptions;
+
+namespace ZCompileCore.Contexts
+{
+    public class ContextPackageImported
+    { 
+        private ZPackageInfo ZPackage;
+        private Dictionary<string, ZLDimInfo> DimTable = new Dictionary<string, ZLDimInfo>();
+        private Dictionary<string, ZLEnumInfo> EnumTable = new Dictionary<string, ZLEnumInfo>();
+        private Dictionary<string, ZLClassInfo> ClassTable = new Dictionary<string, ZLClassInfo>();
+
+        public ContextPackageImported(ZPackageInfo zpackage)
+        {
+            ZPackage = zpackage;
+            ImportPackageTypes();
+        }
+
+        private void ImportPackageTypes()
+        {
+            foreach (var item in ZPackage.EnumTypes)
+            {
+                EnumTable.Add(item.ZTypeName, item);
+            }
+
+            foreach (var item in ZPackage.ClassTypes)
+            {
+                ClassTable.Add(item.ZTypeName, item);
+            }
+
+            foreach (ZLDimInfo item in ZPackage.DimTypes)
+            {
+                DimTable.Add(item.ZName, item);
+            }
+        }
+
+        public string PackageName
+        {
+            get
+            {
+                return this.ZPackage.Name;
+            }
+        }
+    }
+}
