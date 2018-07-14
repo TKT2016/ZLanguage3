@@ -1,5 +1,0 @@
-<runtime>
-	<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-	<probing privatePath="E:/MySource/Zyy/Z6/ZCompileCore/ZCompiler/bin/Debug"/>
-	 </assemblyBinding>
-</runtime>
