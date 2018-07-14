@@ -1,0 +1,13 @@
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\ZExcel开发包.dll
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\ZExcel开发包.pdb
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\EPPlus.dll
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\ZLangRT.dll
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\Z标准包.dll
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\Z语言系统.dll
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\ZLangRT.pdb
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\Z标准包.pdb
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\Z语言系统.pdb
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\bin\Debug\EPPlus.xml
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\obj\Debug\ZExcel开发包.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\obj\Debug\ZExcel开发包.dll
+E:\MySource\Zyy\Z6\ZCompileCore\ZExcel开发包\obj\Debug\ZExcel开发包.pdb

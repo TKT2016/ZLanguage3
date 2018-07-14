@@ -1,0 +1,6 @@
+E:\MySource\Zyy\Z6\ZDev\ZDev.RunExe\bin\Debug\ZDev.RunExe.exe.config
+E:\MySource\Zyy\Z6\ZDev\ZDev.RunExe\bin\Debug\ZDev.RunExe.exe
+E:\MySource\Zyy\Z6\ZDev\ZDev.RunExe\bin\Debug\ZDev.RunExe.pdb
+E:\MySource\Zyy\Z6\ZDev\ZDev.RunExe\obj\Debug\ZDev.RunExe.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z6\ZDev\ZDev.RunExe\obj\Debug\ZDev.RunExe.exe
+E:\MySource\Zyy\Z6\ZDev\ZDev.RunExe\obj\Debug\ZDev.RunExe.pdb

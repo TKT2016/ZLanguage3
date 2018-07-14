@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D52C5BD7-DD7D-459A-9953-8B3972FDF2B1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Z标准包</RootNamespace>
+    <AssemblyName>Z标准包</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="操作系统\0\KeyboardHook.cs" />
+    <Compile Include="操作系统\0\MouseHook.cs" />
+    <Compile Include="操作系统\GetWindowCmd.cs" />
+    <Compile Include="操作系统\IntPtrHelper.cs" />
+    <Compile Include="操作系统\ShortcutCreator.cs" />
+    <Compile Include="操作系统\User32.cs" />
+    <Compile Include="操作系统\0\Win32Api.cs" />
+    <Compile Include="操作系统\回收站.cs" />
+    <Compile Include="操作系统\定时器.cs" />
+    <Compile Include="操作系统\快捷方式操作器.cs" />
+    <Compile Include="操作系统\操作系统配置器.cs" />
+    <Compile Include="操作系统\桌面背景显示方式.cs" />
+    <Compile Include="操作系统\电脑.cs" />
+    <Compile Include="操作系统\程序令牌.cs" />
+    <Compile Include="操作系统\剪贴板.cs" />
+    <Compile Include="操作系统\剪贴板数据格式.cs" />
+    <Compile Include="操作系统\注册表操作器.cs" />
+    <Compile Include="操作系统\进程窗口.cs" />
+    <Compile Include="操作系统\进程窗口操作器.cs" />
+    <Compile Include="操作系统\进程.cs" />
+    <Compile Include="设备\光驱控制器.cs" />
+    <Compile Include="设备\喇叭控制器.cs" />
+    <Compile Include="设备\显示器.cs" />
+    <Compile Include="设备\硬盘.cs" />
+    <Compile Include="设备\驱动器.cs" />
+    <Compile Include="设备\驱动器控制器.cs" />
+    <Content Include="操作系统\0txt\进程操作.cs.TXT" />
+    <Content Include="操作系统\0txt\进程2.cs.TXT" />
+    <Content Include="操作系统\0txt\进程启动体.cs.TXT" />
+    <Compile Include="操作系统\进程操作器.cs" />
+    <Compile Include="操作系统\注册表键.cs" />
+    <Compile Include="操作系统\注册表项.cs" />
+    <Compile Include="文件系统\文件系统操作器.cs" />
+    <Compile Include="文件系统\文件系统节点.cs" />
+    <Compile Include="文件系统\文件.cs" />
+    <Compile Include="文件系统\文件夹.cs" />
+    <Compile Include="桌面控件\0\光标.cs" />
+    <Compile Include="桌面控件\0\尺寸.cs" />
+    <Compile Include="桌面控件\ZPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="桌面控件\控件.cs" />
+    <Compile Include="桌面控件\控件管理器.cs" />
+    <Compile Include="桌面控件\0\桌面定时器.cs" />
+    <Compile Include="桌面控件\ZButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="桌面控件\ZForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="桌面控件\按钮.cs" />
+    <Compile Include="桌面控件\点.cs" />
+    <Compile Include="桌面控件\面板.cs" />
+    <Compile Include="桌面控件\窗体.cs" />
+    <Compile Include="桌面控件\0\键盘参数.cs" />
+    <Compile Include="桌面控件\键盘按键.cs" />
+    <Compile Include="桌面控件\0\鼠标参数.cs" />
+    <Compile Include="桌面控件\0\鼠标按键.cs" />
+    <Compile Include="绘图\0\位图.cs" />
+    <Compile Include="绘图\0\图片辅助.cs" />
+    <Compile Include="绘图\FontUtil.cs" />
+    <Compile Include="绘图\字体辅助.cs" />
+    <Compile Include="绘图\字形.cs" />
+    <Compile Include="绘图\字体.cs" />
+    <Compile Include="文件系统\图片.cs" />
+    <Compile Include="绘图\动画窗体.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="绘图\字形风格.cs" />
+    <Compile Include="绘图\形状\圆.cs" />
+    <Compile Include="绘图\形状\椭圆.cs" />
+    <Compile Include="绘图\形状\点辅助.cs" />
+    <Compile Include="绘图\形状\矩形.cs" />
+    <Compile Include="绘图\形状\线段.cs" />
+    <Compile Include="绘图\0\文本块.cs" />
+    <Compile Include="绘图\0\画笔.cs" />
+    <Compile Include="绘图\0\笔刷.cs" />
+    <Compile Include="绘图\0\笔刷库.cs" />
+    <Compile Include="绘图\0\线性渐变笔刷.cs" />
+    <Compile Include="绘图\绘图器.cs" />
+    <Compile Include="绘图\绘图窗体.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="绘图\0\绘图辅助.cs" />
+    <Compile Include="绘图\颜色.cs" />
+    <Compile Include="网络\HttpHelper.cs" />
+    <Compile Include="网络\IP地址.cs" />
+    <Compile Include="网络\PictureDownUtil.cs" />
+    <Compile Include="网络\SocketHttpRequest.cs" />
+    <Compile Include="网络\网址.cs" />
+    <Compile Include="网络\网络操作.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZLangRT\ZLangRT.csproj">
+      <Project>{bdbcdf64-058a-4f6f-a0d9-f74b4f564dd2}</Project>
+      <Name>ZLangRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Z语言系统\Z语言系统.csproj">
+      <Project>{c868dd87-84b4-43f0-a984-6a8dd701c38d}</Project>
+      <Name>Z语言系统</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

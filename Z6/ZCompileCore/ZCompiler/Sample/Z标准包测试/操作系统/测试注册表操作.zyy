@@ -1,0 +1,21 @@
+﻿说明:测试注册表操作
+
+导入包:Z语言系统,Z标准包/操作系统
+导入类:注册表操作器，控制台
+属于:唯一类型
+
+启动:
+	 A=注册表项( "HKEY_CLASSES_ROOT\*\zyytest\") 
+	 创建A
+	 B = 注册表键( "HKEY_CLASSES_ROOT\*\zyytest\"，"B")
+	 创建B
+	 B写入数据"test"
+	 C = 注册表键( "HKEY_CLASSES_ROOT\*\zyytest\"，"C")
+	 创建C
+	 C写入数据"test C2"
+	 B读取数据=>B1
+	 控制台打印B1，换行
+	 B写入数据"BBBBB"
+	 B读取数据=>B1
+	控制台打印B1，换行
+	控制台等待按键

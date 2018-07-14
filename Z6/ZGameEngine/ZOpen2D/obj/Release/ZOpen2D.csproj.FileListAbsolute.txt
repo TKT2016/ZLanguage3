@@ -1,0 +1,7 @@
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\bin\Release\ZOpen2D.dll
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\bin\Release\ZOpen2D.pdb
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\bin\Release\OpenTK.dll
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\bin\Release\OpenTK.GLControl.dll
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\obj\Release\ZOpen2D.csprojResolveAssemblyReference.cache
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\obj\Release\ZOpen2D.dll
+E:\MySource\Zyy\Z6\ZGameEngine\ZOpen2D\obj\Release\ZOpen2D.pdb
